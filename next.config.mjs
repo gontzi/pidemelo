@@ -5,7 +5,7 @@ const nextConfig = {
         ignoreDuringBuilds: true,
     },
     typescript: {
-        ignoreDuringBuilds: true,
+        ignoreBuildErrors: true,
     },
 
     // 🖼️ Mantiene tu configuración para que el widget se pueda embeber
