@@ -40,7 +40,6 @@ export default function Home() {
             </SignedIn>
 
             <div className="flex flex-col items-center gap-2 opacity-60">
-              <p className="text-sm text-zinc-500 font-bold uppercase tracking-widest">Cero euros al mes. Cero tonterías.</p>
               <p className="text-xs text-zinc-400 font-medium italic">"Ideal para creadores que valoran su salud mental" — Un tío de Twitter.</p>
             </div>
           </div>
@@ -86,7 +85,7 @@ export default function Home() {
       </main>
 
       <footer className="py-10 text-center border-t border-zinc-100 opacity-50 text-sm font-bold">
-        Hecho con un poco de café y mucha ironía. pidemelo.app © {new Date().getFullYear()}
+        Hecho con un poco de colacao y mucha ironía por <a href="https://ka0s.site/me" target="_blank" className="text-[#FF5C00]">Gontzi</a> de <a href="https://tunuevosoftware.com" target="_blank" className="text-[#ffd400]">TuNuevoSoftware</a>
       </footer>
     </>
   );
