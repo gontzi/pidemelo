@@ -9,6 +9,7 @@ import DashboardClient from "./DashboardClient";
 import SettingsModal from "./SettingsModal";
 import { ExternalLink, ArrowLeft, Settings } from "lucide-react";
 
+export const runtime = 'edge';
 export const dynamic = 'force-dynamic';
 
 export default async function BoardDashboardPage({ params }: { params: { id: string } }) {

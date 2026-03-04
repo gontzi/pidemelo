@@ -5,6 +5,7 @@ import { notFound } from "next/navigation";
 import PublicBoardClient from "../../board/[slug]/PublicBoardClient";
 import SubmitIdeaForm from "../../board/[slug]/SubmitIdeaForm";
 
+export const runtime = 'edge';
 export const dynamic = 'force-dynamic';
 
 export default async function WidgetPage({ params }: { params: { slug: string } }) {

@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import Link from "next/link";
 import { createBoard } from "./actions";
 
+export const runtime = 'edge';
 export const dynamic = 'force-dynamic';
 
 import ProjectCard from "./ProjectCard";
