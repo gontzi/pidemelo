@@ -23,7 +23,7 @@ export const metadata: Metadata = {
   description: 'El tablón de peticiones definitivo para mentes inquietas.',
 }
 
-import Navbar from '@/components/Navbar'
+import ClientWrapper from '@/components/ClientWrapper'
 
 export default function RootLayout({
   children,
@@ -34,10 +34,9 @@ export default function RootLayout({
     <ClerkProvider>
       <html lang="es">
         <body className={`${instrument.variable} ${outfit.variable} ${jakarta.variable} font-sans bg-[#FAFAFA] text-zinc-900 min-h-screen selection:bg-[#FF5C00]/20 selection:text-zinc-900`}>
-          <Navbar />
-          <div className="pt-4">
+          <ClientWrapper>
             {children}
-          </div>
+          </ClientWrapper>
         </body>
       </html>
     </ClerkProvider>

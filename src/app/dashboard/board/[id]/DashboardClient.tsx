@@ -22,9 +22,9 @@ type Idea = {
 };
 
 const columnsConfig = [
-    { id: 'pending', title: '🤔 Pendiente', color: 'bg-zinc-100 border-zinc-200' },
-    { id: 'planned', title: '🏗️ Planeado', color: 'bg-orange-50/50 border-orange-100' },
-    { id: 'done', title: '✅ Completado', color: 'bg-green-50/50 border-green-100' }
+    { id: 'pending', title: '🤔 Pendiente', color: 'bg-zinc-100/50 border-zinc-200/50' },
+    { id: 'planned', title: '🏗️ Planeado', color: 'bg-orange-50/50 border-orange-100/40' },
+    { id: 'done', title: '✅ Completado', color: 'bg-green-50/50 border-green-100/40' }
 ] as const;
 
 export default function DashboardClient({ initialIdeas, boardId }: { initialIdeas: Idea[], boardId: string }) {
@@ -105,12 +105,12 @@ export default function DashboardClient({ initialIdeas, boardId }: { initialIdea
                 </DialogContent>
             </Dialog>
             <DragDropContext onDragEnd={onDragEnd}>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 h-full pb-10">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-8 h-full">
                     {columnsConfig.map(col => (
-                        <div key={col.id} className={`flex flex-col h-full rounded-[2rem] border p-5 bg-white ${col.color}`}>
-                            <div className="flex items-center justify-between mb-5 px-1 tracking-tight">
-                                <h3 className="font-heading font-extrabold text-lg text-zinc-900">{col.title}</h3>
-                                <span className="bg-white border border-zinc-200 text-zinc-600 font-bold text-xs px-2.5 py-1 rounded-full shadow-sm">
+                        <div key={col.id} className={`flex flex-col h-full rounded-[2.5rem] border p-8 ${col.color}`}>
+                            <div className="flex items-center justify-between mb-8 px-2">
+                                <h3 className="text-xl font-black tracking-tighter text-zinc-900 uppercase tracking-widest text-[10px] opacity-60">{col.title}</h3>
+                                <span className="bg-white/80 backdrop-blur-sm border border-zinc-200/50 text-zinc-900 font-black text-[10px] px-3 py-1 rounded-full shadow-sm">
                                     {ideas.filter(i => i.status === col.id).length}
                                 </span>
                             </div>
@@ -120,40 +120,42 @@ export default function DashboardClient({ initialIdeas, boardId }: { initialIdea
                                     <div
                                         ref={provided.innerRef}
                                         {...provided.droppableProps}
-                                        className={`flex-1 transition-colors rounded-2xl min-h-[200px] ${snapshot.isDraggingOver ? 'bg-zinc-50/80 ring-2 ring-zinc-200 ring-inset' : ''}`}
+                                        className={`flex-1 transition-all rounded-[1.5rem] p-1 ${snapshot.isDraggingOver ? 'bg-white/40' : ''}`}
                                     >
-                                        <div className="space-y-4">
+                                        <div className="space-y-6">
                                             {ideas.filter(i => i.status === col.id).map((idea, index) => (
                                                 <Draggable key={idea.id} draggableId={idea.id} index={index}>
                                                     {(provided, snapshot) => (
                                                         <div
                                                             ref={provided.innerRef}
                                                             {...provided.draggableProps}
-                                                            className={`p-5 bg-white border rounded-2xl group transition-all
-                              ${snapshot.isDragging ? 'shadow-xl shadow-zinc-200 border-[#FF5C00] scale-[1.02] rotate-1' : 'border-zinc-200 hover:border-zinc-300 hover:shadow-md'}`}
+                                                            className={`p-8 bg-white border rounded-[2rem] group transition-all duration-300
+                                                                ${snapshot.isDragging
+                                                                    ? 'shadow-2xl shadow-orange-500/20 border-[#FF5C00] scale-[1.05] rotate-2'
+                                                                    : 'border-zinc-200/60 shadow-sm hover:shadow-xl hover:shadow-zinc-200/50 hover:border-[#FF5C00]/20'}`}
                                                             style={provided.draggableProps.style}
                                                         >
-                                                            <div className="flex justify-between items-start gap-2 mb-3">
+                                                            <div className="flex justify-between items-start gap-3 mb-4">
                                                                 <div
                                                                     {...provided.dragHandleProps}
-                                                                    className="cursor-grab active:cursor-grabbing p-1.5 -ml-2 -mt-1 text-zinc-300 hover:text-zinc-500 rounded-lg hover:bg-zinc-50"
+                                                                    className="cursor-grab active:cursor-grabbing p-2 -ml-3 -mt-2 text-zinc-200 hover:text-[#FF5C00] transition-colors rounded-xl"
                                                                 >
-                                                                    <GripVertical className="w-4 h-4" />
+                                                                    <GripVertical className="w-5 h-5" />
                                                                 </div>
-                                                                <h4 className="font-bold text-zinc-900 leading-tight flex-1 tracking-tight">{idea.title}</h4>
+                                                                <h4 className="font-black text-xl text-zinc-900 leading-tight flex-1 tracking-tighter">{idea.title}</h4>
                                                                 <button
                                                                     onClick={(e) => { e.preventDefault(); handleDelete(idea.id); }}
-                                                                    className="text-zinc-300 hover:text-red-500 hover:bg-red-50 p-1.5 rounded-lg transition-colors shrink-0 -mt-1 -mr-2 opacity-0 group-hover:opacity-100"
+                                                                    className="text-zinc-200 hover:text-white hover:bg-red-500 p-2 rounded-xl transition-all shrink-0 -mt-2 -mr-3 opacity-0 group-hover:opacity-100 active:scale-95"
                                                                 >
                                                                     <Trash2 className="w-4 h-4" />
                                                                 </button>
                                                             </div>
 
-                                                            <p className="text-sm text-zinc-500 line-clamp-3 mb-4 leading-relaxed font-medium">{idea.description}</p>
+                                                            <p className="text-sm text-zinc-500 line-clamp-2 mb-6 leading-relaxed font-bold tracking-tight">{idea.description}</p>
 
-                                                            <div className="flex items-center">
-                                                                <span className="flex items-center gap-1.5 text-xs font-bold text-zinc-600 bg-[#FAFAFA] border border-zinc-200 px-3 py-1.5 rounded-full shadow-sm">
-                                                                    <span className="text-[#FF5C00]">▲</span> {idea.votesCount} {idea.votesCount === 1 ? 'voto' : 'votos'}
+                                                            <div className="flex items-center justify-between">
+                                                                <span className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-[#FF5C00] bg-orange-50 border border-orange-100 px-4 py-2 rounded-full shadow-sm">
+                                                                    <span className="text-sm">▲</span> {idea.votesCount} {idea.votesCount === 1 ? 'VOTO' : 'VOTOS'}
                                                                 </span>
                                                             </div>
                                                         </div>
