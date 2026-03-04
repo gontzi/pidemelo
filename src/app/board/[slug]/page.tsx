@@ -5,6 +5,8 @@ import { notFound } from "next/navigation";
 import PublicBoardClient from "./PublicBoardClient";
 import SubmitIdeaForm from "./SubmitIdeaForm";
 
+export const dynamic = 'force-dynamic';
+
 export default async function PublicBoardPage({ params }: { params: { slug: string } }) {
     const board = await db.query.boards.findFirst({
         where: eq(boards.slug, params.slug),
