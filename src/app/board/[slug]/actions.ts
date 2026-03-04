@@ -6,7 +6,8 @@ import { and, eq, desc } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { cookies, headers } from "next/headers";
 import { v4 as uuidv4 } from 'uuid';
-import crypto from 'crypto';
+
+// 🛠️ Eliminado: import crypto from 'crypto';
 
 function getFingerprint() {
     const cookieStore = cookies();
@@ -14,18 +15,24 @@ function getFingerprint() {
 
     if (!fingerprint) {
         fingerprint = uuidv4();
-        cookies().set('voter-id', fingerprint, { maxAge: 60 * 60 * 24 * 365 }); // 1 year
+        // Nota: En Server Actions de Next.js, cookies().set() funciona directamente
+        cookies().set('voter-id', fingerprint, { maxAge: 60 * 60 * 24 * 365 });
     }
 
     return fingerprint;
 }
 
-function getIpHash() {
+// 🌐 Versión compatible con Edge Runtime (Web Crypto API)
+async function getIpHash() {
     const fallback = 'unknown';
     const forwardedFor = headers().get('x-forwarded-for') || fallback;
     const ip = forwardedFor.split(',')[0].trim();
-    // Using a simple SHA-256 hash of the IP for anonymity
-    return crypto.createHash('sha256').update(ip).digest('hex');
+
+    // Usamos la API nativa de Edge
+    const msgUint8 = new TextEncoder().encode(ip);
+    const hashBuffer = await crypto.subtle.digest('SHA-256', msgUint8);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
 }
 
 export async function submitIdea(boardId: string, slug: string, formData: FormData) {
@@ -34,7 +41,8 @@ export async function submitIdea(boardId: string, slug: string, formData: FormDa
 
     if (!title || !description) return { error: "Faltan campos." };
 
-    const ipHash = getIpHash();
+    // ⚡️ IMPORTANTE: Ahora necesitamos await porque el hash es asíncrono
+    const ipHash = await getIpHash();
     const COOLDOWN_MINUTES = 5;
 
     // Verificar cooldown
@@ -60,7 +68,8 @@ export async function submitIdea(boardId: string, slug: string, formData: FormDa
 
         revalidatePath(`/board/${slug}`);
         return { success: true };
-    } catch {
+    } catch (e) {
+        console.error(e);
         return { error: "Hubo un error al guardar tu petición." };
     }
 }
