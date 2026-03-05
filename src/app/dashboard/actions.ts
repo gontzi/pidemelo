@@ -21,7 +21,7 @@ export async function createBoard(formData: FormData) {
 
     if (!isPremium) {
         const boardCount = await db.select({ count: count() }).from(boards).where(eq(boards.userId, userId));
-        if (boardCount[0].count >= 1) {
+        if (boardCount[0].count >= 3) {
             redirect("/dashboard/billing?limit=true");
         }
     }

@@ -1,5 +1,5 @@
 import { db } from "@/db";
-import { boards } from "@/db/schema";
+import { boards, users } from "@/db/schema";
 import { auth } from "@clerk/nextjs/server";
 import { eq } from "drizzle-orm";
 import { Button } from "@/components/ui/button";
@@ -16,10 +16,15 @@ export default async function Dashboard() {
     const { userId } = auth();
     if (!userId) return null;
 
+    const user = await db.query.users.findFirst({ where: eq(users.id, userId) });
+    const isPremium = user?.isPremium || false;
+
     const userBoards = await db.query.boards.findMany({
         where: eq(boards.userId, userId),
         orderBy: (boards, { desc }) => [desc(boards.createdAt)],
     });
+
+    const isLimitReached = !isPremium && userBoards.length >= 3;
 
     return (
         <div className="min-h-screen bg-[#F3F4F6] p-6 md:p-12 pt-32">
@@ -27,11 +32,25 @@ export default async function Dashboard() {
 
                 <section className="flex flex-col md:flex-row md:items-end justify-between gap-8">
                     <div className="space-y-2">
-                        <p className="text-[10px] uppercase tracking-[0.3em] font-black text-zinc-400">Administración</p>
+                        <div className="flex items-center gap-3">
+                            <p className="text-[10px] uppercase tracking-[0.3em] font-black text-zinc-400">Administración</p>
+                            <span className={`text-[10px] font-black px-2 py-0.5 rounded-full ${isLimitReached ? 'bg-orange-100 text-[#FF5C00]' : 'bg-emerald-100 text-emerald-600'}`}>
+                                {isPremium ? '♾️ Proyectos ilimitados' : `${userBoards.length}/3 Proyectos usado`}
+                            </span>
+                        </div>
                         <h1 className="text-5xl font-black tracking-tighter text-zinc-900 leading-none">Mis Tableros</h1>
                     </div>
 
-                    <div className="bg-white border border-zinc-200/60 p-6 rounded-[2rem] shadow-xl shadow-zinc-200/30 flex-1 max-w-xl">
+                    <div className="bg-white border border-zinc-200/60 p-6 rounded-[2rem] shadow-xl shadow-zinc-200/30 flex-1 max-w-xl relative overflow-hidden group">
+                        {isLimitReached && (
+                            <div className="absolute inset-0 bg-white/60 backdrop-blur-[1px] z-10 flex items-center justify-center animate-in fade-in duration-300">
+                                <Link href="/dashboard/billing">
+                                    <Button className="bg-zinc-900 text-white hover:bg-[#FF5C00] font-black text-xs tracking-widest uppercase h-12 rounded-full px-8 shadow-2xl transition-all hover:scale-105 active:scale-95">
+                                        ⚡ Subir a Pro para crear más
+                                    </Button>
+                                </Link>
+                            </div>
+                        )}
                         <form action={createBoard} className="flex flex-col sm:flex-row gap-4 items-end">
                             <div className="flex-1 w-full space-y-2">
                                 <label htmlFor="name" className="text-[10px] uppercase tracking-widest font-black text-zinc-400 ml-1">Nuevo Chiringuito</label>
@@ -40,10 +59,15 @@ export default async function Dashboard() {
                                     name="name"
                                     placeholder="Nombre del proyecto..."
                                     required
+                                    disabled={isLimitReached}
                                     className="h-14 shadow-none border-zinc-100 focus-visible:ring-[#FF5C00] focus-visible:border-[#FF5C00] bg-zinc-50 rounded-2xl text-lg px-4 font-bold"
                                 />
                             </div>
-                            <Button type="submit" className="h-14 px-10 bg-[#FF5C00] text-white hover:bg-[#E65300] shadow-lg shadow-orange-500/20 rounded-full font-black text-sm tracking-widest uppercase transition-all hover:scale-105 active:scale-95 shrink-0">
+                            <Button
+                                type="submit"
+                                disabled={isLimitReached}
+                                className="h-14 px-10 bg-[#FF5C00] text-white hover:bg-[#E65300] shadow-lg shadow-orange-500/20 rounded-full font-black text-sm tracking-widest uppercase transition-all hover:scale-105 active:scale-95 shrink-0"
+                            >
                                 CREAR 🚀
                             </Button>
                         </form>
