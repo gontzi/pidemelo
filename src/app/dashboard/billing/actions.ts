@@ -35,7 +35,7 @@ export async function checkoutAction(formData: FormData) {
     }
 
     try {
-        console.log(`🚀 Iniciando checkout para el producto ${productId} (Usuario: ${userId})`);
+
 
         // 3. Llamada a la API de Polar
         const response = await fetch("https://api.polar.sh/api/v1/checkouts/", {

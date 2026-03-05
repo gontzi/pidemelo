@@ -3,9 +3,7 @@ import { users } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import { headers } from "next/headers";
 import { NextResponse } from "next/server";
-import { Webhook } from "standardwebhooks"; // ¡Usamos la librería estándar!
-
-// 🚫 Adiós import crypto from "crypto";
+import { Webhook } from "standardwebhooks";
 
 export const runtime = 'edge';
 
@@ -16,7 +14,6 @@ export const runtime = 'edge';
 export async function POST(req: Request) {
     const body = await req.text();
     const headersList = headers();
-
     const webhookSecret = process.env.POLAR_WEBHOOK_SECRET;
 
     if (!webhookSecret) {
@@ -28,16 +25,12 @@ export async function POST(req: Request) {
     let payload: any;
     try {
         const wh = new Webhook(webhookSecret);
-        // Construimos el objeto de headers que espera la librería
         const whHeaders = {
             "webhook-id": headersList.get("webhook-id") || "",
             "webhook-signature": headersList.get("webhook-signature") || "",
             "webhook-timestamp": headersList.get("webhook-timestamp") || "",
         };
-
-        // Verifica y parsea el JSON a la vez
         payload = wh.verify(body, whHeaders);
-
     } catch (err) {
         console.warn("⚠️ Intento de webhook con firma inválida o faltan headers", err);
         return NextResponse.json({ error: "Invalid signature" }, { status: 401 });
@@ -46,49 +39,57 @@ export async function POST(req: Request) {
     const eventType = payload.type;
     const data = payload.data;
 
-    console.log(`✉️ Webhook recibido de Polar: ${eventType}`);
+
+
+    // Intentamos extraer el clerkId de varias fuentes posibles
+    const clerkId = data.metadata?.clerkId ||
+        data.customer_metadata?.clerkId ||
+        data.custom_field_data?.clerkId;
 
     try {
         switch (eventType) {
-            // CASO: Compra única (Plan Lifetime)
             case "order.created": {
-                const clerkUserId = data.customer_metadata?.clerkId || data.metadata?.clerkId;
+                // Una orden puede ser por una suscripción (pro) o por un pago único (lifetime)
+                const isSubscriptionOrder = !!data.subscription_id;
+                const plan = isSubscriptionOrder ? 'pro' : 'lifetime';
+                const subscriptionId = data.subscription_id || null;
 
-                if (clerkUserId) {
+                if (clerkId) {
+
                     await db.insert(users)
                         .values({
-                            id: clerkUserId,
+                            id: clerkId,
                             isPremium: true,
-                            plan: 'lifetime',
+                            plan: plan,
+                            subscriptionId: subscriptionId,
                             updatedAt: new Date(),
                         })
                         .onConflictDoUpdate({
                             target: users.id,
                             set: {
                                 isPremium: true,
-                                plan: 'lifetime',
+                                plan: plan,
+                                subscriptionId: subscriptionId,
                                 updatedAt: new Date(),
                             }
                         });
-                    console.log(`✅ Usuario ${clerkUserId} actualizado a Lifetime`);
+
                 }
                 break;
             }
 
-            // CASO: Suscripción nueva o actualizada (Plan Mensual Pro)
             case "subscription.created":
             case "subscription.updated": {
-                const clerkUserId = data.customer_metadata?.clerkId || data.metadata?.clerkId;
-                const subscriptionId = data.id;
                 const status = data.status; // 'active', 'trialing', etc.
+                const subscriptionId = data.id;
+                const isPremium = status === 'active' || status === 'trialing';
 
-                if (clerkUserId) {
-                    const isPremium = status === 'active' || status === 'trialing';
+                if (clerkId) {
 
                     await db.insert(users)
                         .values({
-                            id: clerkUserId,
-                            isPremium,
+                            id: clerkId,
+                            isPremium: isPremium,
                             plan: isPremium ? 'pro' : null,
                             subscriptionId: subscriptionId,
                             updatedAt: new Date(),
@@ -96,22 +97,22 @@ export async function POST(req: Request) {
                         .onConflictDoUpdate({
                             target: users.id,
                             set: {
-                                isPremium,
+                                isPremium: isPremium,
                                 plan: isPremium ? 'pro' : null,
                                 subscriptionId: subscriptionId,
                                 updatedAt: new Date(),
                             }
                         });
-                    console.log(`✅ Suscripción ${status} para usuario ${clerkUserId}`);
+
                 }
                 break;
             }
 
-            // CASO: Cancelaciones, impagos o revocaciones
             case "subscription.canceled":
             case "subscription.revoked":
             case "subscription.past_due": {
                 const subscriptionId = data.id;
+
 
                 if (subscriptionId) {
                     await db.update(users)
@@ -121,18 +122,18 @@ export async function POST(req: Request) {
                             updatedAt: new Date(),
                         })
                         .where(eq(users.subscriptionId, subscriptionId));
-                    console.log(`❌ Suscripción ${subscriptionId} desactivada / Impagada`);
+
                 }
                 break;
             }
 
             default:
-                console.log(`ℹ️ Evento no manejado: ${eventType}`);
+
         }
 
         return NextResponse.json({ received: true }, { status: 200 });
     } catch (error) {
-        console.error("🔥 Error procesando webhook de Polar:", error);
+        console.error("🔥 Error crítico en Webhook de Polar:", error);
         return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
     }
 }
