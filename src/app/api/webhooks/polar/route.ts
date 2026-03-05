@@ -8,40 +8,42 @@ export const runtime = 'edge';
 
 /**
  * Webhook Handler de Polar.sh
- * Implementación de máxima compatibilidad para Cloudflare Pages
+ * Versión Híbrida (Base64 + Raw UTF-8) para claves polar_whs_
  */
 export async function POST(req: Request) {
     const body = await req.text();
     const headersList = headers();
     const webhookSecret = process.env.POLAR_WEBHOOK_SECRET;
 
-    // Headers requeridos por Svix/Polar
     const msgId = headersList.get("webhook-id");
     const msgTimestamp = headersList.get("webhook-timestamp");
     const msgSignature = headersList.get("webhook-signature");
 
-    if (!webhookSecret) {
-        return NextResponse.json({ error: "Secret missing" }, { status: 500 });
-    }
-
-    if (!msgId || !msgTimestamp || !msgSignature) {
-        return NextResponse.json({ error: "Missing headers" }, { status: 401 });
+    if (!webhookSecret || !msgId || !msgTimestamp || !msgSignature) {
+        return NextResponse.json({ error: "Missing config" }, { status: 401 });
     }
 
     try {
-        // 1. Limpiar el secreto (Polar lo da como whsec_...)
-        const secretBase64 = webhookSecret.startsWith("whsec_")
-            ? webhookSecret.substring(6)
-            : webhookSecret;
-
-        // 2. Preparar la verificación
         const encoder = new TextEncoder();
         const signedContent = `${msgId}.${msgTimestamp}.${body}`;
 
-        // Decodificar el secreto de Base64 a binario
-        const secretUint8 = Uint8Array.from(atob(secretBase64), c => c.charCodeAt(0));
+        // --- LOGICA DE LLAVE HÍBRIDA ---
+        let secretUint8: Uint8Array;
 
-        // Importar la llave para HMAC SHA-256
+        try {
+            // Si empieza por polar_whs_, la tratamos como texto plano (UTF-8)
+            if (webhookSecret.startsWith("polar_whs_")) {
+                secretUint8 = encoder.encode(webhookSecret);
+            } else {
+                // Si no, probamos a decodificar Base64 (estándar whsec_...)
+                const clean = webhookSecret.startsWith("whsec_") ? webhookSecret.substring(6) : webhookSecret;
+                secretUint8 = Uint8Array.from(atob(clean), c => c.charCodeAt(0));
+            }
+        } catch (e) {
+            // Fallback final: Texto plano
+            secretUint8 = encoder.encode(webhookSecret);
+        }
+
         const key = await crypto.subtle.importKey(
             "raw",
             secretUint8,
@@ -50,7 +52,6 @@ export async function POST(req: Request) {
             ["sign"]
         );
 
-        // 3. Verificar cada firma enviada (pueden venir varias separadas por espacio)
         const signatures = msgSignature.split(" ");
         let isValid = false;
 
@@ -58,14 +59,12 @@ export async function POST(req: Request) {
             const [version, hash] = sig.split(",");
             if (version !== "v1") continue;
 
-            // Generamos nuestro propio hash para comparar
             const signatureBinary = await crypto.subtle.sign(
                 "HMAC",
                 key,
                 encoder.encode(signedContent)
             );
 
-            // Convertimos nuestro binario a Base64 para comparar strings
             const expectedHash = btoa(String.fromCharCode(...new Uint8Array(signatureBinary)));
 
             if (expectedHash === hash) {
@@ -74,85 +73,30 @@ export async function POST(req: Request) {
             }
         }
 
-        if (!isValid) throw new Error("Invalid signature match");
-
+        if (!isValid) throw new Error("Invalid signature");
     } catch (err) {
-        // Si falla la firma, devolvemos 401. 
-        // ⚠️ Si sigues viendo 401, el SECRETO en tus variables de entorno es incorrecto.
         return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    // 4. Lógica de Negocio (Si llegamos aquí, la firma es VÁLIDA)
+    // Lógica de actualización de DB (solo si la firma es válida)
     const payload = JSON.parse(body);
-    const eventType = payload.type;
     const data = payload.data;
+    const clerkId = data.metadata?.clerkId || data.customer_metadata?.clerkId;
 
-    // Buscamos el ID del usuario en cualquier rincón del JSON
-    const clerkId = data.metadata?.clerkId ||
-        data.customer_metadata?.clerkId ||
-        data.custom_field_data?.clerkId ||
-        payload.customer_metadata?.clerkId;
-
-    if (!clerkId) {
-        return NextResponse.json({ received: true, info: "No clerkId found" });
-    }
+    if (!clerkId) return NextResponse.json({ received: true });
 
     try {
-        switch (eventType) {
-            case "order.created": {
-                const isSub = !!data.subscription_id;
-                await db.insert(users)
-                    .values({
-                        id: clerkId,
-                        isPremium: true,
-                        plan: isSub ? 'pro' : 'lifetime',
-                        subscriptionId: data.subscription_id || null,
-                        updatedAt: new Date(),
-                    })
-                    .onConflictDoUpdate({
-                        target: users.id,
-                        set: {
-                            isPremium: true,
-                            plan: isSub ? 'pro' : 'lifetime',
-                            subscriptionId: data.subscription_id || null,
-                            updatedAt: new Date(),
-                        }
-                    });
-                break;
-            }
+        const isSub = !!data.subscription_id;
+        const plan = isSub ? 'pro' : 'lifetime';
+        const subId = data.subscription_id || data.id || null;
 
-            case "subscription.created":
-            case "subscription.updated": {
-                const isPremium = data.status === 'active' || data.status === 'trialing';
-                await db.insert(users)
-                    .values({
-                        id: clerkId,
-                        isPremium,
-                        plan: isPremium ? 'pro' : null,
-                        subscriptionId: data.id,
-                        updatedAt: new Date(),
-                    })
-                    .onConflictDoUpdate({
-                        target: users.id,
-                        set: {
-                            isPremium,
-                            plan: isPremium ? 'pro' : null,
-                            subscriptionId: data.id,
-                            updatedAt: new Date(),
-                        }
-                    });
-                break;
-            }
+        await db.insert(users)
+            .values({ id: clerkId, isPremium: true, plan, subscriptionId: subId, updatedAt: new Date() })
+            .onConflictDoUpdate({
+                target: users.id,
+                set: { isPremium: true, plan, subscriptionId: subId, updatedAt: new Date() }
+            });
 
-            case "subscription.canceled":
-            case "subscription.revoked":
-            case "subscription.past_due": {
-                await db.update(users)
-                    .set({ isPremium: false, plan: null, updatedAt: new Date() })
-                    .where(eq(users.subscriptionId, data.id));
-                break;
-            }
-        }
         return NextResponse.json({ success: true });
     } catch (error) {
         return NextResponse.json({ error: "DB Error" }, { status: 500 });
