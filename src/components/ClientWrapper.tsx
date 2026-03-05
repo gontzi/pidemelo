@@ -1,9 +1,13 @@
 'use client';
 
 import { usePathname } from 'next/navigation';
-import Navbar from './Navbar';
 
-export default function ClientWrapper({ children }: { children: React.ReactNode }) {
+interface ClientWrapperProps {
+    children: React.ReactNode;
+    navbar: React.ReactNode;
+}
+
+export default function ClientWrapper({ children, navbar }: ClientWrapperProps) {
     const pathname = usePathname();
     const isWidget = pathname.startsWith('/widget');
 
@@ -13,7 +17,7 @@ export default function ClientWrapper({ children }: { children: React.ReactNode 
 
     return (
         <>
-            <Navbar />
+            {navbar}
             <div className="pt-4">
                 {children}
             </div>
