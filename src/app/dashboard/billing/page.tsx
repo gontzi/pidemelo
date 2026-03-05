@@ -1,6 +1,9 @@
 import { SubscriptionButton } from './SubscriptionButton'
 import { Check, Sparkles, Rocket, PartyPopper, Heart } from 'lucide-react'
 
+export const runtime = 'edge';
+export const dynamic = 'force-dynamic';
+
 export const metadata = {
     title: 'Sube de nivel | Pidemelo',
     description: 'Elige cómo quieres apoyarnos para que sigamos haciendo caso a tus ideas.',

@@ -5,6 +5,8 @@ import { headers } from "next/headers";
 import { NextResponse } from "next/server";
 import crypto from "crypto";
 
+export const runtime = 'edge';
+
 /**
  * Webhook Handler para Polar.sh
  * Automatiza la gestión de estados Premium de los usuarios.
