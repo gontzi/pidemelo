@@ -21,23 +21,27 @@ export async function POST(req: Request) {
         return NextResponse.json({ error: "Webhook secret not configured" }, { status: 500 });
     }
 
-    // 1. VERIFICACIÓN DE FIRMA (Usando standardwebhooks compatible con Edge)
+    // 1. VERIFICACIÓN DE FIRMA (A prueba de fallos)
     let payload: any;
     try {
-        // Polar envía el secreto con prefijo 'whsec_', pero la librería espera la clave base64
-        const normalizedSecret = webhookSecret.startsWith("whsec_")
-            ? webhookSecret.substring(6)
-            : webhookSecret;
-
-        const wh = new Webhook(normalizedSecret);
         const whHeaders = {
             "webhook-id": headersList.get("webhook-id") || "",
             "webhook-signature": headersList.get("webhook-signature") || "",
             "webhook-timestamp": headersList.get("webhook-timestamp") || "",
         };
-        payload = wh.verify(body, whHeaders);
+
+        // Intento 1: Con el secreto tal cual (recomendado)
+        try {
+            const wh = new Webhook(webhookSecret);
+            payload = wh.verify(body, whHeaders);
+        } catch (e) {
+            // Intento 2: Sin el prefijo 'whsec_' (fallback por si acaso)
+            const normalized = webhookSecret.startsWith("whsec_") ? webhookSecret.substring(6) : webhookSecret;
+            const wh = new Webhook(normalized);
+            payload = wh.verify(body, whHeaders);
+        }
     } catch (err) {
-        // Error 401: La firma no coincide. Esto suele ser por un secreto mal configurado.
+        // Si ambos fallan, devolvemos 401. Revisa tu POLAR_WEBHOOK_SECRET en Vercel/Cloudflare.
         return NextResponse.json({ error: "Invalid signature" }, { status: 401 });
     }
 
