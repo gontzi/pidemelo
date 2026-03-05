@@ -1,10 +1,19 @@
-import { pgTable, text, timestamp, uuid, pgEnum } from "drizzle-orm/pg-core";
+import { pgTable, text, timestamp, uuid, pgEnum, boolean } from "drizzle-orm/pg-core";
 
 export const statusEnum = pgEnum('status', ['pending', 'planned', 'done']);
 
+export const users = pgTable('users', {
+    id: text('id').primaryKey(), // Clerk User ID
+    isPremium: boolean('is_premium').default(false).notNull(),
+    plan: text('plan'), // 'pro' | 'lifetime' | null
+    subscriptionId: text('subscription_id'),
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+    updatedAt: timestamp('updated_at').defaultNow().notNull(),
+});
+
 export const boards = pgTable('boards', {
     id: uuid('id').primaryKey().defaultRandom(),
-    userId: text('user_id').notNull(), // Clerk User ID
+    userId: text('user_id').references(() => users.id, { onDelete: 'cascade' }).notNull(), // Clerk User ID
     name: text('name').notNull(),
     slug: text('slug').notNull().unique(),
     createdAt: timestamp('created_at').defaultNow().notNull(),
@@ -29,7 +38,15 @@ export const votes = pgTable('votes', {
 
 import { relations } from 'drizzle-orm';
 
-export const boardsRelations = relations(boards, ({ many }) => ({
+export const usersRelations = relations(users, ({ many }) => ({
+    boards: many(boards),
+}));
+
+export const boardsRelations = relations(boards, ({ one, many }) => ({
+    user: one(users, {
+        fields: [boards.userId],
+        references: [users.id],
+    }),
     ideas: many(ideas),
 }));
 
@@ -47,3 +64,4 @@ export const votesRelations = relations(votes, ({ one }) => ({
         references: [ideas.id],
     }),
 }));
+

@@ -37,9 +37,14 @@ export default function Navbar() {
 
                     <SignedIn>
                         <div className="flex items-center gap-4">
+                            <Link href="/dashboard/billing">
+                                <button className="text-sm font-bold text-zinc-600 hover:text-[#FF5C00] transition-colors px-3 py-2 rounded-full hover:bg-orange-50/50 flex items-center gap-2">
+                                    Planes 🚀
+                                </button>
+                            </Link>
                             <Link href="/dashboard">
                                 <Button className="bg-[#FF5C00] hover:bg-[#FF5C00]/90 text-white font-bold text-sm rounded-full px-5 h-9 shadow-lg shadow-[#FF5C00]/10 transition-all hover:scale-105 active:scale-95">
-                                    Panel 🚀
+                                    Panel
                                 </Button>
                             </Link>
                             <div className="h-8 w-8 rounded-full overflow-hidden border border-zinc-200 flex items-center justify-center bg-white shadow-sm">
