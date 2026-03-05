@@ -4,6 +4,8 @@ export const statusEnum = pgEnum('status', ['pending', 'planned', 'done']);
 
 export const users = pgTable('users', {
     id: text('id').primaryKey(), // Clerk User ID
+    email: text('email'),
+    name: text('name'),
     isPremium: boolean('is_premium').default(false).notNull(),
     plan: text('plan'), // 'pro' | 'lifetime' | null
     subscriptionId: text('subscription_id'),
