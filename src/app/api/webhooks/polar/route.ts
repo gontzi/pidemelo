@@ -24,7 +24,12 @@ export async function POST(req: Request) {
     // 1. VERIFICACIÓN DE FIRMA (Usando standardwebhooks compatible con Edge)
     let payload: any;
     try {
-        const wh = new Webhook(webhookSecret);
+        // Polar envía el secreto con prefijo 'whsec_', pero la librería espera la clave base64
+        const normalizedSecret = webhookSecret.startsWith("whsec_")
+            ? webhookSecret.substring(6)
+            : webhookSecret;
+
+        const wh = new Webhook(normalizedSecret);
         const whHeaders = {
             "webhook-id": headersList.get("webhook-id") || "",
             "webhook-signature": headersList.get("webhook-signature") || "",
@@ -32,7 +37,7 @@ export async function POST(req: Request) {
         };
         payload = wh.verify(body, whHeaders);
     } catch (err) {
-        console.warn("⚠️ Intento de webhook con firma inválida o faltan headers", err);
+        // Error 401: La firma no coincide. Esto suele ser por un secreto mal configurado.
         return NextResponse.json({ error: "Invalid signature" }, { status: 401 });
     }
 

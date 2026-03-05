@@ -19,7 +19,7 @@ const jakarta = Plus_Jakarta_Sans({
 })
 
 export const metadata: Metadata = {
-  title: 'Pidemelo.app 🚀 Recopila sugerencias en segundos',
+  title: 'Pídemelo',
   description: 'El tablón de peticiones definitivo para mentes inquietas.',
 }
 
