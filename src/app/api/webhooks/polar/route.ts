@@ -7,89 +7,105 @@ import { NextResponse } from "next/server";
 export const runtime = 'edge';
 
 /**
- * Webhook Handler para Polar.sh (Versión Infalible para Producción)
+ * Webhook Handler de Polar.sh
+ * Implementación de máxima compatibilidad para Cloudflare Pages
  */
 export async function POST(req: Request) {
     const body = await req.text();
     const headersList = headers();
     const webhookSecret = process.env.POLAR_WEBHOOK_SECRET;
 
-    const id = headersList.get("webhook-id");
-    const timestamp = headersList.get("webhook-timestamp");
-    const signature = headersList.get("webhook-signature");
+    // Headers requeridos por Svix/Polar
+    const msgId = headersList.get("webhook-id");
+    const msgTimestamp = headersList.get("webhook-timestamp");
+    const msgSignature = headersList.get("webhook-signature");
 
     if (!webhookSecret) {
-        console.error("❌ POLAR_WEBHOOK_SECRET no configurado");
-        return NextResponse.json({ error: "Webhook secret missing" }, { status: 500 });
+        return NextResponse.json({ error: "Secret missing" }, { status: 500 });
     }
 
-    if (!id || !timestamp || !signature) {
+    if (!msgId || !msgTimestamp || !msgSignature) {
         return NextResponse.json({ error: "Missing headers" }, { status: 401 });
     }
 
-    // 1. VERIFICACIÓN DE FIRMA MANUAL (Compatible con Web Standard Crypto / Edge Runtime)
     try {
+        // 1. Limpiar el secreto (Polar lo da como whsec_...)
+        const secretBase64 = webhookSecret.startsWith("whsec_")
+            ? webhookSecret.substring(6)
+            : webhookSecret;
+
+        // 2. Preparar la verificación
         const encoder = new TextEncoder();
-        // Polar usa Base64 para el secreto (sin el prefijo whsec_)
-        const secretKey = webhookSecret.startsWith("whsec_") ? webhookSecret.substring(6) : webhookSecret;
+        const signedContent = `${msgId}.${msgTimestamp}.${body}`;
 
-        // Convertimos el secreto de Base64 a ArrayBuffer (Polar secrets están en Base64)
-        const secretBuffer = Uint8Array.from(atob(secretKey), c => c.charCodeAt(0));
+        // Decodificar el secreto de Base64 a binario
+        const secretUint8 = Uint8Array.from(atob(secretBase64), c => c.charCodeAt(0));
 
+        // Importar la llave para HMAC SHA-256
         const key = await crypto.subtle.importKey(
             "raw",
-            secretBuffer,
+            secretUint8,
             { name: "HMAC", hash: "SHA-256" },
             false,
-            ["verify", "sign"]
+            ["sign"]
         );
 
-        const signedContent = `${id}.${timestamp}.${body}`;
-        const signatures = signature.split(" ");
-        let isVerified = false;
+        // 3. Verificar cada firma enviada (pueden venir varias separadas por espacio)
+        const signatures = msgSignature.split(" ");
+        let isValid = false;
 
         for (const sig of signatures) {
             const [version, hash] = sig.split(",");
             if (version !== "v1") continue;
 
-            const sigBuffer = Uint8Array.from(atob(hash), c => c.charCodeAt(0));
-            isVerified = await crypto.subtle.verify(
+            // Generamos nuestro propio hash para comparar
+            const signatureBinary = await crypto.subtle.sign(
                 "HMAC",
                 key,
-                sigBuffer,
                 encoder.encode(signedContent)
             );
-            if (isVerified) break;
+
+            // Convertimos nuestro binario a Base64 para comparar strings
+            const expectedHash = btoa(String.fromCharCode(...new Uint8Array(signatureBinary)));
+
+            if (expectedHash === hash) {
+                isValid = true;
+                break;
+            }
         }
 
-        if (!isVerified) throw new Error("Invalid signature");
+        if (!isValid) throw new Error("Invalid signature match");
+
     } catch (err) {
-        console.warn("⚠️ Firma de Polar inválida");
-        return NextResponse.json({ error: "Invalid signature" }, { status: 401 });
+        // Si falla la firma, devolvemos 401. 
+        // ⚠️ Si sigues viendo 401, el SECRETO en tus variables de entorno es incorrecto.
+        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    // 2. PROCESAMIENTO DEL EVENTO
+    // 4. Lógica de Negocio (Si llegamos aquí, la firma es VÁLIDA)
     const payload = JSON.parse(body);
     const eventType = payload.type;
     const data = payload.data;
 
-    // Detección de ClerkId en múltiples fuentes de Polar
+    // Buscamos el ID del usuario en cualquier rincón del JSON
     const clerkId = data.metadata?.clerkId ||
         data.customer_metadata?.clerkId ||
         data.custom_field_data?.clerkId ||
         payload.customer_metadata?.clerkId;
 
+    if (!clerkId) {
+        return NextResponse.json({ received: true, info: "No clerkId found" });
+    }
+
     try {
         switch (eventType) {
             case "order.created": {
-                const plan = !!data.subscription_id ? 'pro' : 'lifetime';
-                if (!clerkId) break;
-
+                const isSub = !!data.subscription_id;
                 await db.insert(users)
                     .values({
                         id: clerkId,
                         isPremium: true,
-                        plan: plan,
+                        plan: isSub ? 'pro' : 'lifetime',
                         subscriptionId: data.subscription_id || null,
                         updatedAt: new Date(),
                     })
@@ -97,7 +113,7 @@ export async function POST(req: Request) {
                         target: users.id,
                         set: {
                             isPremium: true,
-                            plan: plan,
+                            plan: isSub ? 'pro' : 'lifetime',
                             subscriptionId: data.subscription_id || null,
                             updatedAt: new Date(),
                         }
@@ -107,13 +123,11 @@ export async function POST(req: Request) {
 
             case "subscription.created":
             case "subscription.updated": {
-                if (!clerkId) break;
                 const isPremium = data.status === 'active' || data.status === 'trialing';
-
                 await db.insert(users)
                     .values({
                         id: clerkId,
-                        isPremium: isPremium,
+                        isPremium,
                         plan: isPremium ? 'pro' : null,
                         subscriptionId: data.id,
                         updatedAt: new Date(),
@@ -121,7 +135,7 @@ export async function POST(req: Request) {
                     .onConflictDoUpdate({
                         target: users.id,
                         set: {
-                            isPremium: isPremium,
+                            isPremium,
                             plan: isPremium ? 'pro' : null,
                             subscriptionId: data.id,
                             updatedAt: new Date(),
@@ -133,22 +147,14 @@ export async function POST(req: Request) {
             case "subscription.canceled":
             case "subscription.revoked":
             case "subscription.past_due": {
-                if (data.id) {
-                    await db.update(users)
-                        .set({
-                            isPremium: false,
-                            plan: null,
-                            updatedAt: new Date(),
-                        })
-                        .where(eq(users.subscriptionId, data.id));
-                }
+                await db.update(users)
+                    .set({ isPremium: false, plan: null, updatedAt: new Date() })
+                    .where(eq(users.subscriptionId, data.id));
                 break;
             }
         }
-
-        return NextResponse.json({ received: true }, { status: 200 });
+        return NextResponse.json({ success: true });
     } catch (error) {
-        console.error("🔥 Error Neon DB:", error);
-        return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
+        return NextResponse.json({ error: "DB Error" }, { status: 500 });
     }
 }
