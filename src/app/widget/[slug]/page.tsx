@@ -1,5 +1,5 @@
 import { db } from "@/db";
-import { boards, ideas } from "@/db/schema";
+import { boards, ideas, users } from "@/db/schema";
 import { eq, desc } from "drizzle-orm";
 import { notFound } from "next/navigation";
 import PublicBoardClient from "../../board/[slug]/PublicBoardClient";
@@ -20,6 +20,30 @@ export default async function WidgetPage({ params }: { params: { slug: string } 
     });
 
     if (!board) notFound();
+
+    // Verificar si el dueño del tablero es premium
+    const user = await db.query.users.findFirst({
+        where: eq(users.id, board.userId)
+    });
+
+    if (!user?.isPremium) {
+        return (
+            <div className="min-h-screen flex flex-col items-center justify-center p-8 text-center bg-zinc-50 border-4 border-dashed border-zinc-200">
+                <div className="w-16 h-16 bg-white rounded-2xl shadow-xl flex items-center justify-center text-3xl mb-4">🔒</div>
+                <h1 className="text-xl font-black text-zinc-900 mb-2 italic">Widget Desactivado</h1>
+                <p className="text-sm text-zinc-500 font-medium max-w-xs mb-6 leading-relaxed">
+                    Este tablón necesita una suscripción activa para ser incrustado en otras webs.
+                </p>
+                <a
+                    href="https://pidemelo.app"
+                    target="_blank"
+                    className="text-[10px] font-black uppercase tracking-widest text-[#FF5C00] hover:underline"
+                >
+                    ir a pidemelo.app 🚀
+                </a>
+            </div>
+        );
+    }
 
     const sortedIdeas = board.ideas.sort((a, b) => b.votes.length - a.votes.length);
 

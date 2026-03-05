@@ -1,10 +1,11 @@
 'use client';
 
 import { useState } from 'react';
-import { Copy, Check, Code } from 'lucide-react';
+import { Copy, Check, Code, Lock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import Link from 'next/link';
 
-export default function IframeGenerator({ slug }: { slug: string }) {
+export default function IframeGenerator({ slug, isPremium }: { slug: string; isPremium: boolean }) {
     const [copied, setCopied] = useState(false);
 
     // Usamos window.location.origin para que funcione en cualquier entorno (dev/prod)
@@ -12,6 +13,7 @@ export default function IframeGenerator({ slug }: { slug: string }) {
     const iframeCode = `<iframe src="${origin}/widget/${slug}" width="100%" height="600px" frameborder="0"></iframe>`;
 
     const handleCopy = async () => {
+        if (!isPremium) return;
         try {
             await navigator.clipboard.writeText(iframeCode);
             setCopied(true);
@@ -22,10 +24,32 @@ export default function IframeGenerator({ slug }: { slug: string }) {
     };
 
     return (
-        <section className="bg-white p-10 md:p-12 rounded-[2.5rem] border border-zinc-200/60 shadow-xl shadow-zinc-200/20 overflow-hidden relative group">
+        <section className={`bg-white p-10 md:p-12 rounded-[2.5rem] border border-zinc-200/60 shadow-xl shadow-zinc-200/20 overflow-hidden relative group transition-all ${!isPremium ? 'grayscale-[0.5]' : ''}`}>
             <div className="absolute top-0 right-0 -mr-16 -mt-16 w-64 h-64 bg-[#FF5C00]/5 rounded-full blur-3xl transition-all group-hover:bg-[#FF5C00]/10" />
 
-            <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-12">
+            {/* Overlay para No-Premium */}
+            {!isPremium && (
+                <div className="absolute inset-0 z-50 flex items-center justify-center bg-white/40 backdrop-blur-[2px]">
+                    <div className="bg-zinc-900 p-8 rounded-[2rem] shadow-2xl text-center space-y-6 max-w-sm animate-in fade-in zoom-in duration-300">
+                        <div className="w-16 h-16 bg-orange-500 rounded-3xl flex items-center justify-center mx-auto text-white shadow-lg shadow-orange-500/30">
+                            <Lock className="w-8 h-8" />
+                        </div>
+                        <div className="space-y-2">
+                            <h4 className="text-xl font-black text-white italic">Función Premium</h4>
+                            <p className="text-zinc-400 text-sm font-medium">
+                                Los widgets son exclusivos para inversores y suscriptores. Dale un empujón a tu proyecto.
+                            </p>
+                        </div>
+                        <Link href="/dashboard/billing">
+                            <Button className="w-full bg-[#FF5C00] hover:bg-white hover:text-zinc-900 text-white font-black text-xs tracking-widest uppercase h-12 rounded-xl transition-all shadow-lg shadow-orange-500/20">
+                                SUBIR DE NIVEL 🚀
+                            </Button>
+                        </Link>
+                    </div>
+                </div>
+            )}
+
+            <div className={`relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-12 transition-all ${!isPremium ? 'blur-[2px] pointer-events-none' : ''}`}>
                 <div className="space-y-4 max-w-lg">
                     <div className="flex items-center gap-3">
                         <div className="w-10 h-10 bg-orange-100 rounded-2xl flex items-center justify-center text-[#FF5C00]">
@@ -70,6 +94,7 @@ export default function IframeGenerator({ slug }: { slug: string }) {
 
                         <Button
                             onClick={handleCopy}
+                            disabled={!isPremium}
                             className={`mt-6 w-full h-12 rounded-xl transition-all font-black text-xs tracking-widest uppercase ${copied
                                 ? 'bg-green-500 hover:bg-green-600 text-white'
                                 : 'bg-white text-zinc-900 hover:bg-[#FF5C00] hover:text-white'

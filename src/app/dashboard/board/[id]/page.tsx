@@ -1,5 +1,5 @@
 import { db } from "@/db";
-import { boards, ideas } from "@/db/schema";
+import { boards, ideas, users } from "@/db/schema";
 import { auth } from "@clerk/nextjs/server";
 import { and, eq, desc } from "drizzle-orm";
 import { notFound } from "next/navigation";
@@ -27,6 +27,12 @@ export default async function BoardDashboardPage({ params }: { params: { id: str
     });
 
     if (!board) notFound();
+
+    // Consultar estado premium del usuario
+    const user = await db.query.users.findFirst({
+        where: eq(users.id, userId)
+    });
+    const isPremium = user?.isPremium || false;
 
     const formattedIdeas = board.ideas.map(idea => ({
         id: idea.id,
@@ -76,7 +82,7 @@ export default async function BoardDashboardPage({ params }: { params: { id: str
                     </div>
                 </header>
 
-                <IframeGenerator slug={board.slug} />
+                <IframeGenerator slug={board.slug} isPremium={isPremium} />
 
                 <main className="flex-1 bg-white rounded-[2.5rem] border border-zinc-200/60 p-1">
                     <DashboardClient initialIdeas={formattedIdeas} boardId={board.id} />
