@@ -3,7 +3,9 @@ import { users } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import { headers } from "next/headers";
 import { NextResponse } from "next/server";
-import crypto from "crypto";
+import { Webhook } from "standardwebhooks"; // ¡Usamos la librería estándar!
+
+// 🚫 Adiós import crypto from "crypto";
 
 export const runtime = 'edge';
 
@@ -15,10 +17,6 @@ export async function POST(req: Request) {
     const body = await req.text();
     const headersList = headers();
 
-    const signature = headersList.get("webhook-signature");
-    const timestamp = headersList.get("webhook-timestamp");
-    const id = headersList.get("webhook-id");
-
     const webhookSecret = process.env.POLAR_WEBHOOK_SECRET;
 
     if (!webhookSecret) {
@@ -26,19 +24,25 @@ export async function POST(req: Request) {
         return NextResponse.json({ error: "Webhook secret not configured" }, { status: 500 });
     }
 
-    if (!signature || !timestamp || !id) {
-        return NextResponse.json({ error: "Missing headers" }, { status: 400 });
-    }
+    // 1. VERIFICACIÓN DE FIRMA (Usando standardwebhooks compatible con Edge)
+    let payload: any;
+    try {
+        const wh = new Webhook(webhookSecret);
+        // Construimos el objeto de headers que espera la librería
+        const whHeaders = {
+            "webhook-id": headersList.get("webhook-id") || "",
+            "webhook-signature": headersList.get("webhook-signature") || "",
+            "webhook-timestamp": headersList.get("webhook-timestamp") || "",
+        };
 
-    // 1. VERIFICACIÓN DE FIRMA (Seguridad Crítica)
-    const isVerified = verifyPolarSignature(id, timestamp, body, signature, webhookSecret);
+        // Verifica y parsea el JSON a la vez
+        payload = wh.verify(body, whHeaders);
 
-    if (!isVerified) {
-        console.warn("⚠️ Intento de webhook con firma inválida");
+    } catch (err) {
+        console.warn("⚠️ Intento de webhook con firma inválida o faltan headers", err);
         return NextResponse.json({ error: "Invalid signature" }, { status: 401 });
     }
 
-    const payload = JSON.parse(body);
     const eventType = payload.type;
     const data = payload.data;
 
@@ -130,36 +134,5 @@ export async function POST(req: Request) {
     } catch (error) {
         console.error("🔥 Error procesando webhook de Polar:", error);
         return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
-    }
-}
-
-/**
- * Lógica de verificación de firmas de Polar (Standard Webhooks / Svix style)
- */
-function verifyPolarSignature(id: string, timestamp: string, body: string, signature: string, secret: string): boolean {
-    try {
-        // Polar envía el secreto con prefijo 'whsec_' a veces, lo normalizamos
-        const key = secret.startsWith("whsec_") ? secret.split("_")[1] : secret;
-        const keyBuffer = Buffer.from(key, "base64");
-
-        const plainText = `${id}.${timestamp}.${body}`;
-        const hmac = crypto
-            .createHmac("sha256", keyBuffer)
-            .update(plainText)
-            .digest("base64");
-
-        // Las firmas vienen como "v1,base64hash v1,base64hash..."
-        const signatures = signature.split(" ");
-        for (const sig of signatures) {
-            const [version, hash] = sig.split(",");
-            if (version === "v1" && hash === hmac) {
-                return true;
-            }
-        }
-
-        return false;
-    } catch (err) {
-        console.error("Error verificando firma:", err);
-        return false;
     }
 }
