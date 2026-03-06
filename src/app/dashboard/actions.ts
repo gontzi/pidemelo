@@ -30,7 +30,19 @@ export async function createBoard(formData: FormData) {
     if (!name) return;
 
     const baseSlug = slugify(name);
-    const slug = `${baseSlug}-${Math.random().toString(36).substring(2, 6)}`;
+
+    // Comprobar si el slug limpio ya existe en la BBDD
+    let slug = baseSlug;
+    const existing = await db.query.boards.findFirst({ where: eq(boards.slug, baseSlug) });
+    if (existing) {
+        // Solo añadimos sufijo aleatorio si hay colisión
+        let candidate = `${baseSlug}-${Math.random().toString(36).substring(2, 6)}`;
+        // Aseguramos que el candidato con sufijo también sea único
+        while (await db.query.boards.findFirst({ where: eq(boards.slug, candidate) })) {
+            candidate = `${baseSlug}-${Math.random().toString(36).substring(2, 6)}`;
+        }
+        slug = candidate;
+    }
 
     await db.insert(boards).values({
         userId,
