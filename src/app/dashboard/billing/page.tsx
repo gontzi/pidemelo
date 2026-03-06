@@ -6,6 +6,7 @@ import { users } from '@/db/schema';
 import { eq } from 'drizzle-orm';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
+import PricingSwitcher from './PricingSwitcher';
 
 export const runtime = 'edge';
 export const dynamic = 'force-dynamic';
@@ -115,7 +116,6 @@ export default async function BillingPage() {
                         )}
                     </div>
                 ) : (
-                    /* ESTADO 2: USUARIO GRATIS (PLANES) */
                     <>
                         <div className="text-center mb-10 md:mb-16 space-y-5 md:space-y-6">
                             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-orange-100 text-[#FF5C00] text-xs font-black uppercase tracking-widest animate-bounce">
@@ -130,82 +130,44 @@ export default async function BillingPage() {
                             </p>
                         </div>
 
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-8 items-stretch">
-                            {/* Tarjeta 1: El Suscriptor */}
-                            <div className="relative flex flex-col p-7 md:p-10 rounded-[2rem] bg-white border border-zinc-200/60 shadow-xl shadow-zinc-200/20 transition-all hover:scale-[1.02]">
-                                <div className="absolute -top-4 right-6 md:right-8 bg-[#FF5C00] text-white text-[10px] font-black px-4 py-2 rounded-full shadow-lg flex items-center gap-2 tracking-widest uppercase">
-                                    <Sparkles className="w-3 h-3" />
-                                    ¡15 días gratis!
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-12 items-stretch max-w-5xl mx-auto">
+                            {/* Tarjeta 1: El del Montón (Free) */}
+                            <div className="relative flex flex-col p-7 md:p-10 rounded-[2rem] bg-white border border-zinc-200 shadow-xl shadow-zinc-200/20 opacity-80 hover:opacity-100 transition-all">
+                                <div className="mb-8">
+                                    <h3 className="text-xl md:text-2xl font-black tracking-tight mb-2 italic text-zinc-400">El del Montón</h3>
+                                    <p className="text-zinc-300 text-[10px] font-black uppercase tracking-widest">Para experimentos que no van a ningún lado</p>
                                 </div>
 
-                                <div className="mb-6 md:mb-8">
-                                    <h3 className="text-xl md:text-2xl font-black tracking-tight mb-2 italic">El Suscriptor</h3>
-                                    <p className="text-zinc-400 text-sm font-bold uppercase tracking-widest">Para los que van paso a paso</p>
+                                <div className="flex items-baseline mb-8">
+                                    <span className="text-5xl md:text-6xl font-black tracking-tighter text-zinc-300">0€</span>
+                                    <span className="text-zinc-300 font-bold ml-2 uppercase tracking-widest text-sm">/eterno</span>
                                 </div>
 
-                                <div className="flex items-baseline mb-6 md:mb-8">
-                                    <span className="text-5xl md:text-6xl font-black tracking-tighter">2,99€</span>
-                                    <span className="text-zinc-400 font-bold ml-2">/mes</span>
-                                </div>
-
-                                <div className="space-y-3 md:space-y-4 mb-8 md:mb-10 flex-grow">
+                                <div className="space-y-4 mb-10 flex-grow">
                                     {[
-                                        "Acceso a todo (sin filtros)",
-                                        "Si no te mola, cancelas y tan amigos",
-                                        "Danos la chapa con tus ideas",
-                                        "Soporte rápido (si no estamos durmiendo)"
-                                    ].map((feature, i) => (
-                                        <div key={i} className="flex items-start gap-3 text-zinc-600 font-medium">
-                                            <Check className="w-5 h-5 text-[#FF5C00] shrink-0 mt-0.5" />
-                                            <span className="text-sm md:text-base">{feature}</span>
+                                        { text: "Hasta 3 tablones máximo", limit: true },
+                                        { text: "Widgets de incógnito (no se ven)", limit: true },
+                                        { text: "Ni un solo color personalizado", limit: true },
+                                        { text: "Soporte cuando nos apetezca", limit: true },
+                                        { text: "Link público básico", limit: false },
+                                    ].map((feat, i) => (
+                                        <div key={i} className={`flex items-start gap-3 font-medium ${feat.limit ? 'text-zinc-400' : 'text-zinc-500'}`}>
+                                            <Check className={`w-5 h-5 shrink-0 mt-0.5 ${feat.limit ? 'text-zinc-200' : 'text-green-500'}`} />
+                                            <span className="text-sm md:text-base">{feat.text}</span>
                                         </div>
                                     ))}
                                 </div>
 
-                                <SubscriptionButton
-                                    productId={subscriptionProductId}
-                                    label="Probar 15 días gratis 🏃‍♂️"
-                                    variant="outline"
-                                />
+                                <Button variant="ghost" disabled className="h-14 rounded-2xl bg-zinc-50 text-zinc-400 font-black text-xs tracking-widest uppercase cursor-not-allowed">
+                                    YA LO TIENES (Y SE NOTA)
+                                </Button>
                             </div>
 
-                            {/* Tarjeta 2: El Inversor (Lifetime) */}
-                            <div className="relative flex flex-col p-7 md:p-10 rounded-[2rem] bg-zinc-900 text-white shadow-2xl shadow-orange-500/20 transition-all hover:scale-[1.02] overflow-hidden">
-                                <div className="absolute -right-8 -top-8 w-32 h-32 bg-[#FF5C00]/10 rounded-full blur-3xl" />
-
-                                <div className="mb-6 md:mb-8 relative">
-                                    <div className="bg-[#FF5C00] text-white text-[10px] font-black px-3 py-1 rounded-md mb-4 inline-block tracking-widest uppercase">
-                                        LO MÁS TOP
-                                    </div>
-                                    <h3 className="text-xl md:text-2xl font-black tracking-tight mb-2 italic">El Inversor</h3>
-                                    <p className="text-zinc-500 text-sm font-bold uppercase tracking-widest">Pagas una vez y te olvidas</p>
-                                </div>
-
-                                <div className="flex items-baseline mb-6 md:mb-8">
-                                    <span className="text-5xl md:text-6xl font-black tracking-tighter">29,95€</span>
-                                    <span className="text-zinc-500 font-bold ml-2 text-sm uppercase tracking-widest">Único pago</span>
-                                </div>
-
-                                <div className="space-y-3 md:space-y-4 mb-8 md:mb-10 flex-grow">
-                                    {[
-                                        "Pagas una vez, te aguantamos toda la vida",
-                                        "Acceso premium infinito",
-                                        "Eres el VIP del tablón",
-                                        "Todas las locuras que saquemos",
-                                        "Icono de inversor (próximamente™)"
-                                    ].map((feature, i) => (
-                                        <div key={i} className="flex items-start gap-3 text-zinc-300 font-medium">
-                                            <PartyPopper className="w-5 h-5 text-[#FF5C00] shrink-0 mt-0.5" />
-                                            <span className="text-sm md:text-base">{feature}</span>
-                                        </div>
-                                    ))}
-                                </div>
-
-                                <SubscriptionButton
-                                    productId={lifetimeProductId}
-                                    label="Soltar la pasta una vez 💸"
-                                />
-                            </div>
+                            {/* Tarjeta 2: Premium (Switcher) */}
+                            <PricingSwitcher
+                                monthlyProductId={subscriptionProductId}
+                                lifetimeProductId={lifetimeProductId}
+                            />
                         </div>
                     </>
                 )}
