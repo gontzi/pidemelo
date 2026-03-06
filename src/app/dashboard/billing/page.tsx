@@ -213,7 +213,7 @@ export default async function BillingPage() {
 
                 <div className="mt-16 text-center">
                     <p className="text-zinc-400 font-bold text-xs uppercase tracking-[0.3em] flex items-center justify-center gap-3">
-                        Hecho con <Heart className="w-4 h-4 fill-[#FF5C00] text-[#FF5C00]" /> por el equipo de Pídemelo
+                        Hecho con <Heart className="w-4 h-4 fill-[#FF5C00] text-[#FF5C00]" /> por Gontzi
                     </p>
                 </div>
             </div>
