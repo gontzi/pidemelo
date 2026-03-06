@@ -8,11 +8,13 @@ import { submitIdea } from './actions';
 export default function SubmitIdeaForm({
     boardId,
     boardSlug,
-    accentColor = "#FF5C00"
+    accentColor = "#FF5C00",
+    textColor = "#18181b"
 }: {
     boardId: string,
     boardSlug: string,
-    accentColor?: string
+    accentColor?: string,
+    textColor?: string
 }) {
     const [isPending, setIsPending] = useState(false);
     const [error, setError] = useState<string | null>(null);
@@ -48,7 +50,7 @@ export default function SubmitIdeaForm({
                     placeholder="Ej. Poner un botón que me dé café gratis..."
                     required
                     maxLength={100}
-                    style={{ '--tw-ring-color': accentColor } as React.CSSProperties}
+                    style={{ '--tw-ring-color': accentColor, color: textColor } as React.CSSProperties}
                     className="h-14 shadow-none border-zinc-200 bg-[#FAFAFA] rounded-2xl focus-visible:ring-1 focus-visible:bg-white font-medium px-4"
                 />
             </div>
@@ -58,8 +60,8 @@ export default function SubmitIdeaForm({
                     placeholder="Cuéntame tu drama, a ver si podemos hacer algo..."
                     required
                     maxLength={1000}
-                    style={{ '--tw-ring-color': accentColor } as React.CSSProperties}
-                    className="w-full shadow-none border border-zinc-200 bg-[#FAFAFA] p-4 rounded-2xl min-h-[140px] outline-none font-medium text-sm focus-visible:ring-1 focus-visible:border-zinc-300 focus-visible:bg-white text-zinc-900 resize-y"
+                    style={{ '--tw-ring-color': accentColor, color: textColor } as React.CSSProperties}
+                    className="w-full shadow-none border border-zinc-200 bg-[#FAFAFA] p-4 rounded-2xl min-h-[140px] outline-none font-medium text-sm focus-visible:ring-1 focus-visible:border-zinc-300 focus-visible:bg-white resize-y"
                 />
             </div>
             {error && (
@@ -70,7 +72,7 @@ export default function SubmitIdeaForm({
             <Button
                 disabled={isPending}
                 type="submit"
-                style={{ backgroundColor: accentColor, boxShadow: `0 4px 6px -1px ${accentColor}33, 0 2px 4px -1px ${accentColor}1A` }}
+                style={{ color: textColor, backgroundColor: accentColor, boxShadow: `0 4px 6px -1px ${accentColor}33, 0 2px 4px -1px ${accentColor}1A` }}
                 className="w-full h-14 text-white hover:opacity-90 rounded-full font-bold transition-transform active:scale-95 text-lg disabled:opacity-70 disabled:hover:scale-100 shadow-md"
             >
                 {isPending ? 'Mandándolo a la nube...' : 'Soltar mi idea 💣'}

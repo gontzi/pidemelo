@@ -8,10 +8,11 @@ import Link from 'next/link';
 export default function IframeGenerator({ slug, isPremium }: { slug: string; isPremium: boolean }) {
     const [copied, setCopied] = useState(false);
     const [color, setColor] = useState('#FF5C00');
+    const [textColor, setTextColor] = useState('#18181b');
 
     // Usamos window.location.origin para que funcione en cualquier entorno (dev/prod)
     const origin = typeof window !== 'undefined' ? window.location.origin : 'https://pidemelo.app';
-    const iframeCode = `<iframe src="${origin}/widget/${slug}?color=${encodeURIComponent(color)}" width="100%" height="600px" frameborder="0"></iframe>`;
+    const iframeCode = `<iframe src="${origin}/widget/${slug}?color=${encodeURIComponent(color)}&textColor=${encodeURIComponent(textColor)}" width="100%" height="600px" frameborder="0"></iframe>`;
 
     const handleCopy = async () => {
         if (!isPremium) return;
@@ -79,35 +80,54 @@ export default function IframeGenerator({ slug, isPremium }: { slug: string; isP
                         </div>
                     </div>
 
-                    {/* Selector de Color */}
-                    <div className="space-y-6">
-                        <div className="flex flex-wrap gap-3">
-                            {colorPresets.map((preset) => (
-                                <button
-                                    key={preset.hex}
-                                    onClick={() => setColor(preset.hex)}
-                                    className={`w-10 h-10 rounded-xl border-2 transition-all hover:scale-110 active:scale-90 ${color === preset.hex ? 'border-zinc-900 shadow-lg' : 'border-transparent'}`}
-                                    style={{ backgroundColor: preset.hex }}
-                                    title={preset.name}
-                                />
-                            ))}
-                            <div className="relative group/picker">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+                        {/* Selector de Color de Acento */}
+                        <div className="space-y-6">
+                            <label className="text-[10px] uppercase tracking-widest font-black text-zinc-400 ml-1">Color Principal</label>
+                            <div className="flex flex-wrap gap-2.5">
+                                {colorPresets.map((preset) => (
+                                    <button
+                                        key={preset.hex}
+                                        onClick={() => setColor(preset.hex)}
+                                        className={`w-9 h-9 rounded-xl border-2 transition-all hover:scale-110 active:scale-90 ${color === preset.hex ? 'border-zinc-900 shadow-lg' : 'border-transparent'}`}
+                                        style={{ backgroundColor: preset.hex }}
+                                        title={preset.name}
+                                    />
+                                ))}
                                 <input
                                     type="color"
                                     value={color}
                                     onChange={(e) => setColor(e.target.value)}
-                                    className="w-10 h-10 rounded-xl border-2 border-transparent cursor-pointer bg-white overflow-hidden shadow-inner"
+                                    className="w-9 h-9 rounded-xl border-2 border-transparent cursor-pointer bg-white overflow-hidden shadow-inner flex-shrink-0"
                                 />
                             </div>
                         </div>
-                        <div className="flex items-center gap-3 bg-zinc-50 p-3 rounded-2xl border border-zinc-100 w-fit">
-                            <span className="text-[10px] font-black text-zinc-400 uppercase tracking-widest ml-1">Hex</span>
-                            <input
-                                type="text"
-                                value={color.toUpperCase()}
-                                onChange={(e) => setColor(e.target.value)}
-                                className="bg-transparent text-sm font-bold text-zinc-900 outline-none w-20"
-                            />
+
+                        {/* Selector de Color de Texto */}
+                        <div className="space-y-6">
+                            <label className="text-[10px] uppercase tracking-widest font-black text-zinc-400 ml-1">Color de Texto</label>
+                            <div className="flex flex-wrap gap-2.5">
+                                {[
+                                    { name: 'Default', hex: '#18181b' },
+                                    { name: 'Gray', hex: '#52525b' },
+                                    { name: 'Slate', hex: '#334155' },
+                                    { name: 'Navy', hex: '#0f172a' },
+                                ].map((preset) => (
+                                    <button
+                                        key={preset.hex}
+                                        onClick={() => setTextColor(preset.hex)}
+                                        className={`w-9 h-9 rounded-xl border-2 transition-all hover:scale-110 active:scale-90 ${textColor === preset.hex ? 'border-zinc-900 shadow-lg' : 'border-transparent'}`}
+                                        style={{ backgroundColor: preset.hex }}
+                                        title={preset.name}
+                                    />
+                                ))}
+                                <input
+                                    type="color"
+                                    value={textColor}
+                                    onChange={(e) => setTextColor(e.target.value)}
+                                    className="w-9 h-9 rounded-xl border-2 border-transparent cursor-pointer bg-white overflow-hidden shadow-inner flex-shrink-0"
+                                />
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -132,7 +152,7 @@ export default function IframeGenerator({ slug, isPremium }: { slug: string; isP
                             <span className="text-pink-400">iframe</span>
                             <br />
                             <span className="text-zinc-400 ml-6 truncate"> src=</span>
-                            <span className="text-green-400">"{origin}/widget/{slug}?color=<span className="bg-zinc-800 px-1 rounded text-white">{encodeURIComponent(color)}</span>"</span>
+                            <span className="text-green-400">"{origin}/widget/{slug}?color=<span className="bg-zinc-800 px-1 rounded text-white">{encodeURIComponent(color)}</span>&textColor=<span className="bg-zinc-800 px-1 rounded text-white">{encodeURIComponent(textColor)}</span>"</span>
                             <br />
                             <span className="text-zinc-400 ml-6"> width=</span>
                             <span className="text-green-400">"100%"</span>

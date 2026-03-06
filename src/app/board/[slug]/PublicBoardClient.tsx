@@ -15,11 +15,13 @@ type Idea = {
 export default function PublicBoardClient({
     initialIdeas,
     boardSlug,
-    accentColor = "#FF5C00"
+    accentColor = "#FF5C00",
+    textColor = "#18181b"
 }: {
     initialIdeas: Idea[],
     boardSlug: string,
-    accentColor?: string
+    accentColor?: string,
+    textColor?: string
 }) {
     const [searchQuery, setSearchQuery] = useState('');
     const [statusFilter, setStatusFilter] = useState<'all' | 'pending' | 'planned' | 'done'>('all');
@@ -32,9 +34,9 @@ export default function PublicBoardClient({
     });
 
     return (
-        <section className="space-y-6">
+        <section className="space-y-6" style={{ color: textColor }}>
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
-                <h2 className="font-[family-name:var(--font-jakarta)] text-2xl font-bold tracking-tight text-zinc-900">Mostradas 🔥</h2>
+                <h2 className="font-[family-name:var(--font-jakarta)] text-2xl font-bold tracking-tight" style={{ color: textColor }}>Mostradas 🔥</h2>
 
                 <div className="flex flex-col sm:flex-row gap-3">
                     <div className="relative">
@@ -46,16 +48,17 @@ export default function PublicBoardClient({
                             onChange={(e) => setSearchQuery(e.target.value)}
                             style={{
                                 outlineColor: accentColor,
-                                boxShadow: `0 0 0 2px ${accentColor}10`
+                                boxShadow: `0 0 0 2px ${accentColor}10`,
+                                color: textColor
                             } as React.CSSProperties}
-                            className="h-11 pl-9 pr-4 rounded-2xl border border-zinc-200 bg-[#FAFAFA] focus-visible:bg-white text-sm font-medium text-zinc-900 focus:outline-none transition-colors w-full sm:w-64 shadow-sm"
+                            className="h-11 pl-9 pr-4 rounded-2xl border border-zinc-200 bg-[#FAFAFA] focus-visible:bg-white text-sm font-medium focus:outline-none transition-colors w-full sm:w-64 shadow-sm"
                         />
                     </div>
                     <select
                         value={statusFilter}
                         onChange={(e) => setStatusFilter(e.target.value as 'all' | 'pending' | 'planned' | 'done')}
-                        style={{ outlineColor: accentColor } as React.CSSProperties}
-                        className="h-11 px-4 rounded-2xl border border-zinc-200 bg-[#FAFAFA] text-sm font-medium text-zinc-900 focus:outline-none transition-colors cursor-pointer shadow-sm"
+                        style={{ outlineColor: accentColor, color: textColor } as React.CSSProperties}
+                        className="h-11 px-4 rounded-2xl border border-zinc-200 bg-[#FAFAFA] text-sm font-medium focus:outline-none transition-colors cursor-pointer shadow-sm"
                     >
                         <option value="all">Todos los estados</option>
                         <option value="pending">🤔 Pendiente</option>
@@ -85,7 +88,7 @@ export default function PublicBoardClient({
 
                         <div className="flex-1 min-w-0 flex flex-col justify-center">
                             <div className="flex items-center gap-3 mb-2">
-                                <h3 className="font-[family-name:var(--font-jakarta)] text-xl font-bold tracking-tight text-zinc-900 truncate">
+                                <h3 className="font-[family-name:var(--font-jakarta)] text-xl font-bold tracking-tight truncate" style={{ color: textColor }}>
                                     {idea.title}
                                 </h3>
                                 {idea.status !== 'pending' && (
@@ -96,7 +99,7 @@ export default function PublicBoardClient({
                                     </span>
                                 )}
                             </div>
-                            <p className="text-zinc-600 font-medium leading-relaxed whitespace-pre-wrap line-clamp-3">
+                            <p className="font-medium leading-relaxed whitespace-pre-wrap line-clamp-3 opacity-80" style={{ color: textColor }}>
                                 {idea.description}
                             </p>
                         </div>
@@ -106,8 +109,8 @@ export default function PublicBoardClient({
                 {filteredIdeas.length === 0 && (
                     <div className="p-16 text-center bg-white border-2 border-zinc-200 rounded-3xl border-dashed">
                         <span className="text-4xl block mb-4">👀</span>
-                        <p className="text-zinc-500 font-bold text-lg">No hemos encontrado nada.</p>
-                        <p className="text-zinc-400 font-medium mt-1">Prueba con otros filtros o sé el primero en proponerlo.</p>
+                        <p className="font-bold text-lg" style={{ color: textColor }}>No hemos encontrado nada.</p>
+                        <p className="font-medium mt-1 opacity-60" style={{ color: textColor }}>Prueba con otros filtros o sé el primero en proponerlo.</p>
                     </div>
                 )}
             </div>

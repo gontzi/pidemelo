@@ -13,9 +13,10 @@ export default async function WidgetPage({
     searchParams
 }: {
     params: { slug: string },
-    searchParams: { color?: string }
+    searchParams: { color?: string, textColor?: string }
 }) {
     const accentColor = searchParams.color ? decodeURIComponent(searchParams.color) : "#FF5C00";
+    const textColor = searchParams.textColor ? decodeURIComponent(searchParams.textColor) : "#18181b";
 
     const board = await db.query.boards.findFirst({
         where: eq(boards.slug, params.slug),
@@ -61,8 +62,8 @@ export default async function WidgetPage({
                 {/* Minimal Header for Widget */}
                 <div className="flex items-center justify-between pb-4 border-b border-zinc-100">
                     <div>
-                        <h1 className="text-xl font-black tracking-tight text-zinc-900">{board.name}</h1>
-                        <p className="text-xs text-zinc-500 font-medium tracking-tight">Vota o añade tus propias ideas. ¿Qué crees que le falta a {board.name}?</p>
+                        <h1 className="text-xl font-black tracking-tight">{board.name}</h1>
+                        <p className="text-xs font-medium tracking-tight opacity-70">Vota o añade tus propias ideas. ¿Qué crees que le falta a {board.name}?</p>
                     </div>
                 </div>
 
@@ -75,18 +76,12 @@ export default async function WidgetPage({
                         boardId={board.id}
                         boardSlug={board.slug}
                         accentColor={accentColor}
+                        textColor={textColor}
                     />
                 </section>
 
-                {/* Ideas List */}
-                <PublicBoardClient
-                    initialIdeas={sortedIdeas as any}
-                    boardSlug={board.slug}
-                    accentColor={accentColor}
-                />
-
                 {/* Watermark */}
-                <div className="pt-2 pb-1 text-center">
+                <div className="text-center">
                     <a
                         href="https://pidemelo.app"
                         target="_blank"
