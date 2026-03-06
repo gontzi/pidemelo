@@ -45,8 +45,8 @@ export default async function BoardDashboardPage({ params }: { params: { id: str
     formattedIdeas.sort((a, b) => b.votesCount - a.votesCount);
 
     return (
-        <div className="min-h-screen bg-[#F3F4F6] px-4 py-8 md:p-10 pt-24 md:pt-32">
-            <div className="max-w-7xl mx-auto space-y-6 md:space-y-10 h-full flex flex-col">
+        <div className="h-[100dvh] bg-[#F3F4F6] px-4 py-8">
+            <div className="w-full mx-auto space-y-6 md:space-y-10 h-full flex flex-col">
 
                 <header className="flex flex-col md:flex-row md:items-center justify-between gap-6 bg-white p-6 md:p-10 rounded-[2rem] md:rounded-[2.5rem] border border-zinc-200/60 flex-shrink-0 shadow-xl shadow-zinc-200/20 px-6">
                     <div className="space-y-2 md:space-y-3">

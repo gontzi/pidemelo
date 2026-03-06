@@ -105,9 +105,9 @@ export default function DashboardClient({ initialIdeas, boardId }: { initialIdea
                 </DialogContent>
             </Dialog>
             <DragDropContext onDragEnd={onDragEnd}>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8 min-h-full">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 min-h-[50vh] h-full p-4 md:p-6">
                     {columnsConfig.map(col => (
-                        <div key={col.id} className={`flex flex-col rounded-[2rem] md:rounded-[2.5rem] border p-5 md:p-8 ${col.color}`}>
+                        <div key={col.id} className={`flex flex-col rounded-[2rem] md:rounded-[2.5rem] border p-5 md:p-8 h-full ${col.color}`}>
                             <div className="flex items-center justify-between mb-6 md:mb-8 px-1 md:px-2">
                                 <h3 className="text-[10px] font-black tracking-widest text-zinc-900 uppercase opacity-60">{col.title}</h3>
                                 <span className="bg-white/80 backdrop-blur-sm border border-zinc-200/50 text-zinc-900 font-black text-[10px] px-3 py-1 rounded-full shadow-sm">

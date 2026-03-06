@@ -27,7 +27,7 @@ export default async function Dashboard() {
     const isLimitReached = !isPremium && userBoards.length >= 3;
 
     return (
-        <div className="min-h-screen bg-[#F3F4F6] px-4 py-8 md:p-12 pt-24 md:pt-32">
+        <div className="min-h-screen bg-[#F3F4F6] px-4 py-8">
             <div className="max-w-6xl mx-auto space-y-12 md:space-y-20">
 
                 <section className="flex flex-col lg:flex-row lg:items-end justify-between gap-6 md:gap-8">

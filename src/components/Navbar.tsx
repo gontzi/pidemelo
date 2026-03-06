@@ -140,7 +140,7 @@ export default function Navbar() {
                                     Panel de Control 🏠 <span className="text-orange-500 opacity-0 group-hover:opacity-100 transition-opacity">→</span>
                                 </Link>
                                 <Link href="/dashboard/widgets" onClick={() => setMenuOpen(false)} className="px-5 py-4 rounded-2xl text-zinc-600 font-bold hover:bg-zinc-50 border border-transparent hover:border-zinc-100 flex items-center gap-3 transition-all">
-                                    <Monitor className="w-5 h-5 opacity-40" /> Widgets Pro
+                                    <Monitor className="w-5 h-5 opacity-40" /> Widgets
                                 </Link>
                                 <Link href="/dashboard/billing" onClick={() => setMenuOpen(false)} className="px-5 py-4 rounded-2xl text-zinc-600 font-bold hover:bg-zinc-50 border border-transparent hover:border-zinc-100 flex items-center gap-3 transition-all">
                                     {isPremium ? (

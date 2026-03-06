@@ -18,7 +18,7 @@ export default function ClientWrapper({ children, navbar }: ClientWrapperProps) 
     return (
         <>
             {navbar}
-            <div className="pt-4">
+            <div>
                 {children}
             </div>
         </>
