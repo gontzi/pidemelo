@@ -1,9 +1,20 @@
+import type { Metadata } from 'next'
 import { SignedIn, SignedOut, SignInButton } from "@clerk/nextjs";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 
 export const runtime = 'edge';
 export const dynamic = 'force-dynamic';
+
+// Metadata específica para la Landing (hereda el template de layout.tsx)
+export const metadata: Metadata = {
+  title: 'Tablón de feedback y sugerencias para creadores y SaaS',
+  description:
+    'Recoge el feedback de tu comunidad, gestiona sugerencias y publica tu roadmap público sin complicaciones. La herramienta de feedback definitiva para creadores y SaaS independientes.',
+  alternates: {
+    canonical: 'https://pidemelo.app',
+  },
+}
 
 export default function Home() {
   return (
@@ -49,39 +60,42 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Sección de "Beneficios" (si se pueden llamar así) */}
-        <section id="que-es" className="mt-48 max-w-5xl w-full grid md:grid-cols-3 gap-8 text-left pb-32">
-          <div className="p-8 bg-white border border-zinc-200 rounded-[2.5rem] space-y-4 hover:shadow-xl transition-shadow">
-            <div className="text-3xl text-[#FF5C00]">🤫</div>
-            <h3 className="text-xl font-bold">Sin registros pesados</h3>
-            <p className="text-zinc-500 font-medium">Para que tus usuarios se sientan libres de decirte que tu producto es un lío sin que les guardes rencor.</p>
-          </div>
-          <div className="p-8 bg-white border border-zinc-200 rounded-[2.5rem] space-y-4 hover:shadow-xl transition-shadow rotate-1">
-            <div className="text-3xl text-[#FF5C00]">🗳️</div>
-            <h3 className="text-xl font-bold">Votos de verdad</h3>
-            <p className="text-zinc-500 font-medium">Deja que la democracia decida qué es lo siguiente, o ignóralos a todos. Tú eres el que manda aquí.</p>
-          </div>
-          <div className="p-8 bg-white border border-zinc-200 rounded-[2.5rem] space-y-4 hover:shadow-xl transition-shadow -rotate-1">
-            <div className="text-3xl text-[#FF5C00]">⚡</div>
-            <h3 className="text-xl font-bold">Instalación en 1 min</h3>
-            <p className="text-zinc-500 font-medium">Más rápido que pedir un café. Creas el tablón, pasas el link por el grupo de Telegram y a otra cosa.</p>
+        {/* Sección de "Beneficios" */}
+        <section id="que-es" aria-labelledby="beneficios-heading" className="mt-48 max-w-5xl w-full text-left pb-32">
+          <h2 id="beneficios-heading" className="sr-only">Gestión de feedback sin fricciones</h2>
+          <div className="grid md:grid-cols-3 gap-8">
+            <div className="p-8 bg-white border border-zinc-200 rounded-[2.5rem] space-y-4 hover:shadow-xl transition-shadow">
+              <div className="text-3xl text-[#FF5C00]" aria-hidden="true">🤫</div>
+              <h3 className="text-xl font-bold">Sin registros pesados</h3>
+              <p className="text-zinc-500 font-medium">Para que tus usuarios se sientan libres de decirte que tu producto es un lío sin que les guardes rencor.</p>
+            </div>
+            <div className="p-8 bg-white border border-zinc-200 rounded-[2.5rem] space-y-4 hover:shadow-xl transition-shadow rotate-1">
+              <div className="text-3xl text-[#FF5C00]" aria-hidden="true">🗳️</div>
+              <h3 className="text-xl font-bold">Votos de verdad</h3>
+              <p className="text-zinc-500 font-medium">Deja que la democracia decida qué es lo siguiente, o ignóralos a todos. Tú eres el que manda aquí.</p>
+            </div>
+            <div className="p-8 bg-white border border-zinc-200 rounded-[2.5rem] space-y-4 hover:shadow-xl transition-shadow -rotate-1">
+              <div className="text-3xl text-[#FF5C00]" aria-hidden="true">⚡</div>
+              <h3 className="text-xl font-bold">Instalación en 1 min</h3>
+              <p className="text-zinc-500 font-medium">Más rápido que pedir un café. Creas el tablón, pasas el link por el grupo de Telegram y a otra cosa.</p>
+            </div>
           </div>
         </section>
 
         {/* FAQ - Dudas existenciales */}
-        <section id="faq" className="max-w-3xl w-full text-left py-20 font-sans">
-          <h2 className="text-3xl font-heading font-black mb-10 tracking-tight">Dudas existenciales ❓</h2>
+        <section id="faq" aria-labelledby="faq-heading" className="max-w-3xl w-full text-left py-20 font-sans">
+          <h2 id="faq-heading" className="text-3xl font-heading font-black mb-10 tracking-tight">Dudas existenciales ❓</h2>
           <div className="space-y-8">
             <div>
-              <h4 className="font-bold text-lg mb-2">¿Es seguro?</h4>
+              <h3 className="font-bold text-lg mb-2">¿Es seguro?</h3>
               <p className="text-zinc-500 font-medium">Tan seguro como puede ser un tablón donde la gente entra a pedir cosas. Usamos Clerk y Drizzle, así que no te preocupes.</p>
             </div>
             <div>
-              <h4 className="font-bold text-lg mb-2">¿Por qué es gratis?</h4>
+              <h3 className="font-bold text-lg mb-2">¿Por qué es gratis?</h3>
               <p className="text-zinc-500 font-medium">Porque queremos que llenes tu lista de tareas con ideas brillantes antes de intentar cobrarte por algo que podrías hacer en un Excel (pero más feo).</p>
             </div>
             <div>
-              <h4 className="font-bold text-lg mb-2">¿Puedo borrar a los pesados?</h4>
+              <h3 className="font-bold text-lg mb-2">¿Puedo borrar a los pesados?</h3>
               <p className="text-zinc-500 font-medium">¡Claro! Tienes un panel de administrador para mover ideas al limbo o borrarlas si se ponen muy intensos.</p>
             </div>
           </div>

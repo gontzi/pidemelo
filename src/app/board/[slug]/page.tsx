@@ -1,3 +1,4 @@
+import type { Metadata } from 'next'
 import { db } from "@/db";
 import { boards, ideas } from "@/db/schema";
 import { eq, desc } from "drizzle-orm";
@@ -7,6 +8,54 @@ import SubmitIdeaForm from "./SubmitIdeaForm";
 
 export const runtime = 'edge';
 export const dynamic = 'force-dynamic';
+
+type Props = { params: { slug: string } }
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+    const board = await db.query.boards.findFirst({
+        where: eq(boards.slug, params.slug),
+    })
+
+    if (!board) {
+        return {
+            title: 'Tablero no encontrado',
+        }
+    }
+
+    const title = `${board.name} — Tablón de sugerencias`
+    const description = `Vota y envía tus ideas para "${board.name}". Deja que la comunidad decida qué viene después.`
+    const url = `https://pidemelo.app/board/${board.slug}`
+
+    return {
+        title: board.name, // El template en layout lo convierte en: "Nombre del board | Pídemelo"
+        description,
+        alternates: {
+            canonical: url,
+        },
+        openGraph: {
+            type: 'website',
+            url,
+            title,
+            description,
+            images: [
+                {
+                    url: '/og-image.png',
+                    width: 1200,
+                    height: 630,
+                    alt: title,
+                },
+            ],
+        },
+        twitter: {
+            card: 'summary_large_image',
+            title,
+            description,
+            images: ['/og-image.png'],
+        },
+    }
+}
+
+
 
 export default async function PublicBoardPage({ params }: { params: { slug: string } }) {
     const board = await db.query.boards.findFirst({
