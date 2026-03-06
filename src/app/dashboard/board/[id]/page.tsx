@@ -82,7 +82,6 @@ export default async function BoardDashboardPage({ params }: { params: { id: str
                     </div>
                 </header>
 
-                <IframeGenerator slug={board.slug} isPremium={isPremium} />
 
                 <main className="flex-1 bg-white rounded-[2.5rem] border border-zinc-200/60 p-1">
                     <DashboardClient initialIdeas={formattedIdeas} boardId={board.id} />

@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { db } from "@/db";
 import { users } from "@/db/schema";
 import { eq } from "drizzle-orm";
-import { Sparkles, Zap } from "lucide-react";
+import { Sparkles, Zap, Monitor } from "lucide-react";
 
 export default async function Navbar() {
     const { userId } = auth();
@@ -66,6 +66,11 @@ export default async function Navbar() {
                                     )}
                                 </button>
                             </Link>
+                            <Link href="/dashboard/widgets">
+                                <button className="text-sm font-bold text-zinc-600 hover:text-[#FF5C00] transition-colors px-3 py-2 rounded-full hover:bg-orange-50/50 flex items-center gap-2 group">
+                                    Widgets <Monitor className="w-3.5 h-3.5 text-zinc-400 group-hover:text-[#FF5C00] transition-all" />
+                                </button>
+                            </Link>
                             <Link href="/dashboard">
                                 <Button className="bg-[#FF5C00] hover:bg-[#FF5C00]/90 text-white font-bold text-sm rounded-full px-5 h-9 shadow-lg shadow-[#FF5C00]/10 transition-all hover:scale-105 active:scale-95">
                                     Panel
@@ -77,8 +82,8 @@ export default async function Navbar() {
                         </div>
                     </SignedIn>
                 </div>
-            </div>
-        </nav>
+            </div >
+        </nav >
     );
 }
 
