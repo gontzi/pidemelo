@@ -90,6 +90,9 @@ export default function Navbar() {
                                         Panel 🏠
                                     </Button>
                                 </Link>
+                                <div className="ml-2 flex items-center">
+                                    <UserButton appearance={{ elements: { avatarBox: "w-9 h-9 border border-zinc-200 shadow-sm" } }} />
+                                </div>
                             </div>
 
                             {/* Mobile: avatar (hamburger below) */}
