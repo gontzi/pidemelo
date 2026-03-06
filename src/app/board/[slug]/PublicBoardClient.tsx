@@ -1,8 +1,8 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { upvoteIdea } from './actions';
-import { Search } from 'lucide-react';
+import { Search, ChevronDown } from 'lucide-react';
 
 type Idea = {
     id: string;
@@ -25,6 +25,26 @@ export default function PublicBoardClient({
 }) {
     const [searchQuery, setSearchQuery] = useState('');
     const [statusFilter, setStatusFilter] = useState<'all' | 'pending' | 'planned' | 'done'>('all');
+    const [dropdownOpen, setDropdownOpen] = useState(false);
+    const dropdownRef = useRef<HTMLDivElement>(null);
+
+    // Cerrar el dropdown al hacer click fuera
+    useEffect(() => {
+        function handleClickOutside(e: MouseEvent) {
+            if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+                setDropdownOpen(false);
+            }
+        }
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, []);
+
+    const filterOptions = [
+        { value: 'all', label: 'Todos los estados', emoji: '🗂️' },
+        { value: 'pending', label: 'Pendiente', emoji: '🤔' },
+        { value: 'planned', label: 'Planeado', emoji: '🏗️' },
+        { value: 'done', label: 'Hecho', emoji: '✅' },
+    ] as const;
 
     const filteredIdeas = initialIdeas.filter(idea => {
         const matchesSearch = idea.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -35,8 +55,11 @@ export default function PublicBoardClient({
 
     return (
         <section className="space-y-6" style={{ color: textColor }}>
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
-                <h2 className="font-[family-name:var(--font-jakarta)] text-2xl font-bold tracking-tight" style={{ color: textColor }}>Mostradas 🔥</h2>
+            {/* Cabecera con título y filtros */}
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <h2 className="font-[family-name:var(--font-jakarta)] text-2xl font-bold tracking-tight inline-flex items-center gap-2" style={{ color: textColor }}>
+                    Mostradas <span>🔥</span>
+                </h2>
 
                 <div className="flex flex-col sm:flex-row gap-3">
                     <div className="relative">
@@ -54,20 +77,46 @@ export default function PublicBoardClient({
                             className="h-11 pl-9 pr-4 rounded-2xl border border-zinc-200 bg-[#FAFAFA] focus-visible:bg-white text-sm font-medium focus:outline-none transition-colors w-full sm:w-64 shadow-sm"
                         />
                     </div>
-                    <select
-                        value={statusFilter}
-                        onChange={(e) => setStatusFilter(e.target.value as 'all' | 'pending' | 'planned' | 'done')}
-                        style={{ outlineColor: accentColor, color: textColor } as React.CSSProperties}
-                        className="h-11 px-4 rounded-2xl border border-zinc-200 bg-[#FAFAFA] text-sm font-medium focus:outline-none transition-colors cursor-pointer shadow-sm"
-                    >
-                        <option value="all">Todos los estados</option>
-                        <option value="pending">🤔 Pendiente</option>
-                        <option value="planned">🏗️ Planeado</option>
-                        <option value="done">✅ Hecho</option>
-                    </select>
+                    {/* Custom Dropdown */}
+                    <div className="relative" ref={dropdownRef}>
+                        <button
+                            type="button"
+                            onClick={() => setDropdownOpen(p => !p)}
+                            style={{ borderColor: dropdownOpen ? accentColor : undefined, color: textColor } as React.CSSProperties}
+                            className="h-11 pl-4 pr-10 rounded-2xl border border-zinc-200 bg-[#FAFAFA] text-sm font-bold focus:outline-none transition-all cursor-pointer shadow-sm hover:border-zinc-300 hover:bg-white flex items-center gap-2 min-w-[160px] relative"
+                        >
+                            <span>{filterOptions.find(o => o.value === statusFilter)?.emoji}</span>
+                            <span className="flex-1 text-left">{filterOptions.find(o => o.value === statusFilter)?.label}</span>
+                            <ChevronDown
+                                className={`absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400 transition-transform duration-200 ${dropdownOpen ? 'rotate-180' : ''}`}
+                            />
+                        </button>
+
+                        {dropdownOpen && (
+                            <div className="absolute top-[calc(100%+8px)] right-0 z-50 bg-white border border-zinc-200 rounded-2xl shadow-xl shadow-zinc-200/60 py-2 min-w-full overflow-hidden animate-in fade-in slide-in-from-top-2 duration-150">
+                                {filterOptions.map(option => {
+                                    const isActive = statusFilter === option.value;
+                                    return (
+                                        <button
+                                            key={option.value}
+                                            type="button"
+                                            onClick={() => { setStatusFilter(option.value); setDropdownOpen(false); }}
+                                            style={isActive ? { color: accentColor, backgroundColor: `${accentColor}10` } : { color: textColor }}
+                                            className="w-full flex items-center gap-3 px-4 py-2.5 text-sm font-bold hover:bg-zinc-50 transition-colors text-left"
+                                        >
+                                            <span>{option.emoji}</span>
+                                            <span>{option.label}</span>
+                                            {isActive && <span className="ml-auto w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ backgroundColor: accentColor }} />}
+                                        </button>
+                                    );
+                                })}
+                            </div>
+                        )}
+                    </div>
                 </div>
             </div>
 
+            {/* Lista de ideas */}
             <div className="space-y-4">
                 {filteredIdeas.map((idea) => (
                     <div key={idea.id} className="group flex gap-5 p-6 bg-white border border-zinc-200 rounded-3xl hover:border-zinc-300 hover:shadow-lg hover:shadow-zinc-200/50 transition-all">
