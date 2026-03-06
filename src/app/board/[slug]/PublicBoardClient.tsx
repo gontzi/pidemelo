@@ -12,7 +12,15 @@ type Idea = {
     votes: { id: string }[];
 };
 
-export default function PublicBoardClient({ initialIdeas, boardSlug }: { initialIdeas: Idea[], boardSlug: string }) {
+export default function PublicBoardClient({
+    initialIdeas,
+    boardSlug,
+    accentColor = "#FF5C00"
+}: {
+    initialIdeas: Idea[],
+    boardSlug: string,
+    accentColor?: string
+}) {
     const [searchQuery, setSearchQuery] = useState('');
     const [statusFilter, setStatusFilter] = useState<'all' | 'pending' | 'planned' | 'done'>('all');
 
@@ -36,13 +44,18 @@ export default function PublicBoardClient({ initialIdeas, boardSlug }: { initial
                             placeholder="Buscar peticiones..."
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
-                            className="h-11 pl-9 pr-4 rounded-2xl border border-zinc-200 bg-[#FAFAFA] focus-visible:bg-white text-sm font-medium text-zinc-900 focus:outline-none focus:ring-2 focus:ring-[#FF5C00]/20 focus:border-[#FF5C00] transition-colors w-full sm:w-64 shadow-sm"
+                            style={{
+                                outlineColor: accentColor,
+                                boxShadow: `0 0 0 2px ${accentColor}10`
+                            } as React.CSSProperties}
+                            className="h-11 pl-9 pr-4 rounded-2xl border border-zinc-200 bg-[#FAFAFA] focus-visible:bg-white text-sm font-medium text-zinc-900 focus:outline-none transition-colors w-full sm:w-64 shadow-sm"
                         />
                     </div>
                     <select
                         value={statusFilter}
                         onChange={(e) => setStatusFilter(e.target.value as 'all' | 'pending' | 'planned' | 'done')}
-                        className="h-11 px-4 rounded-2xl border border-zinc-200 bg-[#FAFAFA] text-sm font-medium text-zinc-900 focus:outline-none focus:ring-2 focus:ring-[#FF5C00]/20 focus:border-[#FF5C00] transition-colors cursor-pointer shadow-sm"
+                        style={{ outlineColor: accentColor } as React.CSSProperties}
+                        className="h-11 px-4 rounded-2xl border border-zinc-200 bg-[#FAFAFA] text-sm font-medium text-zinc-900 focus:outline-none transition-colors cursor-pointer shadow-sm"
                     >
                         <option value="all">Todos los estados</option>
                         <option value="pending">🤔 Pendiente</option>
@@ -55,13 +68,18 @@ export default function PublicBoardClient({ initialIdeas, boardSlug }: { initial
             <div className="space-y-4">
                 {filteredIdeas.map((idea) => (
                     <div key={idea.id} className="group flex gap-5 p-6 bg-white border border-zinc-200 rounded-3xl hover:border-zinc-300 hover:shadow-lg hover:shadow-zinc-200/50 transition-all">
-                        <form action={upvoteIdea.bind(null, idea.id, boardSlug)} className="shrink-0">
+                        <form action={upvoteIdea.bind(null, idea.id, boardSlug)} className="shrink-0 text-[#FF5C00]">
                             <button
                                 type="submit"
-                                className="flex flex-col items-center justify-center w-16 h-20 border border-zinc-200 bg-[#FAFAFA] rounded-2xl hover:bg-[#FF5C00]/10 hover:border-[#FF5C00] hover:text-[#FF5C00] transition-colors active:scale-95 group/btn shadow-sm"
+                                style={{
+                                    '--hover-bg': `${accentColor}15`,
+                                    '--hover-border': accentColor,
+                                    '--hover-text': accentColor
+                                } as React.CSSProperties}
+                                className="flex flex-col items-center justify-center w-16 h-20 border border-zinc-200 bg-[#FAFAFA] rounded-2xl hover:bg-[var(--hover-bg)] hover:border-[var(--hover-border)] hover:text-[var(--hover-text)] transition-colors active:scale-95 group/btn shadow-sm"
                             >
-                                <span className="text-zinc-400 font-black mb-1 text-sm group-hover/btn:text-[#FF5C00]">▲</span>
-                                <span className="text-zinc-900 font-extrabold text-xl leading-none group-hover/btn:text-[#FF5C00]">{idea.votes.length}</span>
+                                <span className={`text-zinc-400 font-black mb-1 text-sm group-hover/btn:text-[var(--hover-text)]`}>▲</span>
+                                <span className={`text-zinc-900 font-extrabold text-xl leading-none group-hover/btn:text-[var(--hover-text)]`}>{idea.votes.length}</span>
                             </button>
                         </form>
 

@@ -8,7 +8,15 @@ import SubmitIdeaForm from "../../board/[slug]/SubmitIdeaForm";
 export const runtime = 'edge';
 export const dynamic = 'force-dynamic';
 
-export default async function WidgetPage({ params }: { params: { slug: string } }) {
+export default async function WidgetPage({
+    params,
+    searchParams
+}: {
+    params: { slug: string },
+    searchParams: { color?: string }
+}) {
+    const accentColor = searchParams.color ? decodeURIComponent(searchParams.color) : "#FF5C00";
+
     const board = await db.query.boards.findFirst({
         where: eq(boards.slug, params.slug),
         with: {
@@ -63,8 +71,19 @@ export default async function WidgetPage({ params }: { params: { slug: string } 
                     <h2 className="text-sm font-bold tracking-tight mb-4 flex items-center gap-2">
                         <span>💡</span> Sugiere algo nuevo
                     </h2>
-                    <SubmitIdeaForm boardId={board.id} boardSlug={board.slug} />
+                    <SubmitIdeaForm
+                        boardId={board.id}
+                        boardSlug={board.slug}
+                        accentColor={accentColor}
+                    />
                 </section>
+
+                {/* Ideas List */}
+                <PublicBoardClient
+                    initialIdeas={sortedIdeas as any}
+                    boardSlug={board.slug}
+                    accentColor={accentColor}
+                />
 
                 {/* Watermark */}
                 <div className="pt-2 pb-1 text-center">

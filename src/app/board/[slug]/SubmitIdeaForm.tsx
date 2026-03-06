@@ -5,7 +5,15 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { submitIdea } from './actions';
 
-export default function SubmitIdeaForm({ boardId, boardSlug }: { boardId: string, boardSlug: string }) {
+export default function SubmitIdeaForm({
+    boardId,
+    boardSlug,
+    accentColor = "#FF5C00"
+}: {
+    boardId: string,
+    boardSlug: string,
+    accentColor?: string
+}) {
     const [isPending, setIsPending] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const formRef = useRef<HTMLFormElement>(null);
@@ -40,7 +48,8 @@ export default function SubmitIdeaForm({ boardId, boardSlug }: { boardId: string
                     placeholder="Ej. Poner un botón que me dé café gratis..."
                     required
                     maxLength={100}
-                    className="h-14 shadow-none border-zinc-200 bg-[#FAFAFA] rounded-2xl focus-visible:ring-[#FF5C00] focus-visible:bg-white font-medium px-4"
+                    style={{ '--tw-ring-color': accentColor } as React.CSSProperties}
+                    className="h-14 shadow-none border-zinc-200 bg-[#FAFAFA] rounded-2xl focus-visible:ring-1 focus-visible:bg-white font-medium px-4"
                 />
             </div>
             <div>
@@ -49,7 +58,8 @@ export default function SubmitIdeaForm({ boardId, boardSlug }: { boardId: string
                     placeholder="Cuéntame tu drama, a ver si podemos hacer algo..."
                     required
                     maxLength={1000}
-                    className="w-full shadow-none border border-zinc-200 bg-[#FAFAFA] p-4 rounded-2xl min-h-[140px] outline-none font-medium text-sm focus-visible:ring-1 focus-visible:ring-[#FF5C00] focus-visible:border-[#FF5C00] focus-visible:bg-white text-zinc-900 resize-y"
+                    style={{ '--tw-ring-color': accentColor } as React.CSSProperties}
+                    className="w-full shadow-none border border-zinc-200 bg-[#FAFAFA] p-4 rounded-2xl min-h-[140px] outline-none font-medium text-sm focus-visible:ring-1 focus-visible:border-zinc-300 focus-visible:bg-white text-zinc-900 resize-y"
                 />
             </div>
             {error && (
@@ -57,7 +67,12 @@ export default function SubmitIdeaForm({ boardId, boardSlug }: { boardId: string
                     {error}
                 </div>
             )}
-            <Button disabled={isPending} type="submit" className="w-full h-14 bg-[#FF5C00] text-white hover:bg-[#E65300] shadow-md shadow-[#FF5C00]/20 rounded-full font-bold transition-transform active:scale-95 text-lg disabled:opacity-70 disabled:hover:scale-100">
+            <Button
+                disabled={isPending}
+                type="submit"
+                style={{ backgroundColor: accentColor, boxShadow: `0 4px 6px -1px ${accentColor}33, 0 2px 4px -1px ${accentColor}1A` }}
+                className="w-full h-14 text-white hover:opacity-90 rounded-full font-bold transition-transform active:scale-95 text-lg disabled:opacity-70 disabled:hover:scale-100 shadow-md"
+            >
                 {isPending ? 'Mandándolo a la nube...' : 'Soltar mi idea 💣'}
             </Button>
         </form>
