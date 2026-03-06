@@ -80,25 +80,63 @@ export async function POST(req: Request) {
 
     // Lógica de actualización de DB (solo si la firma es válida)
     const payload = JSON.parse(body);
+    const eventType = payload.type;
     const data = payload.data;
-    const clerkId = data.metadata?.clerkId || data.customer_metadata?.clerkId;
 
-    if (!clerkId) return NextResponse.json({ received: true });
+    // Buscamos el ID del usuario en cualquier rincón del JSON (metadata o customer_metadata)
+    const clerkId = data.metadata?.clerkId ||
+        data.customer_metadata?.clerkId ||
+        payload.customer_metadata?.clerkId;
+
+    if (!clerkId && eventType !== "subscription.canceled" && eventType !== "subscription.revoked") {
+        return NextResponse.json({ received: true, info: "No clerkId found" });
+    }
 
     try {
-        const isSub = !!data.subscription_id;
-        const plan = isSub ? 'pro' : 'lifetime';
-        const subId = data.subscription_id || data.id || null;
+        switch (eventType) {
+            case "order.created": {
+                // Si la orden viene con subscription_id, es un plan pro mensual
+                const isSub = !!data.subscription_id;
+                const plan = isSub ? 'pro' : 'lifetime';
+                const subId = data.subscription_id || null;
 
-        await db.insert(users)
-            .values({ id: clerkId, isPremium: true, plan, subscriptionId: subId, updatedAt: new Date() })
-            .onConflictDoUpdate({
-                target: users.id,
-                set: { isPremium: true, plan, subscriptionId: subId, updatedAt: new Date() }
-            });
+                await db.insert(users)
+                    .values({ id: clerkId!, isPremium: true, plan, subscriptionId: subId, updatedAt: new Date() })
+                    .onConflictDoUpdate({
+                        target: users.id,
+                        set: { isPremium: true, plan, subscriptionId: subId, updatedAt: new Date() }
+                    });
+                break;
+            }
+
+            case "subscription.created":
+            case "subscription.updated": {
+                // Es una suscripción activa
+                const isPremium = data.status === 'active' || data.status === 'trialing';
+                await db.insert(users)
+                    .values({ id: clerkId!, isPremium, plan: isPremium ? 'pro' : null, subscriptionId: data.id, updatedAt: new Date() })
+                    .onConflictDoUpdate({
+                        target: users.id,
+                        set: { isPremium, plan: isPremium ? 'pro' : null, subscriptionId: data.id, updatedAt: new Date() }
+                    });
+                break;
+            }
+
+            case "subscription.canceled":
+            case "subscription.revoked":
+            case "subscription.past_due": {
+                // Al cancelar o fallar el pago, quitamos el premium
+                // Nota: Buscamos al usuario por su subscriptionId en lugar de clerkId si fuera necesario
+                await db.update(users)
+                    .set({ isPremium: false, plan: null, updatedAt: new Date() })
+                    .where(eq(users.subscriptionId, data.id));
+                break;
+            }
+        }
 
         return NextResponse.json({ success: true });
     } catch (error) {
+        console.error("🔥 Error Webhook Polar:", error);
         return NextResponse.json({ error: "DB Error" }, { status: 500 });
     }
 }
