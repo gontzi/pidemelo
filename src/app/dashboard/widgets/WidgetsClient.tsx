@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useMemo } from 'react';
-import { Copy, Check, Code, Lock, Monitor, Smartphone, Layout, Palette, Type } from 'lucide-react';
+import { Copy, Check, Code, Lock, Monitor, Smartphone, Layout, Palette, Sun, Moon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 
@@ -21,6 +21,7 @@ export default function WidgetsClient({
     const [selectedBoardId, setSelectedBoardId] = useState(boards[0]?.id || '');
     const [accentColor, setAccentColor] = useState('#FF5C00');
     const [textColor, setTextColor] = useState('#18181b');
+    const [isDarkMode, setIsDarkMode] = useState(false);
     const [copied, setCopied] = useState(false);
     const [viewMode, setViewMode] = useState<'desktop' | 'mobile'>('desktop');
 
@@ -30,8 +31,8 @@ export default function WidgetsClient({
 
     const origin = typeof window !== 'undefined' ? window.location.origin : 'https://pidemelo.app';
     const widgetUrl = useMemo(() =>
-        `${origin}/widget/${selectedBoard?.slug}?color=${encodeURIComponent(accentColor)}&textColor=${encodeURIComponent(textColor)}`,
-        [origin, selectedBoard, accentColor, textColor]);
+        `${origin}/widget/${selectedBoard?.slug}?color=${encodeURIComponent(accentColor)}&textColor=${encodeURIComponent(textColor)}&darkMode=${isDarkMode}`,
+        [origin, selectedBoard, accentColor, textColor, isDarkMode]);
 
     const iframeCode = useMemo(() =>
         `<iframe src="${widgetUrl}" width="100%" height="600px" frameborder="0"></iframe>`,
@@ -162,6 +163,25 @@ export default function WidgetsClient({
                                     onChange={(e) => setTextColor(e.target.value)}
                                     className="w-9 h-9 md:w-10 md:h-10 rounded-xl border-2 border-transparent cursor-pointer bg-white overflow-hidden shadow-inner flex-shrink-0"
                                 />
+                            </div>
+                        </div>
+
+                        {/* Tema del Widget */}
+                        <div className="space-y-3">
+                            <label className="text-[10px] uppercase font-black tracking-widest text-zinc-900 ml-1">Tema del Widget</label>
+                            <div className="flex bg-zinc-100 p-1 rounded-2xl w-fit">
+                                <button
+                                    onClick={() => setIsDarkMode(false)}
+                                    className={`px-4 py-2 flex items-center gap-2 rounded-xl text-xs font-bold transition-all ${!isDarkMode ? 'bg-white text-zinc-900 shadow-md' : 'text-zinc-500 hover:text-zinc-700'}`}
+                                >
+                                    <Sun className="w-4 h-4" /> Claro
+                                </button>
+                                <button
+                                    onClick={() => setIsDarkMode(true)}
+                                    className={`px-4 py-2 flex items-center gap-2 rounded-xl text-xs font-bold transition-all ${isDarkMode ? 'bg-zinc-900 text-white shadow-md' : 'text-zinc-500 hover:text-zinc-700'}`}
+                                >
+                                    <Moon className="w-4 h-4" /> Oscuro
+                                </button>
                             </div>
                         </div>
                     </div>

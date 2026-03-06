@@ -9,12 +9,14 @@ export default function SubmitIdeaForm({
     boardId,
     boardSlug,
     accentColor = "#FF5C00",
-    textColor = "#18181b"
+    textColor = "#18181b",
+    isDarkMode = false
 }: {
     boardId: string,
     boardSlug: string,
     accentColor?: string,
-    textColor?: string
+    textColor?: string,
+    isDarkMode?: boolean
 }) {
     const [isPending, setIsPending] = useState(false);
     const [error, setError] = useState<string | null>(null);
@@ -50,8 +52,8 @@ export default function SubmitIdeaForm({
                     placeholder="Ej. Poner un botón que me dé café gratis..."
                     required
                     maxLength={100}
-                    style={{ '--tw-ring-color': accentColor, color: textColor } as React.CSSProperties}
-                    className="h-12 md:h-14 shadow-none border-zinc-200 bg-[#FAFAFA] rounded-2xl focus-visible:ring-1 focus-visible:bg-white font-medium px-4 text-base"
+                    style={{ '--tw-ring-color': accentColor, color: isDarkMode ? '#f4f4f5' : textColor } as React.CSSProperties}
+                    className={`h-12 md:h-14 shadow-none ${isDarkMode ? 'border-zinc-800 bg-zinc-900 placeholder:text-zinc-600 focus-visible:bg-zinc-800' : 'border-zinc-200 bg-[#FAFAFA] focus-visible:bg-white'} rounded-2xl focus-visible:ring-1 font-medium px-4 text-base transition-colors`}
                 />
             </div>
             <div>
@@ -60,8 +62,8 @@ export default function SubmitIdeaForm({
                     placeholder="Cuéntame tu drama, a ver si podemos hacer algo..."
                     required
                     maxLength={1000}
-                    style={{ '--tw-ring-color': accentColor, color: textColor } as React.CSSProperties}
-                    className="w-full shadow-none border border-zinc-200 bg-[#FAFAFA] p-4 rounded-2xl min-h-[120px] md:min-h-[140px] outline-none font-medium text-base md:text-sm focus-visible:ring-1 focus-visible:border-zinc-300 focus-visible:bg-white resize-y"
+                    style={{ '--tw-ring-color': accentColor, color: isDarkMode ? '#f4f4f5' : textColor } as React.CSSProperties}
+                    className={`w-full shadow-none border ${isDarkMode ? 'border-zinc-800 bg-zinc-900 placeholder:text-zinc-600 focus-visible:border-zinc-700 focus-visible:bg-zinc-800' : 'border-zinc-200 bg-[#FAFAFA] focus-visible:border-zinc-300 focus-visible:bg-white'} p-4 rounded-2xl min-h-[120px] md:min-h-[140px] outline-none font-medium text-base md:text-sm focus-visible:ring-1 resize-y transition-colors`}
                 />
             </div>
             {error && (

@@ -13,10 +13,11 @@ export default async function WidgetPage({
     searchParams
 }: {
     params: { slug: string },
-    searchParams: { color?: string, textColor?: string }
+    searchParams: { color?: string, textColor?: string, darkMode?: string }
 }) {
     const accentColor = searchParams.color ? decodeURIComponent(searchParams.color) : "#FF5C00";
     const textColor = searchParams.textColor ? decodeURIComponent(searchParams.textColor) : "#18181b";
+    const isDarkMode = searchParams.darkMode === 'true';
 
     const board = await db.query.boards.findFirst({
         where: eq(boards.slug, params.slug),
@@ -57,18 +58,18 @@ export default async function WidgetPage({
     const sortedIdeas = board.ideas.sort((a, b) => b.votes.length - a.votes.length);
 
     return (
-        <div className="min-h-screen bg-white">
+        <div className={`min-h-screen ${isDarkMode ? 'bg-zinc-950 text-zinc-50' : 'bg-white text-zinc-900'} transition-colors`}>
             <main className="p-4 space-y-8">
                 {/* Minimal Header for Widget */}
-                <div className="flex items-center justify-between pb-4 border-b border-zinc-100">
+                <div className={`flex items-center justify-between pb-4 border-b ${isDarkMode ? 'border-zinc-800' : 'border-zinc-100'} transition-colors`}>
                     <div>
                         <h1 className="text-xl font-black tracking-tight">{board.name}</h1>
-                        <p className="text-xs font-medium tracking-tight opacity-70">Vota o añade tus propias ideas. ¿Qué crees que le falta a {board.name}?</p>
+                        <p className={`text-xs font-medium tracking-tight opacity-70 ${isDarkMode ? 'text-zinc-400' : ''}`}>Vota o añade tus propias ideas. ¿Qué crees que le falta a {board.name}?</p>
                     </div>
                 </div>
 
                 {/* Form at Top for Widget to save space */}
-                <section className="bg-zinc-50/50 border border-zinc-100 p-6 rounded-2xl">
+                <section className={`${isDarkMode ? 'bg-zinc-900 border-zinc-800' : 'bg-zinc-50/50 border-zinc-100'} border p-6 rounded-2xl transition-colors`}>
                     <h2 className="text-sm font-bold tracking-tight mb-4 flex items-center gap-2">
                         <span>💡</span> Sugiere algo nuevo
                     </h2>
@@ -77,6 +78,7 @@ export default async function WidgetPage({
                         boardSlug={board.slug}
                         accentColor={accentColor}
                         textColor={textColor}
+                        isDarkMode={isDarkMode}
                     />
                 </section>
 

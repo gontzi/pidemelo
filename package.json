@@ -20,6 +20,7 @@
     "drizzle-orm": "^0.45.1",
     "lucide-react": "^0.576.0",
     "next": "14.2.15",
+    "next-themes": "^0.4.6",
     "react": "^18",
     "react-dom": "^18",
     "standardwebhooks": "^1.0.0",
