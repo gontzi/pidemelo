@@ -51,7 +51,7 @@ export default function SubmitIdeaForm({
                     required
                     maxLength={100}
                     style={{ '--tw-ring-color': accentColor, color: textColor } as React.CSSProperties}
-                    className="h-14 shadow-none border-zinc-200 bg-[#FAFAFA] rounded-2xl focus-visible:ring-1 focus-visible:bg-white font-medium px-4"
+                    className="h-12 md:h-14 shadow-none border-zinc-200 bg-[#FAFAFA] rounded-2xl focus-visible:ring-1 focus-visible:bg-white font-medium px-4 text-base"
                 />
             </div>
             <div>
@@ -61,21 +61,21 @@ export default function SubmitIdeaForm({
                     required
                     maxLength={1000}
                     style={{ '--tw-ring-color': accentColor, color: textColor } as React.CSSProperties}
-                    className="w-full shadow-none border border-zinc-200 bg-[#FAFAFA] p-4 rounded-2xl min-h-[140px] outline-none font-medium text-sm focus-visible:ring-1 focus-visible:border-zinc-300 focus-visible:bg-white resize-y"
+                    className="w-full shadow-none border border-zinc-200 bg-[#FAFAFA] p-4 rounded-2xl min-h-[120px] md:min-h-[140px] outline-none font-medium text-base md:text-sm focus-visible:ring-1 focus-visible:border-zinc-300 focus-visible:bg-white resize-y"
                 />
             </div>
             {error && (
-                <div className="p-3 bg-red-50 text-red-600 text-sm font-bold rounded-xl border border-red-100 text-center">
+                <div className="p-3 bg-red-50 text-red-600 text-[10px] md:text-sm font-bold rounded-xl border border-red-100 text-center uppercase tracking-widest">
                     {error}
                 </div>
             )}
             <Button
                 disabled={isPending}
                 type="submit"
-                style={{ color: textColor, backgroundColor: accentColor, boxShadow: `0 4px 6px -1px ${accentColor}33, 0 2px 4px -1px ${accentColor}1A` }}
-                className="w-full h-14 text-white hover:opacity-90 rounded-full font-bold transition-transform active:scale-95 text-lg disabled:opacity-70 disabled:hover:scale-100 shadow-md"
+                style={{ color: textColor, backgroundColor: accentColor, boxShadow: `0 4px 12px ${accentColor}33` }}
+                className="w-full h-12 md:h-14 text-white hover:opacity-90 rounded-full font-black tracking-widest uppercase transition-all active:scale-95 text-xs md:text-sm disabled:opacity-70 disabled:hover:scale-100 shadow-lg"
             >
-                {isPending ? 'Mandándolo a la nube...' : 'Soltar mi idea 💣'}
+                {isPending ? 'ENVIANDO...' : 'SOLTAR MI IDEA 🚀'}
             </Button>
         </form>
     );

@@ -117,9 +117,9 @@ export default function PublicBoardClient({
             </div>
 
             {/* Lista de ideas */}
-            <div className="space-y-4">
+            <div className="space-y-3 md:space-y-4">
                 {filteredIdeas.map((idea) => (
-                    <div key={idea.id} className="group flex gap-5 p-6 bg-white border border-zinc-200 rounded-3xl hover:border-zinc-300 hover:shadow-lg hover:shadow-zinc-200/50 transition-all">
+                    <div key={idea.id} className="group flex gap-3 md:gap-5 p-4 md:p-6 bg-white border border-zinc-200 rounded-2xl md:rounded-3xl hover:border-zinc-300 hover:shadow-lg hover:shadow-zinc-200/50 transition-all">
                         <form action={upvoteIdea.bind(null, idea.id, boardSlug)} className="shrink-0 text-[#FF5C00]">
                             <button
                                 type="submit"
@@ -128,27 +128,27 @@ export default function PublicBoardClient({
                                     '--hover-border': accentColor,
                                     '--hover-text': accentColor
                                 } as React.CSSProperties}
-                                className="flex flex-col items-center justify-center w-16 h-20 border border-zinc-200 bg-[#FAFAFA] rounded-2xl hover:bg-[var(--hover-bg)] hover:border-[var(--hover-border)] hover:text-[var(--hover-text)] transition-colors active:scale-95 group/btn shadow-sm"
+                                className="flex flex-col items-center justify-center w-14 md:w-16 h-18 md:h-20 border border-zinc-200 bg-[#FAFAFA] rounded-xl md:rounded-2xl hover:bg-[var(--hover-bg)] hover:border-[var(--hover-border)] hover:text-[var(--hover-text)] transition-colors active:scale-95 group/btn shadow-sm"
                             >
-                                <span className={`text-zinc-400 font-black mb-1 text-sm group-hover/btn:text-[var(--hover-text)]`}>▲</span>
-                                <span className={`text-zinc-900 font-extrabold text-xl leading-none group-hover/btn:text-[var(--hover-text)]`}>{idea.votes.length}</span>
+                                <span className="text-zinc-400 font-black mb-0.5 md:mb-1 text-[10px] md:text-sm group-hover/btn:text-[var(--hover-text)]">▲</span>
+                                <span className="text-zinc-900 font-black text-lg md:text-xl leading-none group-hover/btn:text-[var(--hover-text)]">{idea.votes.length}</span>
                             </button>
                         </form>
 
                         <div className="flex-1 min-w-0 flex flex-col justify-center">
-                            <div className="flex items-center gap-3 mb-2">
-                                <h3 className="font-[family-name:var(--font-jakarta)] text-xl font-bold tracking-tight truncate" style={{ color: textColor }}>
+                            <div className="flex flex-col sm:flex-row sm:items-center gap-1.5 md:gap-3 mb-1.5 md:mb-2 text-left">
+                                <h3 className="font-[family-name:var(--font-jakarta)] text-lg md:text-xl font-bold tracking-tight truncate leading-tight" style={{ color: textColor }}>
                                     {idea.title}
                                 </h3>
                                 {idea.status !== 'pending' && (
-                                    <span className={`px-3 py-1 rounded-full text-[11px] uppercase font-bold tracking-wider 
+                                    <span className={`w-fit px-2 md:px-3 py-0.5 md:py-1 rounded-full text-[9px] md:text-[11px] uppercase font-black md:font-bold tracking-wider 
                                         ${idea.status === 'done' ? 'bg-green-100 text-green-700 border border-green-200' :
                                             idea.status === 'planned' ? 'bg-amber-100 text-amber-700 border border-amber-200' : ''}`}>
-                                        {idea.status === 'done' ? '✅ Hecho' : '🏗️ Planeado'}
+                                        {idea.status === 'done' ? 'Hecho' : 'Planeado'}
                                     </span>
                                 )}
                             </div>
-                            <p className="font-medium leading-relaxed whitespace-pre-wrap line-clamp-3 opacity-80" style={{ color: textColor }}>
+                            <p className="font-medium text-xs md:text-base leading-relaxed whitespace-pre-wrap line-clamp-2 md:line-clamp-3 opacity-80" style={{ color: textColor }}>
                                 {idea.description}
                             </p>
                         </div>

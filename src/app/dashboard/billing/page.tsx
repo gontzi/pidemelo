@@ -29,50 +29,50 @@ export default async function BillingPage() {
     const plan = userData?.plan; // 'pro' o 'lifetime'
 
     return (
-        <div className="min-h-screen bg-[#FAFAFA] p-6 md:p-12 pt-32">
+        <div className="min-h-screen bg-[#FAFAFA] px-4 py-6 md:p-12 pt-24 md:pt-32">
             <div className="max-w-4xl mx-auto">
 
                 {/* ESTADO 1: USUARIO PREMIUM (DETALLES) */}
                 {isPremium ? (
-                    <div className="space-y-12">
+                    <div className="space-y-8 md:space-y-12">
                         <div className="text-center space-y-4">
                             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-green-100 text-green-700 text-xs font-black uppercase tracking-widest animate-pulse">
                                 <ShieldCheck className="w-4 h-4" />
                                 {plan === 'lifetime' ? 'Acceso Vitalicio Activado' : 'Suscripción Pro Activa'}
                             </div>
-                            <h1 className="text-5xl md:text-6xl font-black tracking-tighter text-zinc-900 leading-none">
+                            <h1 className="text-4xl md:text-5xl lg:text-6xl font-black tracking-tighter text-zinc-900 leading-none">
                                 ¡Gracias por <br /> <span className="text-[#FF5C00] italic">apoyarnos!</span>
                             </h1>
-                            <p className="text-zinc-500 text-xl font-medium max-w-xl mx-auto">
+                            <p className="text-zinc-500 text-base md:text-xl font-medium max-w-xl mx-auto">
                                 Eres parte del 1% de mentes inquietas que hacen que <span className="font-bold text-zinc-900 underline decoration-[#FF5C00]/30">Pídemelo</span> siga vivo.
                             </p>
                         </div>
 
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
                             {/* Card de Estado del Plan */}
-                            <div className="md:col-span-2 p-8 rounded-[2.5rem] bg-zinc-900 text-white shadow-2xl overflow-hidden relative">
-                                <div className="absolute top-0 right-0 p-8 opacity-10">
-                                    <Sparkles className="w-24 h-24" />
+                            <div className="md:col-span-2 p-6 md:p-8 rounded-[2rem] bg-zinc-900 text-white shadow-2xl overflow-hidden relative">
+                                <div className="absolute top-0 right-0 p-6 md:p-8 opacity-10">
+                                    <Sparkles className="w-20 h-20 md:w-24 md:h-24" />
                                 </div>
-                                <h3 className="text-sm font-bold uppercase tracking-widest text-[#FF5C00] mb-6 flex items-center gap-2">
+                                <h3 className="text-sm font-bold uppercase tracking-widest text-[#FF5C00] mb-5 flex items-center gap-2">
                                     <Zap className="w-4 h-4 fill-[#FF5C00]" />
                                     Tu Plan Actual
                                 </h3>
-                                <div className="space-y-6">
+                                <div className="space-y-5">
                                     <div>
-                                        <p className="text-4xl font-black italic tracking-tighter">
+                                        <p className="text-3xl md:text-4xl font-black italic tracking-tighter">
                                             {plan === 'lifetime' ? 'El Inversor 🔥' : 'El Suscriptor 🚀'}
                                         </p>
-                                        <p className="text-zinc-400 font-medium mt-1">
+                                        <p className="text-zinc-400 font-medium mt-1 text-sm md:text-base">
                                             {plan === 'lifetime'
                                                 ? 'Acceso infinito para toda la eternidad.'
                                                 : 'Acceso a todas las funciones premium de forma recurrente.'}
                                         </p>
                                     </div>
 
-                                    <div className="pt-6 border-t border-white/10 flex flex-wrap gap-4 items-center justify-between">
+                                    <div className="pt-5 border-t border-white/10 flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
                                         <div className="flex items-center gap-3">
-                                            <div className="h-10 w-10 rounded-full bg-white/5 flex items-center justify-center">
+                                            <div className="h-10 w-10 rounded-full bg-white/5 flex items-center justify-center flex-shrink-0">
                                                 <CreditCard className="w-5 h-5 text-white" />
                                             </div>
                                             <div>
@@ -81,12 +81,11 @@ export default async function BillingPage() {
                                             </div>
                                         </div>
 
-                                        {/* Link de gestión (para Pro) */}
                                         {plan === 'pro' && (
                                             <Link
                                                 href={`https://polar.sh/${process.env.NEXT_PUBLIC_POLAR_ORGANIZATION_SLUG || 'pidemelo'}/portal`}
                                                 target="_blank"
-                                                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-white text-zinc-900 text-sm font-black transition-all hover:scale-105 active:scale-95 shadow-lg"
+                                                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-white text-zinc-900 text-sm font-black transition-all hover:scale-105 active:scale-95 shadow-lg w-full sm:w-auto justify-center"
                                             >
                                                 Gestionar suscripción
                                                 <ExternalLink className="w-4 h-4" />
@@ -97,9 +96,9 @@ export default async function BillingPage() {
                             </div>
 
                             {/* Card de Soporte VIP */}
-                            <div className="p-8 rounded-[2.5rem] bg-white border border-zinc-200/60 shadow-xl flex flex-col justify-center items-center text-center space-y-4">
-                                <div className="h-16 w-16 rounded-3xl bg-orange-50 flex items-center justify-center">
-                                    <Heart className="w-8 h-8 text-[#FF5C00] fill-[#FF5C00]/10" />
+                            <div className="p-6 md:p-8 rounded-[2rem] bg-white border border-zinc-200/60 shadow-xl flex flex-col justify-center items-center text-center space-y-4">
+                                <div className="h-14 w-14 md:h-16 md:w-16 rounded-3xl bg-orange-50 flex items-center justify-center">
+                                    <Heart className="w-7 h-7 md:w-8 md:h-8 text-[#FF5C00] fill-[#FF5C00]/10" />
                                 </div>
                                 <h4 className="font-black text-xl italic tracking-tight leading-none">Miembro VIP</h4>
                                 <p className="text-sm text-zinc-500 font-medium">Tienes pase preferente para sugerir mejoras y arreglos.</p>
@@ -108,7 +107,7 @@ export default async function BillingPage() {
 
                         {/* Extra para Lifetime */}
                         {plan === 'lifetime' && (
-                            <div className="p-6 rounded-3xl bg-orange-50 border border-orange-100/50 text-center">
+                            <div className="p-5 md:p-6 rounded-3xl bg-orange-50 border border-orange-100/50 text-center">
                                 <p className="text-sm font-bold text-zinc-600">
                                     No tienes pagos pendientes. <span className="text-[#FF5C00]">Pídemelo es tuyo para siempre.</span>
                                 </p>
@@ -118,38 +117,38 @@ export default async function BillingPage() {
                 ) : (
                     /* ESTADO 2: USUARIO GRATIS (PLANES) */
                     <>
-                        <div className="text-center mb-16 space-y-6">
+                        <div className="text-center mb-10 md:mb-16 space-y-5 md:space-y-6">
                             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-orange-100 text-[#FF5C00] text-xs font-black uppercase tracking-widest animate-bounce">
                                 <Rocket className="w-4 h-4" />
                                 Planazo a la vista
                             </div>
-                            <h1 className="text-5xl md:text-7xl font-black tracking-tighter text-zinc-900 leading-none">
+                            <h1 className="text-4xl sm:text-5xl md:text-7xl font-black tracking-tighter text-zinc-900 leading-none">
                                 Deja de ser un <br /> <span className="text-[#FF5C00] italic">usuario del montón</span>
                             </h1>
-                            <p className="text-zinc-500 text-xl font-medium max-w-xl mx-auto leading-relaxed">
+                            <p className="text-zinc-500 text-base md:text-xl font-medium max-w-xl mx-auto leading-relaxed">
                                 Elige cómo quieres apoyarnos para que sigamos haciendo caso a tus ideas. O no, tú verás.
                             </p>
                         </div>
 
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-stretch">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-8 items-stretch">
                             {/* Tarjeta 1: El Suscriptor */}
-                            <div className="relative flex flex-col p-10 rounded-[2.5rem] bg-white border border-zinc-200/60 shadow-xl shadow-zinc-200/20 transition-all hover:scale-[1.02]">
-                                <div className="absolute -top-4 right-8 bg-[#FF5C00] text-white text-[10px] font-black px-4 py-2 rounded-full shadow-lg flex items-center gap-2 tracking-widest uppercase">
+                            <div className="relative flex flex-col p-7 md:p-10 rounded-[2rem] bg-white border border-zinc-200/60 shadow-xl shadow-zinc-200/20 transition-all hover:scale-[1.02]">
+                                <div className="absolute -top-4 right-6 md:right-8 bg-[#FF5C00] text-white text-[10px] font-black px-4 py-2 rounded-full shadow-lg flex items-center gap-2 tracking-widest uppercase">
                                     <Sparkles className="w-3 h-3" />
                                     ¡15 días gratis!
                                 </div>
 
-                                <div className="mb-8">
-                                    <h3 className="text-2xl font-black tracking-tight mb-2 italic">El Suscriptor</h3>
+                                <div className="mb-6 md:mb-8">
+                                    <h3 className="text-xl md:text-2xl font-black tracking-tight mb-2 italic">El Suscriptor</h3>
                                     <p className="text-zinc-400 text-sm font-bold uppercase tracking-widest">Para los que van paso a paso</p>
                                 </div>
 
-                                <div className="flex items-baseline mb-8">
-                                    <span className="text-6xl font-black tracking-tighter">2,99€</span>
+                                <div className="flex items-baseline mb-6 md:mb-8">
+                                    <span className="text-5xl md:text-6xl font-black tracking-tighter">2,99€</span>
                                     <span className="text-zinc-400 font-bold ml-2">/mes</span>
                                 </div>
 
-                                <div className="space-y-4 mb-10 flex-grow">
+                                <div className="space-y-3 md:space-y-4 mb-8 md:mb-10 flex-grow">
                                     {[
                                         "Acceso a todo (sin filtros)",
                                         "Si no te mola, cancelas y tan amigos",
@@ -158,7 +157,7 @@ export default async function BillingPage() {
                                     ].map((feature, i) => (
                                         <div key={i} className="flex items-start gap-3 text-zinc-600 font-medium">
                                             <Check className="w-5 h-5 text-[#FF5C00] shrink-0 mt-0.5" />
-                                            <span>{feature}</span>
+                                            <span className="text-sm md:text-base">{feature}</span>
                                         </div>
                                     ))}
                                 </div>
@@ -171,23 +170,23 @@ export default async function BillingPage() {
                             </div>
 
                             {/* Tarjeta 2: El Inversor (Lifetime) */}
-                            <div className="relative flex flex-col p-10 rounded-[2.5rem] bg-zinc-900 text-white shadow-2xl shadow-orange-500/20 transition-all hover:scale-[1.02] overflow-hidden">
+                            <div className="relative flex flex-col p-7 md:p-10 rounded-[2rem] bg-zinc-900 text-white shadow-2xl shadow-orange-500/20 transition-all hover:scale-[1.02] overflow-hidden">
                                 <div className="absolute -right-8 -top-8 w-32 h-32 bg-[#FF5C00]/10 rounded-full blur-3xl" />
 
-                                <div className="mb-8 relative">
+                                <div className="mb-6 md:mb-8 relative">
                                     <div className="bg-[#FF5C00] text-white text-[10px] font-black px-3 py-1 rounded-md mb-4 inline-block tracking-widest uppercase">
                                         LO MÁS TOP
                                     </div>
-                                    <h3 className="text-2xl font-black tracking-tight mb-2 italic">El Inversor</h3>
+                                    <h3 className="text-xl md:text-2xl font-black tracking-tight mb-2 italic">El Inversor</h3>
                                     <p className="text-zinc-500 text-sm font-bold uppercase tracking-widest">Pagas una vez y te olvidas</p>
                                 </div>
 
-                                <div className="flex items-baseline mb-8">
-                                    <span className="text-6xl font-black tracking-tighter">29,95€</span>
+                                <div className="flex items-baseline mb-6 md:mb-8">
+                                    <span className="text-5xl md:text-6xl font-black tracking-tighter">29,95€</span>
                                     <span className="text-zinc-500 font-bold ml-2 text-sm uppercase tracking-widest">Único pago</span>
                                 </div>
 
-                                <div className="space-y-4 mb-10 flex-grow">
+                                <div className="space-y-3 md:space-y-4 mb-8 md:mb-10 flex-grow">
                                     {[
                                         "Pagas una vez, te aguantamos toda la vida",
                                         "Acceso premium infinito",
@@ -197,7 +196,7 @@ export default async function BillingPage() {
                                     ].map((feature, i) => (
                                         <div key={i} className="flex items-start gap-3 text-zinc-300 font-medium">
                                             <PartyPopper className="w-5 h-5 text-[#FF5C00] shrink-0 mt-0.5" />
-                                            <span>{feature}</span>
+                                            <span className="text-sm md:text-base">{feature}</span>
                                         </div>
                                     ))}
                                 </div>
@@ -211,7 +210,7 @@ export default async function BillingPage() {
                     </>
                 )}
 
-                <div className="mt-16 text-center">
+                <div className="mt-10 md:mt-16 text-center">
                     <p className="text-zinc-400 font-bold text-xs uppercase tracking-[0.3em] flex items-center justify-center gap-3">
                         Hecho con <Heart className="w-4 h-4 fill-[#FF5C00] text-[#FF5C00]" /> por Gontzi
                     </p>
@@ -220,4 +219,3 @@ export default async function BillingPage() {
         </div>
     )
 }
-

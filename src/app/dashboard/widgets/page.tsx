@@ -22,11 +22,11 @@ export default async function WidgetsPage() {
     });
 
     return (
-        <div className="min-h-screen bg-[#F3F4F6] p-6 md:p-12 pt-32">
-            <div className="max-w-7xl mx-auto space-y-10">
+        <div className="min-h-screen bg-[#F3F4F6] px-4 py-8 md:p-12 pt-24 md:pt-32">
+            <div className="max-w-7xl mx-auto space-y-8 md:space-y-10">
                 <header className="space-y-2">
-                    <h1 className="text-5xl font-black tracking-tighter text-zinc-900 leading-none">Widgets Pro</h1>
-                    <p className="text-zinc-500 font-bold text-lg max-w-2xl">
+                    <h1 className="text-4xl md:text-5xl font-black tracking-tighter text-zinc-900 leading-none">Widgets Pro</h1>
+                    <p className="text-zinc-500 font-bold text-base md:text-lg max-w-2xl">
                         Personaliza e incrusta tus tablones de feedback en cualquier sitio web. Haz que parezca parte de tu marca.
                     </p>
                 </header>

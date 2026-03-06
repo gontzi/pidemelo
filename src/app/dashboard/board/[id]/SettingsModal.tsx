@@ -65,31 +65,31 @@ export default function SettingsModal({
             <Dialog open={isSettingsOpen} onOpenChange={setIsSettingsOpen}>
                 <DialogTrigger asChild>
                     {trigger ? trigger : (
-                        <button className="inline-flex items-center justify-center px-4 py-3 bg-white border border-zinc-200 text-zinc-700 hover:bg-zinc-50 hover:border-zinc-300 rounded-full text-sm font-bold transition-all shadow-sm active:scale-95">
-                            <Settings className="w-4 h-4 mr-2" /> Ajustes
+                        <button className="inline-flex items-center justify-center px-4 py-2.5 bg-white border border-zinc-200 text-zinc-700 hover:bg-zinc-50 hover:border-zinc-300 rounded-full text-xs md:text-sm font-bold transition-all shadow-sm active:scale-95">
+                            <Settings className="w-3.5 h-3.5 mr-2" /> Ajustes
                         </button>
                     )}
                 </DialogTrigger>
-                <DialogContent className="sm:max-w-md rounded-[2rem] border-zinc-200 p-8">
+                <DialogContent className="w-[90vw] md:max-w-md rounded-[2rem] border-zinc-200 p-6 md:p-8">
                     <DialogHeader>
-                        <DialogTitle className="font-heading text-2xl font-bold tracking-tight">Ajustes del Tablón ⚙️</DialogTitle>
+                        <DialogTitle className="font-heading text-xl md:text-2xl font-bold tracking-tight">Ajustes del Tablón ⚙️</DialogTitle>
                     </DialogHeader>
 
-                    <form action={handleUpdate} className="space-y-5 mt-4">
-                        <div className="space-y-2">
-                            <Label htmlFor="name" className="text-sm font-bold text-zinc-700">Nombre</Label>
+                    <form action={handleUpdate} className="space-y-4 md:space-y-5 mt-4">
+                        <div className="space-y-1.5 md:space-y-2">
+                            <Label htmlFor="name" className="text-xs md:text-sm font-bold text-zinc-700">Nombre</Label>
                             <Input
                                 id="name"
                                 name="name"
                                 defaultValue={currentName}
                                 required
-                                className="h-14 rounded-2xl shadow-none border-zinc-200 bg-[#FAFAFA] focus-visible:ring-[#FF5C00] font-medium px-4"
+                                className="h-12 md:h-14 rounded-2xl shadow-none border-zinc-200 bg-[#FAFAFA] focus-visible:ring-[#FF5C00] font-medium px-4 text-sm md:text-base"
                             />
                         </div>
-                        <div className="space-y-2">
-                            <Label htmlFor="slug" className="text-sm font-bold text-zinc-700">URL (Slug)</Label>
+                        <div className="space-y-1.5 md:space-y-2">
+                            <Label htmlFor="slug" className="text-xs md:text-sm font-bold text-zinc-700">URL (Slug)</Label>
                             <div className="flex">
-                                <span className="inline-flex items-center px-4 rounded-l-2xl border border-r-0 border-zinc-200 bg-zinc-100 text-zinc-500 text-sm font-medium">
+                                <span className="inline-flex items-center px-3 md:px-4 rounded-l-2xl border border-r-0 border-zinc-200 bg-zinc-100 text-zinc-500 text-[10px] md:text-sm font-medium">
                                     /board/
                                 </span>
                                 <Input
@@ -97,36 +97,36 @@ export default function SettingsModal({
                                     name="slug"
                                     defaultValue={currentSlug}
                                     required
-                                    className="h-14 rounded-none rounded-r-2xl shadow-none border-zinc-200 bg-[#FAFAFA] focus-visible:ring-[#FF5C00] font-medium"
+                                    className="h-12 md:h-14 rounded-none rounded-r-2xl shadow-none border-zinc-200 bg-[#FAFAFA] focus-visible:ring-[#FF5C00] font-medium text-sm md:text-base"
                                 />
                             </div>
-                            {error && <p className="text-sm text-red-500 font-medium mt-2">{error}</p>}
+                            {error && <p className="text-[10px] md:text-sm text-red-500 font-medium mt-2">{error}</p>}
                         </div>
 
-                        <div className="flex gap-3 pt-6">
+                        <div className="flex flex-col sm:flex-row gap-2 md:gap-3 pt-4 md:pt-6">
                             <Button
                                 type="button"
                                 onClick={() => setIsSettingsOpen(false)}
                                 disabled={isPending}
                                 variant="outline"
-                                className="w-full h-14 rounded-full font-bold border-zinc-200 hover:bg-zinc-50"
+                                className="w-full h-12 md:h-14 rounded-full font-bold border-zinc-200 hover:bg-zinc-50 order-2 sm:order-1 text-sm"
                             >
                                 Cerrar
                             </Button>
                             <Button
                                 type="submit"
                                 disabled={isPending}
-                                className="w-full h-14 rounded-full bg-[#FF5C00] text-white hover:bg-[#E65300] font-bold shadow-md shadow-[#FF5C00]/20 active:scale-95"
+                                className="w-full h-12 md:h-14 rounded-full bg-[#FF5C00] text-white hover:bg-[#E65300] font-bold shadow-md shadow-[#FF5C00]/20 active:scale-95 order-1 sm:order-2 text-sm"
                             >
                                 {isPending ? 'Guardando...' : 'Guardar ✅'}
                             </Button>
                         </div>
 
-                        <div className="pt-6 mt-6 border-t border-red-50">
+                        <div className="pt-4 md:pt-6 mt-4 md:mt-6 border-t border-red-50">
                             <div className="bg-red-50/50 border border-red-100 rounded-2xl p-4 flex flex-col gap-3">
                                 <div>
-                                    <h4 className="font-bold text-red-900 text-sm">Zona de peligro</h4>
-                                    <p className="text-red-700 font-medium text-xs">Eliminar definitivamente este tablón y sus datos.</p>
+                                    <h4 className="font-bold text-red-900 text-xs md:text-sm">Zona de peligro</h4>
+                                    <p className="text-red-700 font-medium text-[10px] md:text-xs">Eliminar definitivamente este tablón y sus datos.</p>
                                 </div>
                                 <Button
                                     type="button"
@@ -136,7 +136,7 @@ export default function SettingsModal({
                                         setTimeout(() => setIsDeleteOpen(true), 150);
                                     }}
                                     disabled={isPending}
-                                    className="w-full h-10 rounded-full bg-white hover:bg-red-50 text-red-600 border border-red-200 font-bold shadow-sm transition-colors"
+                                    className="w-full h-10 rounded-full bg-white hover:bg-red-50 text-red-600 border border-red-200 font-bold shadow-sm transition-colors text-xs"
                                 >
                                     Borrar Tablón
                                 </Button>
@@ -148,29 +148,29 @@ export default function SettingsModal({
 
             {/* Modal de Borrado (High-Conversion Style) */}
             <Dialog open={isDeleteOpen} onOpenChange={setIsDeleteOpen}>
-                <DialogContent className="sm:max-w-sm rounded-[2.5rem] p-8 border-none shadow-2xl overflow-hidden">
+                <DialogContent className="w-[90vw] sm:max-w-sm rounded-[2rem] md:rounded-[2.5rem] p-6 md:p-8 border-none shadow-2xl overflow-hidden">
                     <div className="flex flex-col items-center text-center space-y-4">
-                        <div className="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center mb-2 animate-pulse">
-                            <AlertTriangle className="w-10 h-10 text-red-600" />
+                        <div className="w-16 h-16 md:w-20 md:h-20 bg-red-100 rounded-full flex items-center justify-center mb-2 animate-pulse">
+                            <AlertTriangle className="w-8 h-8 md:w-10 md:h-10 text-red-600" />
                         </div>
                         <DialogHeader>
-                            <DialogTitle className="text-2xl font-black tracking-tight text-zinc-900 leading-tight">
+                            <DialogTitle className="text-xl md:text-2xl font-black tracking-tight text-zinc-900 leading-tight">
                                 ¡Cuidado! Estás a punto de borrarlo todo
                             </DialogTitle>
-                            <DialogDescription className="text-zinc-500 font-semibold leading-relaxed pt-2">
+                            <DialogDescription className="text-zinc-500 font-semibold leading-relaxed pt-2 text-xs md:text-sm">
                                 Esta acción es irreversible. Se borrarán todos los votos e ideas acumuladas. ¿Seguro que quieres seguir?
                             </DialogDescription>
                         </DialogHeader>
 
-                        <div className="flex flex-col w-full gap-3 pt-6">
+                        <div className="flex flex-col w-full gap-3 pt-4 md:pt-6">
                             <Button
                                 onClick={handleDelete}
                                 disabled={isPending}
-                                className="w-full h-16 rounded-full bg-red-600 hover:bg-red-700 text-white font-black text-lg shadow-xl shadow-red-600/20 transition-all active:scale-95 flex items-center justify-center gap-2"
+                                className="w-full h-14 md:h-16 rounded-full bg-red-600 hover:bg-red-700 text-white font-black text-base md:text-lg shadow-xl shadow-red-600/20 transition-all active:scale-95 flex items-center justify-center gap-2"
                             >
                                 {isPending ? (
                                     <>
-                                        <X className="w-5 h-5 animate-spin-fast" />
+                                        <X className="w-4 h-4 md:w-5 md:h-5 animate-spin-fast" />
                                         Borrando...
                                     </>
                                 ) : 'Sí, borrar definitivamente 🗑️'}
@@ -179,7 +179,7 @@ export default function SettingsModal({
                                 variant="ghost"
                                 onClick={() => setIsDeleteOpen(false)}
                                 disabled={isPending}
-                                className="w-full h-14 rounded-full bg-zinc-100 hover:bg-zinc-200 text-zinc-900 font-black tracking-tight"
+                                className="w-full h-12 md:h-14 rounded-full bg-zinc-100 hover:bg-zinc-200 text-zinc-900 font-black tracking-tight text-sm md:text-base"
                             >
                                 Me lo he pensado mejor
                             </Button>
