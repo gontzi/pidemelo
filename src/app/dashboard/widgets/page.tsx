@@ -4,11 +4,13 @@ import { auth } from "@clerk/nextjs/server";
 import { eq } from "drizzle-orm";
 import { redirect } from "next/navigation";
 import WidgetsClient from "./WidgetsClient";
+import { getDictionary } from "@/i18n";
 
 export const runtime = 'edge';
 export const dynamic = 'force-dynamic';
 
 export default async function WidgetsPage() {
+    const t = await getDictionary();
     const { userId } = auth();
     if (!userId) redirect("/");
 
@@ -25,15 +27,16 @@ export default async function WidgetsPage() {
         <div className="min-h-screen bg-[#F3F4F6] px-4 py-8 md:p-12 pt-24 md:pt-32">
             <div className="max-w-7xl mx-auto space-y-8 md:space-y-10">
                 <header className="space-y-2">
-                    <h1 className="text-4xl md:text-5xl font-black tracking-tighter text-zinc-900 leading-none">Widgets</h1>
+                    <h1 className="text-4xl md:text-5xl font-black tracking-tighter text-zinc-900 leading-none">{t.widgets_page.title}</h1>
                     <p className="text-zinc-500 font-bold text-base md:text-lg max-w-2xl">
-                        Personaliza e incrusta tus tablones de feedback en cualquier sitio web. Haz que parezca parte de tu marca.
+                        {t.widgets_page.subtitle}
                     </p>
                 </header>
 
                 <WidgetsClient
                     boards={userBoards}
                     isPremium={user?.isPremium || false}
+                    dict={t.widgets_client}
                 />
             </div>
         </div>

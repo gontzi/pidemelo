@@ -13,10 +13,12 @@ type Board = {
 
 export default function WidgetsClient({
     boards,
-    isPremium
+    isPremium,
+    dict
 }: {
     boards: Board[];
-    isPremium: boolean
+    isPremium: boolean;
+    dict: Record<string, string>;
 }) {
     const [selectedBoardId, setSelectedBoardId] = useState(boards[0]?.id || '');
     const [accentColor, setAccentColor] = useState('#FF5C00');
@@ -69,11 +71,11 @@ export default function WidgetsClient({
         return (
             <div className="bg-white rounded-[2.5rem] md:rounded-[3rem] p-10 md:p-20 flex flex-col items-center justify-center text-center border border-zinc-200/60 shadow-xl shadow-zinc-200/10 min-h-[400px]">
                 <span className="text-5xl md:text-6xl mb-6">🔌</span>
-                <h3 className="text-xl md:text-2xl font-black text-zinc-900 tracking-tighter">Sin tableros activos</h3>
-                <p className="text-zinc-500 font-bold mt-2 max-w-xs text-sm md:text-base">Necesitas crear al menos un tablero para empezar a usar widgets.</p>
+                <h3 className="text-xl md:text-2xl font-black text-zinc-900 tracking-tighter">{dict.no_boards_title}</h3>
+                <p className="text-zinc-500 font-bold mt-2 max-w-xs text-sm md:text-base">{dict.no_boards_desc}</p>
                 <Link href="/dashboard" className="mt-8 w-full sm:w-auto">
                     <Button className="w-full bg-[#FF5C00] text-white hover:bg-[#E65300] font-black text-xs tracking-widest uppercase h-14 rounded-full px-10 transition-all hover:scale-105 active:scale-95 shadow-xl shadow-orange-500/20">
-                        CREAR TABLERO 🚀
+                        {dict.create_board}
                     </Button>
                 </Link>
             </div>
@@ -92,7 +94,7 @@ export default function WidgetsClient({
                         <div className="w-8 h-8 bg-zinc-100 rounded-xl flex items-center justify-center text-zinc-700 flex-shrink-0">
                             <Monitor className="w-4 h-4" />
                         </div>
-                        <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400">Paso 1: ¿Cuál usamos?</h3>
+                        <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400">{dict.step_1}</h3>
                     </div>
 
                     <div className="grid gap-2">
@@ -118,13 +120,13 @@ export default function WidgetsClient({
                         <div className="w-8 h-8 bg-zinc-100 rounded-xl flex items-center justify-center text-zinc-700 flex-shrink-0">
                             <Palette className="w-4 h-4" />
                         </div>
-                        <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400">Paso 2: A tu gusto</h3>
+                        <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400">{dict.step_2}</h3>
                     </div>
 
                     <div className="space-y-6 md:space-y-8">
                         {/* Acento */}
                         <div className="space-y-3">
-                            <label className="text-[10px] uppercase font-black tracking-widest text-zinc-900 ml-1">Color Principal</label>
+                            <label className="text-[10px] uppercase font-black tracking-widest text-zinc-900 ml-1">{dict.color_main}</label>
                             <div className="flex flex-wrap gap-2">
                                 {colorPresets.map((preset) => (
                                     <button
@@ -146,7 +148,7 @@ export default function WidgetsClient({
 
                         {/* Texto */}
                         <div className="space-y-3">
-                            <label className="text-[10px] uppercase font-black tracking-widest text-zinc-900 ml-1">Color de Texto</label>
+                            <label className="text-[10px] uppercase font-black tracking-widest text-zinc-900 ml-1">{dict.color_text}</label>
                             <div className="flex flex-wrap gap-2">
                                 {textPresets.map((preset) => (
                                     <button
@@ -168,19 +170,19 @@ export default function WidgetsClient({
 
                         {/* Tema del Widget */}
                         <div className="space-y-3">
-                            <label className="text-[10px] uppercase font-black tracking-widest text-zinc-900 ml-1">Tema del Widget</label>
+                            <label className="text-[10px] uppercase font-black tracking-widest text-zinc-900 ml-1">{dict.theme}</label>
                             <div className="flex bg-zinc-100 p-1 rounded-2xl w-fit">
                                 <button
                                     onClick={() => setIsDarkMode(false)}
                                     className={`px-4 py-2 flex items-center gap-2 rounded-xl text-xs font-bold transition-all ${!isDarkMode ? 'bg-white text-zinc-900 shadow-md' : 'text-zinc-500 hover:text-zinc-700'}`}
                                 >
-                                    <Sun className="w-4 h-4" /> Claro
+                                    <Sun className="w-4 h-4" /> {dict.light}
                                 </button>
                                 <button
                                     onClick={() => setIsDarkMode(true)}
                                     className={`px-4 py-2 flex items-center gap-2 rounded-xl text-xs font-bold transition-all ${isDarkMode ? 'bg-zinc-900 text-white shadow-md' : 'text-zinc-500 hover:text-zinc-700'}`}
                                 >
-                                    <Moon className="w-4 h-4" /> Oscuro
+                                    <Moon className="w-4 h-4" /> {dict.dark}
                                 </button>
                             </div>
                         </div>
@@ -194,8 +196,8 @@ export default function WidgetsClient({
                     </div>
 
                     <div className="space-y-1">
-                        <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500">Paso 3: Copia y pega</h4>
-                        <p className="text-white font-black text-xl tracking-tighter">Listo para producción</p>
+                        <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500">{dict.step_3}</h4>
+                        <p className="text-white font-black text-xl tracking-tighter">{dict.ready}</p>
                     </div>
 
                     <div className="bg-black/50 p-5 md:p-6 rounded-2xl font-mono text-[10px] md:text-[11px] leading-relaxed text-zinc-400 border border-zinc-800 overflow-x-auto whitespace-pre">
@@ -216,9 +218,9 @@ export default function WidgetsClient({
                         className={`w-full h-14 rounded-2xl transition-all font-black text-xs tracking-widest uppercase hover:opacity-90 shadow-2xl active:scale-95 text-white`}
                     >
                         {copied ? (
-                            <><Check className="w-5 h-5 mr-3" /> ¡COPIADO!</>
+                            <><Check className="w-5 h-5 mr-3" /> {dict.copied}</>
                         ) : (
-                            <><Copy className="w-5 h-5 mr-3" /> COPIAR CÓDIGO</>
+                            <><Copy className="w-5 h-5 mr-3" /> {dict.copy_code}</>
                         )}
                     </Button>
                 </section>
@@ -235,8 +237,8 @@ export default function WidgetsClient({
                                 <Monitor className="w-5 h-5" />
                             </div>
                             <div>
-                                <h4 className="text-sm font-black text-zinc-900">Previsualización</h4>
-                                <p className="text-[10px] font-black text-zinc-400 uppercase tracking-widest">Live Experience</p>
+                                <h4 className="text-sm font-black text-zinc-900">{dict.preview}</h4>
+                                <p className="text-[10px] font-black text-zinc-400 uppercase tracking-widest">{dict.live_exp}</p>
                             </div>
                         </div>
 
@@ -253,7 +255,7 @@ export default function WidgetsClient({
                                 className={`px-3 md:px-4 py-1.5 md:py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all flex items-center gap-2 ${viewMode === 'mobile' ? 'bg-white text-zinc-900 shadow-xl' : 'text-zinc-500 hover:text-zinc-800'
                                     }`}
                             >
-                                <Smartphone className="w-3.5 h-3.5" /> <span className="hidden xs:inline">Móvil</span>
+                                <Smartphone className="w-3.5 h-3.5" /> <span className="hidden xs:inline">{dict.mobile}</span>
                             </button>
                         </div>
                     </div>
@@ -268,14 +270,14 @@ export default function WidgetsClient({
                                         <Lock className="w-8 h-8 md:w-10 md:h-10" />
                                     </div>
                                     <div className="space-y-2">
-                                        <h4 className="text-xl md:text-2xl font-black text-white italic tracking-tighter">Acceso Pro</h4>
+                                        <h4 className="text-xl md:text-2xl font-black text-white italic tracking-tighter">{dict.pro_access}</h4>
                                         <p className="text-zinc-400 text-xs md:text-sm font-medium leading-relaxed">
-                                            La previsualización y el código incrustable son exclusivos para suscriptores e inversores.
+                                            {dict.pro_desc}
                                         </p>
                                     </div>
                                     <Link href="/dashboard/billing" className="block pt-2">
                                         <Button className="w-full bg-[#FF5C00] hover:bg-white hover:text-zinc-900 text-white font-black text-[10px] md:text-xs tracking-widest uppercase h-12 md:h-14 rounded-2xl transition-all shadow-xl shadow-orange-500/20">
-                                            SUBIR DE NIVEL 🚀
+                                            {dict.upgrade}
                                         </Button>
                                     </Link>
                                 </div>
@@ -294,7 +296,7 @@ export default function WidgetsClient({
                             ) : (
                                 <div className="w-full h-full bg-zinc-50 flex flex-col items-center justify-center p-8 md:p-12 text-center opacity-30 grayscale">
                                     <h4 className="text-xl md:text-2xl font-black text-zinc-900 mb-2">{selectedBoard?.name}</h4>
-                                    <p className="text-zinc-400 font-bold text-xs md:text-sm italic">Simulando entorno de feedback...</p>
+                                    <p className="text-zinc-400 font-bold text-xs md:text-sm italic">{dict.simulating}</p>
                                 </div>
                             )}
                         </div>

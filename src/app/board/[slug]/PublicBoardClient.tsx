@@ -16,12 +16,14 @@ export default function PublicBoardClient({
     initialIdeas,
     boardSlug,
     accentColor = "#FF5C00",
-    textColor = "#18181b"
+    textColor = "#18181b",
+    dict
 }: {
     initialIdeas: Idea[],
     boardSlug: string,
     accentColor?: string,
-    textColor?: string
+    textColor?: string,
+    dict: Record<string, string>
 }) {
     const [searchQuery, setSearchQuery] = useState('');
     const [statusFilter, setStatusFilter] = useState<'all' | 'pending' | 'planned' | 'done'>('all');
@@ -40,10 +42,10 @@ export default function PublicBoardClient({
     }, []);
 
     const filterOptions = [
-        { value: 'all', label: 'Todos los estados', emoji: '🗂️' },
-        { value: 'pending', label: 'Pendiente', emoji: '🤔' },
-        { value: 'planned', label: 'Planeado', emoji: '🏗️' },
-        { value: 'done', label: 'Hecho', emoji: '✅' },
+        { value: 'all', label: dict.filter_all, emoji: '🗂️' },
+        { value: 'pending', label: dict.filter_pending, emoji: '🤔' },
+        { value: 'planned', label: dict.filter_planned, emoji: '🏗️' },
+        { value: 'done', label: dict.filter_done, emoji: '✅' },
     ] as const;
 
     const filteredIdeas = initialIdeas.filter(idea => {
@@ -58,7 +60,7 @@ export default function PublicBoardClient({
             {/* Cabecera con título y filtros */}
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <h2 className="font-[family-name:var(--font-jakarta)] text-2xl font-bold tracking-tight inline-flex items-center gap-2" style={{ color: textColor }}>
-                    Mostradas <span>🔥</span>
+                    {dict.showing} <span>🔥</span>
                 </h2>
 
                 <div className="flex flex-col sm:flex-row gap-3">
@@ -66,7 +68,7 @@ export default function PublicBoardClient({
                         <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400" />
                         <input
                             type="text"
-                            placeholder="Buscar peticiones..."
+                            placeholder={dict.search_placeholder}
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
                             style={{
@@ -144,7 +146,7 @@ export default function PublicBoardClient({
                                     <span className={`w-fit px-2 md:px-3 py-0.5 md:py-1 rounded-full text-[9px] md:text-[11px] uppercase font-black md:font-bold tracking-wider 
                                         ${idea.status === 'done' ? 'bg-green-100 text-green-700 border border-green-200' :
                                             idea.status === 'planned' ? 'bg-amber-100 text-amber-700 border border-amber-200' : ''}`}>
-                                        {idea.status === 'done' ? 'Hecho' : 'Planeado'}
+                                        {idea.status === 'done' ? dict.tag_done : dict.tag_planned}
                                     </span>
                                 )}
                             </div>
@@ -158,8 +160,8 @@ export default function PublicBoardClient({
                 {filteredIdeas.length === 0 && (
                     <div className="p-16 text-center bg-white border-2 border-zinc-200 rounded-3xl border-dashed">
                         <span className="text-4xl block mb-4">👀</span>
-                        <p className="font-bold text-lg" style={{ color: textColor }}>No hemos encontrado nada.</p>
-                        <p className="font-medium mt-1 opacity-60" style={{ color: textColor }}>Prueba con otros filtros o sé el primero en proponerlo.</p>
+                        <p className="font-bold text-lg" style={{ color: textColor }}>{dict.empty_title}</p>
+                        <p className="font-medium mt-1 opacity-60" style={{ color: textColor }}>{dict.empty_desc}</p>
                     </div>
                 )}
             </div>

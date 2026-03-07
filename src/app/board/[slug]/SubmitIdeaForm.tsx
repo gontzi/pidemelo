@@ -10,13 +10,15 @@ export default function SubmitIdeaForm({
     boardSlug,
     accentColor = "#FF5C00",
     textColor = "#18181b",
-    isDarkMode = false
+    isDarkMode = false,
+    dict
 }: {
     boardId: string,
     boardSlug: string,
     accentColor?: string,
     textColor?: string,
-    isDarkMode?: boolean
+    isDarkMode?: boolean,
+    dict: Record<string, string>
 }) {
     const [isPending, setIsPending] = useState(false);
     const [error, setError] = useState<string | null>(null);
@@ -35,9 +37,9 @@ export default function SubmitIdeaForm({
             }
         } catch (err: unknown) {
             if (err instanceof Error) {
-                setError(err.message || "Algo salió mal");
+                setError(err.message || dict.error_fallback);
             } else {
-                setError("Algo salió mal");
+                setError(dict.error_fallback);
             }
         } finally {
             setIsPending(false);
@@ -49,7 +51,7 @@ export default function SubmitIdeaForm({
             <div>
                 <Input
                     name="title"
-                    placeholder="Ej. Poner un botón que me dé café gratis..."
+                    placeholder={dict.title_placeholder}
                     required
                     maxLength={100}
                     style={{ '--tw-ring-color': accentColor, color: isDarkMode ? '#f4f4f5' : textColor } as React.CSSProperties}
@@ -59,7 +61,7 @@ export default function SubmitIdeaForm({
             <div>
                 <textarea
                     name="description"
-                    placeholder="Cuéntame tu drama, a ver si podemos hacer algo..."
+                    placeholder={dict.desc_placeholder}
                     required
                     maxLength={1000}
                     style={{ '--tw-ring-color': accentColor, color: isDarkMode ? '#f4f4f5' : textColor } as React.CSSProperties}
@@ -77,7 +79,7 @@ export default function SubmitIdeaForm({
                 style={{ color: textColor, backgroundColor: accentColor, boxShadow: `0 4px 12px ${accentColor}33` }}
                 className="w-full h-12 md:h-14 text-white hover:opacity-90 rounded-full font-black tracking-widest uppercase transition-all active:scale-95 text-xs md:text-sm disabled:opacity-70 disabled:hover:scale-100 shadow-lg"
             >
-                {isPending ? 'ENVIANDO...' : 'SOLTAR MI IDEA 🚀'}
+                {isPending ? dict.submitting : dict.submit_btn}
             </Button>
         </form>
     );

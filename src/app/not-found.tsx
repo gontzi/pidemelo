@@ -1,11 +1,13 @@
 import Link from 'next/link';
 import { Button } from "@/components/ui/button";
 import { MoveLeft, Ghost } from "lucide-react";
+import { getDictionary } from '@/i18n';
 
 export const runtime = 'edge';
 export const dynamic = 'force-dynamic';
 
-export default function NotFound() {
+export default async function NotFound() {
+    const t = await getDictionary();
     return (
         <main className="flex min-h-[80vh] flex-col items-center justify-center p-6 text-center relative overflow-hidden">
             {/* Fondo de puntitos retro-moderno (igual que la home) */}
@@ -19,11 +21,11 @@ export default function NotFound() {
                 <div className="space-y-4">
                     <h1 className="font-heading text-5xl md:text-6xl font-black tracking-tighter text-zinc-900 leading-none">
                         404 — <br />
-                        <span className="text-[#FF5C00]">Vaya chasco.</span>
+                        <span className="text-[#FF5C00]">{t.not_found.title}</span>
                     </h1>
 
                     <p className="text-xl text-zinc-500 font-bold leading-tight max-w-sm mx-auto">
-                        Aquí no hay nada. Ni ideas, ni votos, ni ese café que tanto necesitas ahora mismo.
+                        {t.not_found.desc}
                     </p>
                 </div>
 
@@ -31,13 +33,13 @@ export default function NotFound() {
                     <Link href="/">
                         <Button size="lg" className="h-16 px-10 text-lg bg-zinc-900 text-white hover:bg-zinc-800 shadow-2xl shadow-zinc-900/20 rounded-full font-black transition-all hover:scale-105 active:scale-95 group">
                             <MoveLeft className="w-5 h-5 mr-3 group-hover:-translate-x-1 transition-transform" />
-                            Volver a la civilización
+                            {t.not_found.back}
                         </Button>
                     </Link>
                 </div>
 
                 <p className="text-xs text-zinc-400 font-medium italic opacity-60">
-                    "Si buscas resultados distintos, no entres en rutas que no existen" — Probablemente Einstein.
+                    {t.not_found.quote}
                 </p>
             </div>
         </main>

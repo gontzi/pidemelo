@@ -21,13 +21,13 @@ type Idea = {
     votesCount: number;
 };
 
-const columnsConfig = [
-    { id: 'pending', title: '🤔 Pendiente', color: 'bg-zinc-100/50 border-zinc-200/50' },
-    { id: 'planned', title: '🏗️ Planeado', color: 'bg-orange-50/50 border-orange-100/40' },
-    { id: 'done', title: '✅ Completado', color: 'bg-green-50/50 border-green-100/40' }
-] as const;
+export default function DashboardClient({ initialIdeas, boardId, dict }: { initialIdeas: Idea[], boardId: string, dict: Record<string, string> }) {
+    const columnsConfig = [
+        { id: 'pending', title: dict.col_pending, color: 'bg-zinc-100/50 border-zinc-200/50' },
+        { id: 'planned', title: dict.col_planned, color: 'bg-orange-50/50 border-orange-100/40' },
+        { id: 'done', title: dict.col_done, color: 'bg-green-50/50 border-green-100/40' }
+    ] as const;
 
-export default function DashboardClient({ initialIdeas, boardId }: { initialIdeas: Idea[], boardId: string }) {
     const [isPending, startTransition] = useTransition();
     const [ideas, setIdeas] = useState(initialIdeas);
     const [ideaToDelete, setIdeaToDelete] = useState<string | null>(null);
@@ -77,10 +77,10 @@ export default function DashboardClient({ initialIdeas, boardId }: { initialIdea
                         </div>
                         <DialogHeader>
                             <DialogTitle className="text-xl md:text-2xl font-black tracking-tight text-zinc-900 leading-tight">
-                                ¿Borrar esta petición?
+                                {dict.delete_idea_title}
                             </DialogTitle>
                             <DialogDescription className="text-zinc-500 font-semibold leading-relaxed pt-2 text-xs md:text-sm">
-                                Esta acción no se puede deshacer y los votos acumulados se perderán para siempre.
+                                {dict.delete_idea_desc}
                             </DialogDescription>
                         </DialogHeader>
 
@@ -90,7 +90,7 @@ export default function DashboardClient({ initialIdeas, boardId }: { initialIdea
                                 disabled={isPending}
                                 className="w-full h-14 md:h-16 rounded-full bg-red-600 hover:bg-red-700 text-white font-black text-base md:text-lg shadow-xl shadow-red-600/20 transition-all active:scale-95 flex items-center justify-center gap-2"
                             >
-                                {isPending ? 'Borrando...' : 'Sí, borrar 🗑️'}
+                                {isPending ? dict.deleting : dict.yes_delete_idea}
                             </Button>
                             <Button
                                 variant="ghost"
@@ -98,7 +98,7 @@ export default function DashboardClient({ initialIdeas, boardId }: { initialIdea
                                 disabled={isPending}
                                 className="w-full h-12 md:h-14 rounded-full bg-zinc-100 hover:bg-zinc-200 text-zinc-900 font-black text-sm md:text-base"
                             >
-                                Cancelar
+                                {dict.cancel}
                             </Button>
                         </div>
                     </div>
@@ -155,7 +155,7 @@ export default function DashboardClient({ initialIdeas, boardId }: { initialIdea
 
                                                             <div className="flex items-center justify-between">
                                                                 <span className="flex items-center gap-2 text-[9px] md:text-[10px] font-black uppercase tracking-widest text-[#FF5C00] bg-orange-50 border border-orange-100 px-3 md:px-4 py-1.5 md:py-2 rounded-full shadow-sm">
-                                                                    <span className="text-xs md:text-sm">▲</span> {idea.votesCount} {idea.votesCount === 1 ? 'VOTO' : 'VOTOS'}
+                                                                    <span className="text-xs md:text-sm">▲</span> {idea.votesCount} {idea.votesCount === 1 ? dict.vote : dict.votes}
                                                                 </span>
                                                             </div>
                                                         </div>

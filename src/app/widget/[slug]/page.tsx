@@ -4,6 +4,7 @@ import { eq, desc } from "drizzle-orm";
 import { notFound } from "next/navigation";
 import PublicBoardClient from "../../board/[slug]/PublicBoardClient";
 import SubmitIdeaForm from "../../board/[slug]/SubmitIdeaForm";
+import { getDictionary } from "@/i18n";
 
 export const runtime = 'edge';
 export const dynamic = 'force-dynamic';
@@ -15,6 +16,7 @@ export default async function WidgetPage({
     params: { slug: string },
     searchParams: { color?: string, textColor?: string, darkMode?: string }
 }) {
+    const t = await getDictionary();
     const accentColor = searchParams.color ? decodeURIComponent(searchParams.color) : "#FF5C00";
     const textColor = searchParams.textColor ? decodeURIComponent(searchParams.textColor) : "#18181b";
     const isDarkMode = searchParams.darkMode === 'true';
@@ -40,16 +42,16 @@ export default async function WidgetPage({
         return (
             <div className="min-h-screen flex flex-col items-center justify-center p-8 text-center bg-zinc-50 border-4 border-dashed border-zinc-200">
                 <div className="w-16 h-16 bg-white rounded-2xl shadow-xl flex items-center justify-center text-3xl mb-4">🔒</div>
-                <h1 className="text-xl font-black text-zinc-900 mb-2 italic">Widget Desactivado</h1>
+                <h1 className="text-xl font-black text-zinc-900 mb-2 italic">{t.widget_page.disabled_title}</h1>
                 <p className="text-sm text-zinc-500 font-medium max-w-xs mb-6 leading-relaxed">
-                    Este tablón necesita una suscripción activa para ser incrustado en otras webs.
+                    {t.widget_page.disabled_desc}
                 </p>
                 <a
                     href="https://pidemelo.app"
                     target="_blank"
                     className="text-[10px] font-black uppercase tracking-widest text-[#FF5C00] hover:underline"
                 >
-                    ir a pidemelo.app 🚀
+                    {t.widget_page.go_to}
                 </a>
             </div>
         );
@@ -64,14 +66,14 @@ export default async function WidgetPage({
                 <div className={`flex items-center justify-between pb-4 border-b ${isDarkMode ? 'border-zinc-800' : 'border-zinc-100'} transition-colors`}>
                     <div>
                         <h1 className="text-xl font-black tracking-tight">{board.name}</h1>
-                        <p className={`text-xs font-medium tracking-tight opacity-70 ${isDarkMode ? 'text-zinc-400' : ''}`}>Vota o añade tus propias ideas. ¿Qué crees que le falta a {board.name}?</p>
+                        <p className={`text-xs font-medium tracking-tight opacity-70 ${isDarkMode ? 'text-zinc-400' : ''}`}>{t.widget_page.vote_or_add}{board.name}?</p>
                     </div>
                 </div>
 
                 {/* Form at Top for Widget to save space */}
                 <section className={`${isDarkMode ? 'bg-zinc-900 border-zinc-800' : 'bg-zinc-50/50 border-zinc-100'} border p-6 rounded-2xl transition-colors`}>
                     <h2 className="text-sm font-bold tracking-tight mb-4 flex items-center gap-2">
-                        <span>💡</span> Sugiere algo nuevo
+                        <span>💡</span> {t.widget_page.suggest}
                     </h2>
                     <SubmitIdeaForm
                         boardId={board.id}
@@ -79,6 +81,7 @@ export default async function WidgetPage({
                         accentColor={accentColor}
                         textColor={textColor}
                         isDarkMode={isDarkMode}
+                        dict={t.submit_idea_form}
                     />
                 </section>
 

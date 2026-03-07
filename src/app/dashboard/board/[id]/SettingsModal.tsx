@@ -20,11 +20,13 @@ export default function SettingsModal({
     boardId,
     currentName,
     currentSlug,
-    trigger
+    trigger,
+    dict
 }: {
     boardId: string,
     currentName: string,
     currentSlug: string,
+    dict: Record<string, string>,
     trigger?: React.ReactNode
 }) {
     const [isSettingsOpen, setIsSettingsOpen] = useState(false);
@@ -66,88 +68,104 @@ export default function SettingsModal({
                 <DialogTrigger asChild>
                     {trigger ? trigger : (
                         <button className="inline-flex items-center justify-center px-4 py-2.5 bg-white border border-zinc-200 text-zinc-700 hover:bg-zinc-50 hover:border-zinc-300 rounded-full text-xs md:text-sm font-bold transition-all shadow-sm active:scale-95">
-                            <Settings className="w-3.5 h-3.5 mr-2" /> Ajustes
+                            <Settings className="w-3.5 h-3.5 mr-2" /> {dict.settings}
                         </button>
                     )}
                 </DialogTrigger>
-                <DialogContent className="w-[90vw] md:max-w-md rounded-[2rem] border-zinc-200 p-6 md:p-8">
+                <DialogContent className="w-[90vw] md:max-w-3xl lg:max-w-5xl rounded-[2rem] border-zinc-200 p-6 md:p-10">
                     <DialogHeader>
-                        <DialogTitle className="font-heading text-xl md:text-2xl font-bold tracking-tight">Ajustes del Tablón ⚙️</DialogTitle>
+                        <DialogTitle className="font-heading text-xl md:text-3xl font-bold tracking-tight">{dict.board_settings}</DialogTitle>
                     </DialogHeader>
 
-                    <form action={handleUpdate} className="space-y-4 md:space-y-5 mt-4">
-                        <div className="space-y-1.5 md:space-y-2">
-                            <Label htmlFor="name" className="text-xs md:text-sm font-bold text-zinc-700">Nombre</Label>
-                            <Input
-                                id="name"
-                                name="name"
-                                defaultValue={currentName}
-                                required
-                                className="h-12 md:h-14 rounded-2xl shadow-none border-zinc-200 bg-[#FAFAFA] focus-visible:ring-[#FF5C00] font-medium px-4 text-sm md:text-base"
-                            />
-                        </div>
-                        <div className="space-y-1.5 md:space-y-2">
-                            <Label htmlFor="slug" className="text-xs md:text-sm font-bold text-zinc-700">URL (Slug)</Label>
-                            <div className="flex">
-                                <span className="inline-flex items-center px-3 md:px-4 rounded-l-2xl border border-r-0 border-zinc-200 bg-zinc-100 text-zinc-500 text-[10px] md:text-sm font-medium">
-                                    /board/
-                                </span>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 mt-2 md:mt-4">
+                        <form action={handleUpdate} className="space-y-4 md:space-y-5 flex flex-col">
+                            <div className="space-y-1.5 md:space-y-2">
+                                <Label htmlFor="name" className="text-xs md:text-sm font-bold text-zinc-700">{dict.name}</Label>
                                 <Input
-                                    id="slug"
-                                    name="slug"
-                                    defaultValue={currentSlug}
+                                    id="name"
+                                    name="name"
+                                    defaultValue={currentName}
                                     required
-                                    className="h-12 md:h-14 rounded-none rounded-r-2xl shadow-none border-zinc-200 bg-[#FAFAFA] focus-visible:ring-[#FF5C00] font-medium text-sm md:text-base"
+                                    className="h-12 md:h-14 rounded-2xl shadow-none border-zinc-200 bg-[#FAFAFA] focus-visible:ring-[#FF5C00] font-medium px-4 text-sm md:text-base"
                                 />
                             </div>
-                            {error && <p className="text-[10px] md:text-sm text-red-500 font-medium mt-2">{error}</p>}
-                        </div>
-
-                        <div className="flex flex-col sm:flex-row gap-2 md:gap-3 pt-4 md:pt-6">
-                            <Button
-                                type="button"
-                                onClick={() => setIsSettingsOpen(false)}
-                                disabled={isPending}
-                                variant="outline"
-                                className="w-full h-12 md:h-14 rounded-full font-bold border-zinc-200 hover:bg-zinc-50 order-2 sm:order-1 text-sm"
-                            >
-                                Cerrar
-                            </Button>
-                            <Button
-                                type="submit"
-                                disabled={isPending}
-                                className="w-full h-12 md:h-14 rounded-full bg-[#FF5C00] text-white hover:bg-[#E65300] font-bold shadow-md shadow-[#FF5C00]/20 active:scale-95 order-1 sm:order-2 text-sm"
-                            >
-                                {isPending ? 'Guardando...' : 'Guardar ✅'}
-                            </Button>
-                        </div>
-
-                        <div className="pt-4 md:pt-6 mt-4 md:mt-6 border-t border-red-50">
-                            <div className="bg-red-50/50 border border-red-100 rounded-2xl p-4 flex flex-col gap-3">
-                                <div>
-                                    <h4 className="font-bold text-red-900 text-xs md:text-sm">Zona de peligro</h4>
-                                    <p className="text-red-700 font-medium text-[10px] md:text-xs">Eliminar definitivamente este tablón y sus datos.</p>
+                            <div className="space-y-1.5 md:space-y-2">
+                                <Label htmlFor="slug" className="text-xs md:text-sm font-bold text-zinc-700">{dict.slug}</Label>
+                                <div className="flex">
+                                    <span className="inline-flex items-center px-3 md:px-4 rounded-l-2xl border border-r-0 border-zinc-200 bg-zinc-100 text-zinc-500 text-[10px] md:text-sm font-medium">
+                                        /board/
+                                    </span>
+                                    <Input
+                                        id="slug"
+                                        name="slug"
+                                        defaultValue={currentSlug}
+                                        required
+                                        className="h-12 md:h-14 rounded-none rounded-r-2xl shadow-none border-zinc-200 bg-[#FAFAFA] focus-visible:ring-[#FF5C00] font-medium text-sm md:text-base"
+                                    />
                                 </div>
+                                {error && <p className="text-[10px] md:text-sm text-red-500 font-medium mt-2">{error}</p>}
+                            </div>
+
+                            <div className="flex flex-col sm:flex-row gap-2 md:gap-3 pt-4 md:pt-6">
                                 <Button
                                     type="button"
-                                    onClick={() => {
-                                        setIsSettingsOpen(false);
-                                        // timeout for smoother transition between modals
-                                        setTimeout(() => setIsDeleteOpen(true), 150);
-                                    }}
+                                    onClick={() => setIsSettingsOpen(false)}
                                     disabled={isPending}
-                                    className="w-full h-10 rounded-full bg-white hover:bg-red-50 text-red-600 border border-red-200 font-bold shadow-sm transition-colors text-xs"
+                                    variant="outline"
+                                    className="w-full h-12 md:h-14 rounded-full font-bold border-zinc-200 hover:bg-zinc-50 order-2 sm:order-1 text-sm"
                                 >
-                                    Borrar Tablón
+                                    {dict.close}
+                                </Button>
+                                <Button
+                                    type="submit"
+                                    disabled={isPending}
+                                    className="w-full h-12 md:h-14 rounded-full bg-[#FF5C00] text-white hover:bg-[#E65300] font-bold shadow-md shadow-[#FF5C00]/20 active:scale-95 order-1 sm:order-2 text-sm"
+                                >
+                                    {isPending ? dict.saving : dict.save}
                                 </Button>
                             </div>
+
+                            <div className="pt-4 md:pt-6 mt-4 md:mt-6 border-t border-red-50">
+                                <div className="bg-red-50/50 border border-red-100 rounded-2xl p-4 flex flex-col gap-3">
+                                    <div>
+                                        <h4 className="font-bold text-red-900 text-xs md:text-sm">{dict.danger_zone}</h4>
+                                        <p className="text-red-700 font-medium text-[10px] md:text-xs">{dict.delete_warning}</p>
+                                    </div>
+                                    <Button
+                                        type="button"
+                                        onClick={() => {
+                                            setIsSettingsOpen(false);
+                                            // timeout for smoother transition between modals
+                                            setTimeout(() => setIsDeleteOpen(true), 150);
+                                        }}
+                                        disabled={isPending}
+                                        className="w-full h-10 rounded-full bg-white hover:bg-red-50 text-red-600 border border-red-200 font-bold shadow-sm transition-colors text-xs"
+                                    >
+                                        {dict.delete_board}
+                                    </Button>
+                                </div>
+                            </div>
+                        </form>
+
+                        <div className="hidden md:flex flex-col space-y-4 md:border-l md:pl-8 lg:pl-12 border-zinc-100">
+                            <div className="space-y-1">
+                                <h3 className="font-bold text-lg md:text-xl text-zinc-900 tracking-tight">Etiquetas / Tags</h3>
+                                <p className="text-xs md:text-sm font-medium text-zinc-500">Próximamente podrás crear y administrar etiquetas personalizadas para este board.</p>
+                            </div>
+
+                            <div className="flex-1 border-2 border-dashed border-zinc-100 rounded-2xl bg-zinc-50 flex flex-col items-center justify-center p-8 text-center text-zinc-400 gap-3 min-h-[300px]">
+                                <div className="p-3 bg-white rounded-xl shadow-sm border border-zinc-100">
+                                    <Settings className="w-6 h-6 text-zinc-300" />
+                                </div>
+                                <span className="text-xs font-bold uppercase tracking-widest">En construcción</span>
+                            </div>
                         </div>
-                    </form>
+                    </div>
                 </DialogContent>
             </Dialog>
 
             {/* Modal de Borrado (High-Conversion Style) */}
-            <Dialog open={isDeleteOpen} onOpenChange={setIsDeleteOpen}>
+            < Dialog open={isDeleteOpen} onOpenChange={setIsDeleteOpen} >
                 <DialogContent className="w-[90vw] sm:max-w-sm rounded-[2rem] md:rounded-[2.5rem] p-6 md:p-8 border-none shadow-2xl overflow-hidden">
                     <div className="flex flex-col items-center text-center space-y-4">
                         <div className="w-16 h-16 md:w-20 md:h-20 bg-red-100 rounded-full flex items-center justify-center mb-2 animate-pulse">
@@ -155,10 +173,10 @@ export default function SettingsModal({
                         </div>
                         <DialogHeader>
                             <DialogTitle className="text-xl md:text-2xl font-black tracking-tight text-zinc-900 leading-tight">
-                                ¡Cuidado! Estás a punto de borrarlo todo
+                                {dict.delete_confirm_title}
                             </DialogTitle>
                             <DialogDescription className="text-zinc-500 font-semibold leading-relaxed pt-2 text-xs md:text-sm">
-                                Esta acción es irreversible. Se borrarán todos los votos e ideas acumuladas. ¿Seguro que quieres seguir?
+                                {dict.delete_confirm_desc}
                             </DialogDescription>
                         </DialogHeader>
 
@@ -171,9 +189,9 @@ export default function SettingsModal({
                                 {isPending ? (
                                     <>
                                         <X className="w-4 h-4 md:w-5 md:h-5 animate-spin-fast" />
-                                        Borrando...
+                                        {dict.deleting}
                                     </>
-                                ) : 'Sí, borrar definitivamente 🗑️'}
+                                ) : dict.yes_delete}
                             </Button>
                             <Button
                                 variant="ghost"
@@ -181,12 +199,12 @@ export default function SettingsModal({
                                 disabled={isPending}
                                 className="w-full h-12 md:h-14 rounded-full bg-zinc-100 hover:bg-zinc-200 text-zinc-900 font-black tracking-tight text-sm md:text-base"
                             >
-                                Me lo he pensado mejor
+                                {dict.changed_my_mind}
                             </Button>
                         </div>
                     </div>
                 </DialogContent>
-            </Dialog>
+            </Dialog >
         </>
     );
 }

@@ -78,17 +78,20 @@ export const metadata: Metadata = {
 
 import ClientWrapper from '@/components/ClientWrapper'
 import Navbar from '@/components/Navbar'
+import { getDictionary } from '@/i18n'
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
+  const t = await getDictionary();
+
   return (
     <ClerkProvider>
       <html lang="es">
         <body className={`${instrument.variable} ${outfit.variable} ${jakarta.variable} font-sans bg-[#FAFAFA] text-zinc-900 min-h-screen selection:bg-[#FF5C00]/20 selection:text-zinc-900`}>
-          <ClientWrapper navbar={<Navbar />}>
+          <ClientWrapper navbar={<Navbar dict={t.navbar} />}>
             {children}
           </ClientWrapper>
         </body>

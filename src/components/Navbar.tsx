@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { useState, useEffect } from "react";
 import { Menu, X, Monitor, Zap } from "lucide-react";
+import LanguageSwitcher from "./LanguageSwitcher";
 
 function Rocket({ className }: { className?: string }) {
     return (
@@ -12,7 +13,7 @@ function Rocket({ className }: { className?: string }) {
     )
 }
 
-export default function Navbar() {
+export default function Navbar({ dict }: { dict: Record<string, string> }) {
     const [menuOpen, setMenuOpen] = useState(false);
     // We'll derive isPremium from user public metadata if available,
     // but keep it simple here; for full support pass it as a prop from a server component wrapper
@@ -41,20 +42,21 @@ export default function Navbar() {
 
                     {/* Desktop nav links */}
                     <div className="hidden md:flex items-center gap-2 mr-2">
-                        <Link href="/#que-es" className="text-sm font-bold text-zinc-500 hover:text-zinc-900 transition-colors px-3 py-2 rounded-xl hover:bg-zinc-50">¿Qué es?</Link>
-                        <Link href="/#faq" className="text-sm font-bold text-zinc-500 hover:text-zinc-900 transition-colors px-3 py-2 rounded-xl hover:bg-zinc-50">Dudas</Link>
+                        <Link href="/#que-es" className="text-sm font-bold text-zinc-500 hover:text-zinc-900 transition-colors px-3 py-2 rounded-xl hover:bg-zinc-50">{dict.what_is}</Link>
+                        <Link href="/#faq" className="text-sm font-bold text-zinc-500 hover:text-zinc-900 transition-colors px-3 py-2 rounded-xl hover:bg-zinc-50">{dict.faq}</Link>
                     </div>
 
                     {/* Right side */}
                     <div className="flex items-center gap-2 md:gap-3">
+                        <LanguageSwitcher />
                         <SignedOut>
                             <div className="hidden md:flex items-center gap-3">
                                 <SignInButton mode="modal">
-                                    <button className="text-sm font-bold text-zinc-500 hover:text-zinc-900 transition-colors px-4 py-2 rounded-full hover:bg-zinc-100/50">Entrar</button>
+                                    <button className="text-sm font-bold text-zinc-500 hover:text-zinc-900 transition-colors px-4 py-2 rounded-full hover:bg-zinc-100/50">{dict.login}</button>
                                 </SignInButton>
                                 <SignInButton mode="modal">
                                     <Button className="bg-[#FF5C00] hover:bg-[#E65300] text-white font-black text-xs tracking-widest uppercase rounded-full px-6 h-10 shadow-lg shadow-orange-500/20 transition-all hover:scale-105 active:scale-95">
-                                        Empieza ya 🚀
+                                        {dict.start_now}
                                     </Button>
                                 </SignInButton>
                             </div>
@@ -62,7 +64,7 @@ export default function Navbar() {
                             <div className="flex md:hidden">
                                 <SignInButton mode="modal">
                                     <Button className="bg-[#FF5C00] hover:bg-[#E65300] text-white font-black text-[10px] tracking-widest uppercase rounded-full px-4 h-9 shadow-lg shadow-orange-500/20 active:scale-95">
-                                        Entrar ⚡
+                                        {dict.login_mobile}
                                     </Button>
                                 </SignInButton>
                             </div>
@@ -74,20 +76,20 @@ export default function Navbar() {
                                 <Link href="/dashboard/billing">
                                     <button className="text-sm font-bold text-zinc-500 hover:text-[#FF5C00] transition-colors px-4 py-2 rounded-xl hover:bg-orange-50/50 flex items-center gap-2 group">
                                         {isPremium ? (
-                                            <><Zap className="w-4 h-4 fill-[#FF5C00] text-[#FF5C00] group-hover:animate-pulse" /> Pro</>
+                                            <><Zap className="w-4 h-4 fill-[#FF5C00] text-[#FF5C00] group-hover:animate-pulse" /> {dict.pro}</>
                                         ) : (
-                                            <><Rocket className="w-4 h-4 text-zinc-400 group-hover:text-[#FF5C00] transition-all" /> Planes</>
+                                            <><Rocket className="w-4 h-4 text-zinc-400 group-hover:text-[#FF5C00] transition-all" /> {dict.plans}</>
                                         )}
                                     </button>
                                 </Link>
                                 <Link href="/dashboard/widgets">
                                     <button className="text-sm font-bold text-zinc-500 hover:text-[#FF5C00] transition-colors px-4 py-2 rounded-xl hover:bg-orange-50/50 flex items-center gap-2 group">
-                                        <Monitor className="w-4 h-4 text-zinc-400 group-hover:text-[#FF5C00] transition-all" /> Widgets
+                                        <Monitor className="w-4 h-4 text-zinc-400 group-hover:text-[#FF5C00] transition-all" /> {dict.widgets}
                                     </button>
                                 </Link>
                                 <Link href="/dashboard">
                                     <Button className="bg-[#FF5C00] hover:bg-[#E65300] text-white font-black text-xs tracking-widest uppercase rounded-full px-6 h-10 shadow-lg shadow-orange-500/20 transition-all hover:scale-105 active:scale-95 ml-2">
-                                        Panel 🏠
+                                        {dict.dashboard}
                                     </Button>
                                 </Link>
                                 <div className="ml-2 flex items-center">
@@ -119,16 +121,16 @@ export default function Navbar() {
                         <SignedOut>
                             <div className="grid gap-2 text-left">
                                 <Link href="/#que-es" onClick={() => setMenuOpen(false)} className="px-5 py-4 rounded-2xl text-zinc-600 font-bold hover:bg-zinc-50 border border-transparent hover:border-zinc-100 transition-all">
-                                    📦 ¿Qué es Pídemelo?
+                                    {dict.mobile_what_is}
                                 </Link>
                                 <Link href="/#faq" onClick={() => setMenuOpen(false)} className="px-5 py-4 rounded-2xl text-zinc-600 font-bold hover:bg-zinc-50 border border-transparent hover:border-zinc-100 transition-all">
-                                    🤔 Dudas frecuentes
+                                    {dict.mobile_faq}
                                 </Link>
                             </div>
                             <div className="pt-4 border-t border-zinc-100">
                                 <SignInButton mode="modal">
                                     <Button className="w-full bg-[#FF5C00] text-white font-black text-sm tracking-widest uppercase rounded-2xl h-14 shadow-xl shadow-orange-500/20 active:scale-95 transition-all">
-                                        PROBAR GRATIS 🚀
+                                        {dict.mobile_try_free}
                                     </Button>
                                 </SignInButton>
                             </div>
@@ -137,16 +139,16 @@ export default function Navbar() {
                         <SignedIn>
                             <div className="grid gap-2 text-left">
                                 <Link href="/dashboard" onClick={() => setMenuOpen(false)} className="w-full px-5 py-4 rounded-2xl bg-zinc-900 text-white font-black text-sm tracking-widest uppercase shadow-xl shadow-zinc-900/10 flex items-center justify-between group active:scale-[0.98] transition-all">
-                                    Panel de Control 🏠 <span className="text-orange-500 opacity-0 group-hover:opacity-100 transition-opacity">→</span>
+                                    {dict.mobile_dashboard} <span className="text-orange-500 opacity-0 group-hover:opacity-100 transition-opacity">→</span>
                                 </Link>
                                 <Link href="/dashboard/widgets" onClick={() => setMenuOpen(false)} className="px-5 py-4 rounded-2xl text-zinc-600 font-bold hover:bg-zinc-50 border border-transparent hover:border-zinc-100 flex items-center gap-3 transition-all">
-                                    <Monitor className="w-5 h-5 opacity-40" /> Widgets
+                                    <Monitor className="w-5 h-5 opacity-40" /> {dict.widgets}
                                 </Link>
                                 <Link href="/dashboard/billing" onClick={() => setMenuOpen(false)} className="px-5 py-4 rounded-2xl text-zinc-600 font-bold hover:bg-zinc-50 border border-transparent hover:border-zinc-100 flex items-center gap-3 transition-all">
                                     {isPremium ? (
-                                        <><Zap className="w-5 h-5 text-orange-500" /> Tu Suscripción</>
+                                        <><Zap className="w-5 h-5 text-orange-500" /> {dict.mobile_subscription}</>
                                     ) : (
-                                        <><Rocket className="w-5 h-5 opacity-40" /> Planes y Precios</>
+                                        <><Rocket className="w-5 h-5 opacity-40" /> {dict.mobile_plans}</>
                                     )}
                                 </Link>
                             </div>
