@@ -19,6 +19,7 @@ type Idea = {
     description: string;
     status: 'pending' | 'planned' | 'done';
     votesCount: number;
+    tag: { id: string; name: string; color: string; } | null;
 };
 
 export default function DashboardClient({ initialIdeas, boardId, dict }: { initialIdeas: Idea[], boardId: string, dict: Record<string, string> }) {
@@ -154,9 +155,17 @@ export default function DashboardClient({ initialIdeas, boardId, dict }: { initi
                                                             <p className="text-xs md:text-sm text-zinc-500 line-clamp-2 mb-5 md:mb-6 leading-relaxed font-bold tracking-tight">{idea.description}</p>
 
                                                             <div className="flex items-center justify-between">
-                                                                <span className="flex items-center gap-2 text-[9px] md:text-[10px] font-black uppercase tracking-widest text-[#FF5C00] bg-orange-50 border border-orange-100 px-3 md:px-4 py-1.5 md:py-2 rounded-full shadow-sm">
+                                                                <span className="flex items-center gap-2 text-[9px] md:text-[10px] font-black uppercase tracking-widest text-[#FF5C00] bg-orange-50 border border-orange-100 px-3 md:px-4 py-1.5 md:py-2 rounded-full shadow-sm flex-shrink-0">
                                                                     <span className="text-xs md:text-sm">▲</span> {idea.votesCount} {idea.votesCount === 1 ? dict.vote : dict.votes}
                                                                 </span>
+                                                                {idea.tag && (
+                                                                    <span
+                                                                        className="flex items-center gap-1.5 text-[9px] md:text-[10px] font-black uppercase tracking-widest border border-zinc-100 px-3 py-1.5 md:py-2 rounded-full shadow-sm max-w-[120px] truncate"
+                                                                    >
+                                                                        <span className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: idea.tag.color }} />
+                                                                        <span className="truncate">{idea.tag.name}</span>
+                                                                    </span>
+                                                                )}
                                                             </div>
                                                         </div>
                                                     )}

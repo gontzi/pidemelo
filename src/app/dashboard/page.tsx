@@ -23,6 +23,7 @@ export default async function Dashboard() {
 
     const userBoards = await db.query.boards.findMany({
         where: eq(boards.userId, userId),
+        with: { tags: true },
         orderBy: (boards, { desc }) => [desc(boards.createdAt)],
     });
 

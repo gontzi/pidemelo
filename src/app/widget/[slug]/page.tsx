@@ -24,8 +24,9 @@ export default async function WidgetPage({
     const board = await db.query.boards.findFirst({
         where: eq(boards.slug, params.slug),
         with: {
+            tags: true,
             ideas: {
-                with: { votes: true },
+                with: { votes: true, tag: true },
                 orderBy: [desc(ideas.createdAt)]
             }
         }
@@ -82,6 +83,7 @@ export default async function WidgetPage({
                         textColor={textColor}
                         isDarkMode={isDarkMode}
                         dict={t.submit_idea_form}
+                        tags={board.tags}
                     />
                 </section>
 

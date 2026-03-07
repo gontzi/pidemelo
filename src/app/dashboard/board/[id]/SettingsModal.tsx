@@ -15,19 +15,30 @@ import {
     DialogTrigger,
 } from "@/components/ui/dialog";
 import { updateBoardSettings, deleteBoard } from './actions';
+import TagsManager from './TagsManager';
+
+type Tag = {
+    id: string;
+    name: string;
+    color: string;
+};
 
 export default function SettingsModal({
     boardId,
     currentName,
     currentSlug,
     trigger,
-    dict
+    dict,
+    tags,
+    isPremium
 }: {
     boardId: string,
     currentName: string,
     currentSlug: string,
     dict: Record<string, string>,
-    trigger?: React.ReactNode
+    trigger?: React.ReactNode,
+    tags?: Tag[],
+    isPremium?: boolean
 }) {
     const [isSettingsOpen, setIsSettingsOpen] = useState(false);
     const [isDeleteOpen, setIsDeleteOpen] = useState(false);
@@ -148,17 +159,16 @@ export default function SettingsModal({
                         </form>
 
                         <div className="hidden md:flex flex-col space-y-4 md:border-l md:pl-8 lg:pl-12 border-zinc-100">
-                            <div className="space-y-1">
-                                <h3 className="font-bold text-lg md:text-xl text-zinc-900 tracking-tight">Etiquetas / Tags</h3>
-                                <p className="text-xs md:text-sm font-medium text-zinc-500">Próximamente podrás crear y administrar etiquetas personalizadas para este board.</p>
-                            </div>
-
-                            <div className="flex-1 border-2 border-dashed border-zinc-100 rounded-2xl bg-zinc-50 flex flex-col items-center justify-center p-8 text-center text-zinc-400 gap-3 min-h-[300px]">
-                                <div className="p-3 bg-white rounded-xl shadow-sm border border-zinc-100">
-                                    <Settings className="w-6 h-6 text-zinc-300" />
+                            {tags !== undefined && isPremium !== undefined ? (
+                                <TagsManager boardId={boardId} tags={tags} isPremium={isPremium} dict={dict} />
+                            ) : (
+                                <div className="flex-1 border-2 border-dashed border-zinc-100 rounded-2xl bg-zinc-50 flex flex-col items-center justify-center p-8 text-center text-zinc-400 gap-3 min-h-[300px]">
+                                    <div className="p-3 bg-white rounded-xl shadow-sm border border-zinc-100">
+                                        <Settings className="w-6 h-6 text-zinc-300" />
+                                    </div>
+                                    <span className="text-xs font-bold uppercase tracking-widest">En construcción</span>
                                 </div>
-                                <span className="text-xs font-bold uppercase tracking-widest">En construcción</span>
-                            </div>
+                            )}
                         </div>
                     </div>
                 </DialogContent>

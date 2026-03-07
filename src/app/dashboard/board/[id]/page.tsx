@@ -21,8 +21,9 @@ export default async function BoardDashboardPage({ params }: { params: { id: str
     const board = await db.query.boards.findFirst({
         where: and(eq(boards.id, params.id), eq(boards.userId, userId)),
         with: {
+            tags: true,
             ideas: {
-                with: { votes: true },
+                with: { votes: true, tag: true },
                 orderBy: [desc(ideas.createdAt)]
             }
         }
@@ -42,6 +43,11 @@ export default async function BoardDashboardPage({ params }: { params: { id: str
         description: idea.description,
         status: idea.status,
         votesCount: idea.votes.length,
+        tag: idea.tag ? {
+            id: idea.tag.id,
+            name: idea.tag.name,
+            color: idea.tag.color
+        } : null,
     }));
 
     formattedIdeas.sort((a, b) => b.votesCount - a.votesCount);
@@ -69,6 +75,8 @@ export default async function BoardDashboardPage({ params }: { params: { id: str
                             currentName={board.name}
                             currentSlug={board.slug}
                             dict={t.board_details}
+                            tags={board.tags}
+                            isPremium={isPremium}
                             trigger={
                                 <button className="p-3 md:p-4 rounded-xl md:rounded-2xl bg-zinc-50 border border-zinc-100 text-zinc-400 hover:text-zinc-900 transition-all active:scale-95 flex-shrink-0">
                                     <Settings className="w-5 h-5 md:w-6 md:h-6" />

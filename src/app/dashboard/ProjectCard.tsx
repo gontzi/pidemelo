@@ -9,8 +9,8 @@ import SettingsModal from './board/[id]/SettingsModal';
 interface ProjectCardProps {
     board: {
         id: string;
-        name: string;
         slug: string;
+        tags?: { id: string; name: string; color: string; }[];
     };
     dict: Record<string, string>;
     settingsDict: Record<string, string>;
@@ -68,6 +68,8 @@ export default function ProjectCard({ board, dict, settingsDict }: ProjectCardPr
                         currentName={board.name}
                         currentSlug={board.slug}
                         dict={settingsDict}
+                        tags={board.tags}
+                        isPremium={true} // Ocultar límite visualmente en este dropdown secundario o mapear desde arriba si prefieres
                         trigger={
                             <button
                                 title={dict.settings_tooltip}

@@ -10,6 +10,7 @@ type Idea = {
     description: string;
     status: 'pending' | 'planned' | 'done';
     votes: { id: string }[];
+    tag: { id: string; name: string; color: string; } | null;
 };
 
 export default function PublicBoardClient({
@@ -147,6 +148,14 @@ export default function PublicBoardClient({
                                         ${idea.status === 'done' ? 'bg-green-100 text-green-700 border border-green-200' :
                                             idea.status === 'planned' ? 'bg-amber-100 text-amber-700 border border-amber-200' : ''}`}>
                                         {idea.status === 'done' ? dict.tag_done : dict.tag_planned}
+                                    </span>
+                                )}
+                                {idea.tag && (
+                                    <span
+                                        className="w-fit flex items-center gap-1.5 px-2 md:px-3 py-0.5 md:py-1 rounded-full text-[9px] md:text-[11px] uppercase font-black tracking-wider border border-zinc-200 bg-white"
+                                    >
+                                        <span className="w-2 h-2 rounded-full" style={{ backgroundColor: idea.tag.color }} />
+                                        <span className="text-zinc-600">{idea.tag.name}</span>
                                     </span>
                                 )}
                             </div>

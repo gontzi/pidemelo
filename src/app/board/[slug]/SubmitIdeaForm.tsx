@@ -1,9 +1,12 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { submitIdea } from './actions';
+import { ChevronDown } from 'lucide-react';
+
+type Tag = { id: string, name: string, color: string };
 
 export default function SubmitIdeaForm({
     boardId,
@@ -11,18 +14,33 @@ export default function SubmitIdeaForm({
     accentColor = "#FF5C00",
     textColor = "#18181b",
     isDarkMode = false,
-    dict
+    dict,
+    tags
 }: {
     boardId: string,
     boardSlug: string,
     accentColor?: string,
     textColor?: string,
     isDarkMode?: boolean,
-    dict: Record<string, string>
+    dict: Record<string, string>,
+    tags?: Tag[]
 }) {
     const [isPending, setIsPending] = useState(false);
     const [error, setError] = useState<string | null>(null);
+    const [selectedTagId, setSelectedTagId] = useState<string | null>(null);
+    const [dropdownOpen, setDropdownOpen] = useState(false);
     const formRef = useRef<HTMLFormElement>(null);
+    const dropdownRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        function handleClickOutside(e: MouseEvent) {
+            if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+                setDropdownOpen(false);
+            }
+        }
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, []);
 
     async function handleSubmit(formData: FormData) {
         setIsPending(true);
@@ -34,6 +52,7 @@ export default function SubmitIdeaForm({
                 setError(res.error);
             } else {
                 formRef.current?.reset();
+                setSelectedTagId(null);
             }
         } catch (err: unknown) {
             if (err instanceof Error) {
@@ -58,6 +77,62 @@ export default function SubmitIdeaForm({
                     className={`h-12 md:h-14 shadow-none ${isDarkMode ? 'border-zinc-800 bg-zinc-900 placeholder:text-zinc-600 focus-visible:bg-zinc-800' : 'border-zinc-200 bg-[#FAFAFA] focus-visible:bg-white'} rounded-2xl focus-visible:ring-1 font-medium px-4 text-base transition-colors`}
                 />
             </div>
+            {tags && tags.length > 0 && (
+                <div className="relative z-10" ref={dropdownRef}>
+                    <input type="hidden" name="tagId" value={selectedTagId || ''} />
+                    <button
+                        type="button"
+                        onClick={() => setDropdownOpen(p => !p)}
+                        style={{
+                            borderColor: dropdownOpen ? accentColor : (isDarkMode ? '#27272a' : '#e4e4e7'),
+                            color: isDarkMode ? '#f4f4f5' : textColor,
+                            backgroundColor: isDarkMode ? '#18181b' : '#FAFAFA'
+                        }}
+                        className="w-full h-12 md:h-14 pl-4 pr-10 rounded-2xl border text-base md:text-sm font-medium focus:outline-none transition-all cursor-pointer shadow-sm flex items-center gap-2 relative"
+                    >
+                        {selectedTagId ? (
+                            <span className="flex items-center gap-2">
+                                <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: tags.find(t => t.id === selectedTagId)?.color }} />
+                                {tags.find(t => t.id === selectedTagId)?.name}
+                            </span>
+                        ) : (
+                            <span className="opacity-60">{dict.select_tag || 'Seleccionar etiqueta (opcional)'}</span>
+                        )}
+                        <ChevronDown className={`absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 transition-transform duration-200 opacity-50 ${dropdownOpen ? 'rotate-180' : ''}`} />
+                    </button>
+
+                    {dropdownOpen && (
+                        <div className="absolute top-[calc(100%+8px)] left-0 w-full z-50 rounded-2xl shadow-xl overflow-hidden animate-in fade-in slide-in-from-top-2 duration-150 border"
+                            style={{
+                                backgroundColor: isDarkMode ? '#18181b' : '#ffffff',
+                                borderColor: isDarkMode ? '#27272a' : '#e4e4e7',
+                                boxShadow: isDarkMode ? '0 10px 15px -3px rgba(0, 0, 0, 0.5)' : '0 10px 15px -3px rgba(0, 0, 0, 0.1)'
+                            }}
+                        >
+                            <button
+                                type="button"
+                                onClick={() => { setSelectedTagId(null); setDropdownOpen(false); }}
+                                style={{ color: isDarkMode ? '#a1a1aa' : '#71717a' }}
+                                className={`w-full text-left px-4 py-3 text-sm font-medium transition-colors ${isDarkMode ? 'hover:bg-zinc-800/50' : 'hover:bg-zinc-50'}`}
+                            >
+                                {dict.no_tag || 'Sin etiqueta'}
+                            </button>
+                            {tags.map(t => (
+                                <button
+                                    key={t.id}
+                                    type="button"
+                                    onClick={() => { setSelectedTagId(t.id); setDropdownOpen(false); }}
+                                    style={{ color: isDarkMode ? '#f4f4f5' : textColor }}
+                                    className={`w-full flex items-center gap-2 px-4 py-3 text-sm font-bold transition-colors ${isDarkMode ? 'hover:bg-zinc-800/50' : 'hover:bg-zinc-50'}`}
+                                >
+                                    <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: t.color }} />
+                                    {t.name}
+                                </button>
+                            ))}
+                        </div>
+                    )}
+                </div>
+            )}
             <div>
                 <textarea
                     name="description"

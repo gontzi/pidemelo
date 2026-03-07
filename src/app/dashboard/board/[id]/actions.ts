@@ -1,7 +1,7 @@
 'use server'
 
 import { db } from "@/db";
-import { boards, ideas, votes } from "@/db/schema";
+import { boards, ideas, votes, tags, users } from "@/db/schema";
 import { auth } from "@clerk/nextjs/server";
 import { eq, and, ne } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
@@ -92,5 +92,50 @@ export async function deleteBoard(boardId: string) {
     await db.delete(boards).where(and(eq(boards.id, boardId), eq(boards.userId, userId)));
 
     revalidatePath(`/dashboard`);
+    return { success: true };
+}
+
+export async function createTag(boardId: string, name: string, color: string) {
+    const { userId } = auth();
+    if (!userId) return { error: "Unauthorized" };
+
+    const user = await db.query.users.findFirst({
+        where: eq(users.id, userId)
+    });
+
+    const board = await db.query.boards.findFirst({
+        where: and(eq(boards.id, boardId), eq(boards.userId, userId)),
+        with: { tags: true }
+    });
+
+    if (!board) return { error: "No permission" };
+
+    if (!user?.isPremium && board.tags.length >= 6) {
+        return { error: "Limit reached. Upgrade to Pro for unlimited tags." };
+    }
+
+    await db.insert(tags).values({
+        boardId,
+        name,
+        color
+    });
+
+    revalidatePath(`/dashboard/board/${boardId}`);
+    return { success: true };
+}
+
+export async function deleteTag(tagId: string, boardId: string) {
+    const { userId } = auth();
+    if (!userId) return { error: "Unauthorized" };
+
+    const board = await db.query.boards.findFirst({
+        where: and(eq(boards.id, boardId), eq(boards.userId, userId))
+    });
+
+    if (!board) return { error: "No permission" };
+
+    await db.delete(tags).where(and(eq(tags.id, tagId), eq(tags.boardId, boardId)));
+
+    revalidatePath(`/dashboard/board/${boardId}`);
     return { success: true };
 }

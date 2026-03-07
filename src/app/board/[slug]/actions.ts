@@ -38,6 +38,7 @@ async function getIpHash() {
 export async function submitIdea(boardId: string, slug: string, formData: FormData) {
     const title = formData.get('title') as string;
     const description = formData.get('description') as string;
+    const tagId = formData.get('tagId') as string | null;
 
     if (!title || !description) return { error: "Faltan campos." };
 
@@ -61,6 +62,7 @@ export async function submitIdea(boardId: string, slug: string, formData: FormDa
     try {
         await db.insert(ideas).values({
             boardId,
+            tagId: tagId || null,
             title,
             description,
             authorFingerprint: ipHash,

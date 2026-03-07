@@ -63,8 +63,9 @@ export default async function PublicBoardPage({ params }: { params: { slug: stri
     const board = await db.query.boards.findFirst({
         where: eq(boards.slug, params.slug),
         with: {
+            tags: true,
             ideas: {
-                with: { votes: true },
+                with: { votes: true, tag: true },
                 orderBy: [desc(ideas.createdAt)]
             }
         }
@@ -112,7 +113,7 @@ export default async function PublicBoardPage({ params }: { params: { slug: stri
                     <aside className="md:sticky md:top-20 bg-white border border-zinc-200 p-6 md:p-8 rounded-2xl md:rounded-3xl shadow-lg shadow-zinc-200/40 w-full order-first md:order-last">
                         <h2 className="font-heading text-lg md:text-xl font-bold tracking-tight mb-1">{t.public_board_page.form_title}</h2>
                         <p className="text-zinc-500 font-medium text-sm mb-5">{t.public_board_page.form_desc}</p>
-                        <SubmitIdeaForm boardId={board.id} boardSlug={board.slug} dict={t.submit_idea_form} />
+                        <SubmitIdeaForm boardId={board.id} boardSlug={board.slug} dict={t.submit_idea_form} tags={board.tags} />
                     </aside>
 
                 </div>
