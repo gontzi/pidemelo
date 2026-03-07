@@ -73,20 +73,6 @@ export default function Navbar({ dict }: { dict: Record<string, string> }) {
                         <SignedIn>
                             {/* Desktop signed-in links */}
                             <div className="hidden md:flex items-center gap-2">
-                                <Link href="/dashboard/billing">
-                                    <button className="text-sm font-bold text-zinc-500 hover:text-[#FF5C00] transition-colors px-4 py-2 rounded-xl hover:bg-orange-50/50 flex items-center gap-2 group">
-                                        {isPremium ? (
-                                            <><Zap className="w-4 h-4 fill-[#FF5C00] text-[#FF5C00] group-hover:animate-pulse" /> {dict.pro}</>
-                                        ) : (
-                                            <><Rocket className="w-4 h-4 text-zinc-400 group-hover:text-[#FF5C00] transition-all" /> {dict.plans}</>
-                                        )}
-                                    </button>
-                                </Link>
-                                <Link href="/dashboard/widgets">
-                                    <button className="text-sm font-bold text-zinc-500 hover:text-[#FF5C00] transition-colors px-4 py-2 rounded-xl hover:bg-orange-50/50 flex items-center gap-2 group">
-                                        <Monitor className="w-4 h-4 text-zinc-400 group-hover:text-[#FF5C00] transition-all" /> {dict.widgets}
-                                    </button>
-                                </Link>
                                 <Link href="/dashboard">
                                     <Button className="bg-[#FF5C00] hover:bg-[#E65300] text-white font-black text-xs tracking-widest uppercase rounded-full px-6 h-10 shadow-lg shadow-orange-500/20 transition-all hover:scale-105 active:scale-95 ml-2">
                                         {dict.dashboard}
@@ -140,16 +126,6 @@ export default function Navbar({ dict }: { dict: Record<string, string> }) {
                             <div className="grid gap-2 text-left">
                                 <Link href="/dashboard" onClick={() => setMenuOpen(false)} className="w-full px-5 py-4 rounded-2xl bg-zinc-900 text-white font-black text-sm tracking-widest uppercase shadow-xl shadow-zinc-900/10 flex items-center justify-between group active:scale-[0.98] transition-all">
                                     {dict.mobile_dashboard} <span className="text-orange-500 opacity-0 group-hover:opacity-100 transition-opacity">→</span>
-                                </Link>
-                                <Link href="/dashboard/widgets" onClick={() => setMenuOpen(false)} className="px-5 py-4 rounded-2xl text-zinc-600 font-bold hover:bg-zinc-50 border border-transparent hover:border-zinc-100 flex items-center gap-3 transition-all">
-                                    <Monitor className="w-5 h-5 opacity-40" /> {dict.widgets}
-                                </Link>
-                                <Link href="/dashboard/billing" onClick={() => setMenuOpen(false)} className="px-5 py-4 rounded-2xl text-zinc-600 font-bold hover:bg-zinc-50 border border-transparent hover:border-zinc-100 flex items-center gap-3 transition-all">
-                                    {isPremium ? (
-                                        <><Zap className="w-5 h-5 text-orange-500" /> {dict.mobile_subscription}</>
-                                    ) : (
-                                        <><Rocket className="w-5 h-5 opacity-40" /> {dict.mobile_plans}</>
-                                    )}
                                 </Link>
                             </div>
                         </SignedIn>

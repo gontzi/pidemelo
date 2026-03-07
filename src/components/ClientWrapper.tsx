@@ -15,9 +15,11 @@ export default function ClientWrapper({ children, navbar }: ClientWrapperProps) 
         return <>{children}</>;
     }
 
+    const isLanding = pathname === '/';
+
     return (
         <>
-            {navbar}
+            {isLanding && navbar}
             <div>
                 {children}
             </div>
