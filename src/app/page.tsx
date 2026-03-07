@@ -82,6 +82,27 @@ export default function Home() {
           </div>
         </section>
 
+        {/* Sección de Feedback en Vivo */}
+        <section id="demo" className="w-full max-w-5xl mx-auto py-16 md:py-24 px-4 sm:px-6">
+          <div className="text-center mb-8 md:mb-12 space-y-4">
+            <h2 className="text-3xl md:text-4xl font-heading font-black tracking-tight text-zinc-900">
+              Pruébalo tú mismo 👇
+            </h2>
+            <p className="text-zinc-500 font-medium text-base md:text-lg max-w-2xl mx-auto">
+              Déjanos una idea, fíchate las de los demás o vota tus favoritas. Así de fácil se ve el widget incrustado (sí, esta es la versión Premium).
+            </p>
+          </div>
+          <div className="bg-white rounded-[2rem] md:rounded-[2.5rem] border border-zinc-200 shadow-2xl shadow-zinc-200/50 p-2 sm:p-4">
+            <iframe
+              src="https://pidemelo.app/widget/pidemelo?color=%23FF5C00&textColor=%2318181b&darkMode=false"
+              width="100%"
+              height="600px"
+              frameBorder="0"
+              className="rounded-[1.5rem] md:rounded-[2rem] w-full"
+            ></iframe>
+          </div>
+        </section>
+
         {/* FAQ */}
         <section id="faq" aria-labelledby="faq-heading" className="max-w-3xl w-full text-left py-12 md:py-20 font-sans">
           <h2 id="faq-heading" className="text-2xl md:text-3xl font-heading font-black mb-8 md:mb-10 tracking-tight">Dudas existenciales ❓</h2>
