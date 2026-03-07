@@ -170,6 +170,8 @@ export default async function BillingPage() {
                                 monthlyProductId={subscriptionProductId}
                                 lifetimeProductId={lifetimeProductId}
                                 dict={t.pricing_switcher}
+                                currentPlan={plan}
+                                isPremium={isPremium}
                             />
                         </div>
                     </>

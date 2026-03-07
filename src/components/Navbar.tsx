@@ -43,6 +43,7 @@ export default function Navbar({ dict }: { dict: Record<string, string> }) {
                     {/* Desktop nav links */}
                     <div className="hidden md:flex items-center gap-2 mr-2">
                         <Link href="/#que-es" className="text-sm font-bold text-zinc-500 hover:text-zinc-900 transition-colors px-3 py-2 rounded-xl hover:bg-zinc-50">{dict.what_is}</Link>
+                        <Link href="/#precios" className="text-sm font-bold text-zinc-500 hover:text-zinc-900 transition-colors px-3 py-2 rounded-xl hover:bg-zinc-50">{dict.plans}</Link>
                         <Link href="/#faq" className="text-sm font-bold text-zinc-500 hover:text-zinc-900 transition-colors px-3 py-2 rounded-xl hover:bg-zinc-50">{dict.faq}</Link>
                     </div>
 
@@ -108,6 +109,9 @@ export default function Navbar({ dict }: { dict: Record<string, string> }) {
                             <div className="grid gap-2 text-left">
                                 <Link href="/#que-es" onClick={() => setMenuOpen(false)} className="px-5 py-4 rounded-2xl text-zinc-600 font-bold hover:bg-zinc-50 border border-transparent hover:border-zinc-100 transition-all">
                                     {dict.mobile_what_is}
+                                </Link>
+                                <Link href="/#precios" onClick={() => setMenuOpen(false)} className="px-5 py-4 rounded-2xl text-zinc-600 font-bold hover:bg-zinc-50 border border-transparent hover:border-zinc-100 transition-all">
+                                    {dict.plans}
                                 </Link>
                                 <Link href="/#faq" onClick={() => setMenuOpen(false)} className="px-5 py-4 rounded-2xl text-zinc-600 font-bold hover:bg-zinc-50 border border-transparent hover:border-zinc-100 transition-all">
                                     {dict.mobile_faq}

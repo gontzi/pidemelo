@@ -16,6 +16,15 @@ export default function PublicHeader({ dict }: { dict?: Record<string, string> }
                     <span className="text-zinc-900">app</span>
                 </Link>
 
+                <div className="hidden md:flex items-center gap-6">
+                    <Link href="/#que-es" className="text-sm font-bold text-zinc-500 hover:text-zinc-900 transition-colors uppercase tracking-widest text-[10px]">
+                        ¿Qué es?
+                    </Link>
+                    <Link href="/#precios" className="text-sm font-bold text-zinc-500 hover:text-zinc-900 transition-colors uppercase tracking-widest text-[10px]">
+                        Planes
+                    </Link>
+                </div>
+
                 {/* Right side */}
                 <div className="flex items-center gap-3">
                     <LanguageSwitcher />

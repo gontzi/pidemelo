@@ -3,15 +3,24 @@
 import { useState } from 'react';
 import { Check, Sparkles, PartyPopper } from 'lucide-react';
 import { SubscriptionButton } from './SubscriptionButton';
+import { SignedIn, SignedOut, SignInButton } from '@clerk/nextjs';
+import { Button } from '@/components/ui/button';
 
 interface PricingSwitcherProps {
     monthlyProductId: string;
     lifetimeProductId: string;
     dict: Record<string, string>;
+    currentPlan?: string | null;
+    isPremium?: boolean;
 }
 
-export default function PricingSwitcher({ monthlyProductId, lifetimeProductId, dict }: PricingSwitcherProps) {
-    const [plan, setPlan] = useState<'monthly' | 'lifetime'>('monthly');
+export default function PricingSwitcher({ monthlyProductId, lifetimeProductId, dict, currentPlan, isPremium }: PricingSwitcherProps) {
+    const [plan, setPlan] = useState<'monthly' | 'lifetime'>(currentPlan === 'lifetime' ? 'lifetime' : 'monthly');
+
+    const isCurrentPlan = (p: 'monthly' | 'lifetime') => {
+        if (!isPremium) return false;
+        return p === currentPlan;
+    };
 
     const features = [
         dict.feat_1,
@@ -35,19 +44,25 @@ export default function PricingSwitcher({ monthlyProductId, lifetimeProductId, d
                 </div>
 
                 {/* 2. Selector debajo */}
-                <div className="flex bg-black/40 p-1.5 rounded-[1.5rem] w-fit border border-white/5">
+                <div className="flex bg-black/40 p-1.5 rounded-[1.5rem] w-fit border border-white/5 relative">
                     <button
                         onClick={() => setPlan('monthly')}
-                        className={`px-6 py-3 rounded-xl text-xs font-black tracking-tight transition-all ${plan === 'monthly' ? 'bg-zinc-800 text-zinc-400 border border-white/5' : 'text-zinc-500 hover:text-zinc-300'}`}
+                        className={`relative px-6 py-3 rounded-xl text-xs font-black tracking-tight transition-all ${plan === 'monthly' ? 'bg-zinc-800 text-zinc-400 border border-white/5' : 'text-zinc-500 hover:text-zinc-300'}`}
                     >
                         {dict.monthly}
+                        {isCurrentPlan('monthly') && (
+                            <span className="absolute -top-2 -right-2 bg-emerald-500 text-white text-[8px] px-1.5 py-0.5 rounded-full shadow-lg">TU PLAN</span>
+                        )}
                     </button>
                     <button
                         onClick={() => setPlan('lifetime')}
-                        className={`px-6 py-3 rounded-xl text-xs font-black tracking-tight transition-all flex items-center gap-2 ${plan === 'lifetime' ? 'bg-[#FF5C00] text-white shadow-xl' : 'text-zinc-500 hover:text-zinc-300'}`}
+                        className={`relative px-6 py-3 rounded-xl text-xs font-black tracking-tight transition-all flex items-center gap-2 ${plan === 'lifetime' ? 'bg-[#FF5C00] text-white shadow-xl' : 'text-zinc-500 hover:text-zinc-300'}`}
                     >
                         {dict.lifetime}
                         <span role="img" aria-label="fire" className="text-sm">🔥</span>
+                        {isCurrentPlan('lifetime') && (
+                            <span className="absolute -top-2 -right-2 bg-emerald-500 text-white text-[8px] px-1.5 py-0.5 rounded-full shadow-lg">TU PLAN</span>
+                        )}
                     </button>
                 </div>
 
@@ -80,10 +95,29 @@ export default function PricingSwitcher({ monthlyProductId, lifetimeProductId, d
                 ))}
             </div>
 
-            <SubscriptionButton
-                productId={plan === 'monthly' ? monthlyProductId : lifetimeProductId}
-                label={plan === 'monthly' ? dict.btn_monthly : dict.btn_lifetime}
-            />
+            <SignedIn>
+                {isCurrentPlan(plan) ? (
+                    <Button disabled className="w-full h-14 rounded-2xl bg-zinc-800 text-zinc-500 font-bold text-sm tracking-widest uppercase cursor-not-allowed">
+                        {dict.current_plan || "Tu plan actual"}
+                    </Button>
+                ) : (currentPlan === 'lifetime' && plan === 'monthly') ? (
+                    <Button disabled className="w-full h-14 rounded-2xl bg-zinc-800 text-zinc-500 font-bold text-sm tracking-widest uppercase cursor-not-allowed">
+                        Completado ✅
+                    </Button>
+                ) : (
+                    <SubscriptionButton
+                        productId={plan === 'monthly' ? monthlyProductId : lifetimeProductId}
+                        label={plan === 'monthly' ? dict.btn_monthly : dict.btn_lifetime}
+                    />
+                )}
+            </SignedIn>
+            <SignedOut>
+                <SignInButton mode="modal">
+                    <Button className="w-full h-14 rounded-2xl bg-[#FF5C00] text-white hover:bg-[#E65300] shadow-lg shadow-orange-500/20 font-bold text-sm tracking-widest uppercase transition-all hover:scale-[1.02] active:scale-[0.98]">
+                        {plan === 'monthly' ? dict.btn_monthly : dict.btn_lifetime}
+                    </Button>
+                </SignInButton>
+            </SignedOut>
 
             {plan === 'monthly' && (
                 <p className="text-center text-[10px] text-zinc-500 font-bold mt-4 uppercase tracking-[0.2em]">

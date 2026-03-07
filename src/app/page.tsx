@@ -3,6 +3,11 @@ import { SignedIn, SignedOut, SignInButton } from "@clerk/nextjs";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { getDictionary } from '@/i18n';
+import PricingSwitcher from './dashboard/billing/PricingSwitcher';
+import { auth } from '@clerk/nextjs/server';
+import { db } from '@/db';
+import { users } from '@/db/schema';
+import { eq } from 'drizzle-orm';
 
 export const runtime = 'edge';
 export const dynamic = 'force-dynamic';
@@ -19,6 +24,15 @@ export const metadata: Metadata = {
 
 export default async function Home() {
   const t = await getDictionary();
+  const { userId } = auth();
+
+  // Recuperamos el estado del usuario de la DB para personalizar los precios
+  const userData = userId ? await db.query.users.findFirst({
+    where: eq(users.id, userId)
+  }) : null;
+
+  const isPremium = userData?.isPremium || false;
+  const userPlan = userData?.plan;
 
   return (
     <>
@@ -103,6 +117,72 @@ export default async function Home() {
               frameBorder="0"
               className="rounded-[1.5rem] md:rounded-[2rem] w-full"
             ></iframe>
+          </div>
+        </section>
+
+        {/* Sección de Precios */}
+        <section id="precios" className="w-full max-w-5xl mx-auto py-16 md:py-32 px-4 sm:px-6">
+          <div className="text-center mb-12 md:mb-20 space-y-6">
+            <h2 className="text-4xl md:text-6xl font-black tracking-tighter text-zinc-900 leading-none">
+              {t.billing_page.free_title_1} <br /> <span className="text-[#FF5C00] italic">{t.billing_page.free_title_2}</span>
+            </h2>
+            <p className="text-zinc-500 text-lg md:text-xl font-medium max-w-xl mx-auto leading-relaxed">
+              {t.billing_page.free_subtitle}
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-12 items-stretch max-w-5xl mx-auto text-left">
+            {/* Tarjeta 1: Free */}
+            <div className="relative flex flex-col p-7 md:p-10 rounded-[2rem] bg-white border border-zinc-200 shadow-xl shadow-zinc-200/20 opacity-80 hover:opacity-100 transition-all">
+              <div className="mb-8">
+                <h3 className="text-xl md:text-2xl font-black tracking-tight mb-2 italic text-zinc-400">{t.billing_page.free_card_title}</h3>
+                <p className="text-zinc-300 text-[10px] font-black uppercase tracking-widest">{t.billing_page.free_card_subtitle}</p>
+              </div>
+
+              <div className="flex items-baseline mb-8">
+                <span className="text-5xl md:text-6xl font-black tracking-tighter text-zinc-300">0€</span>
+                <span className="text-zinc-300 font-bold ml-2 uppercase tracking-widest text-sm">{t.billing_page.free_price_suffix}</span>
+              </div>
+
+              <div className="space-y-4 mb-10 flex-grow">
+                {[
+                  { text: t.billing_page.free_feat_1, limit: true },
+                  { text: t.billing_page.free_feat_2, limit: true },
+                  { text: t.billing_page.free_feat_3, limit: true },
+                  { text: t.billing_page.free_feat_4, limit: true },
+                  { text: t.billing_page.free_feat_5, limit: false },
+                ].map((feat, i) => (
+                  <div key={i} className={`flex items-start gap-3 font-medium ${feat.limit ? 'text-zinc-400' : 'text-zinc-500'}`}>
+                    <span className="text-zinc-200 shrink-0 mt-0.5" aria-hidden="true">✓</span>
+                    <span className="text-sm md:text-base">{feat.text}</span>
+                  </div>
+                ))}
+              </div>
+
+              <SignedOut>
+                <SignInButton mode="modal">
+                  <Button className="h-14 rounded-2xl bg-zinc-100 text-zinc-400 font-black text-xs tracking-widest uppercase w-full">
+                    {t.navbar.start_now}
+                  </Button>
+                </SignInButton>
+              </SignedOut>
+              <SignedIn>
+                <Link href="/dashboard" className="w-full">
+                  <Button className="h-14 rounded-2xl bg-zinc-100 text-zinc-400 font-black text-xs tracking-widest uppercase w-full">
+                    {t.navbar.dashboard}
+                  </Button>
+                </Link>
+              </SignedIn>
+            </div>
+
+            {/* Tarjeta 2: Reusamos el componente de Precios */}
+            <PricingSwitcher
+              monthlyProductId={process.env.NEXT_PUBLIC_POLAR_SUBSCRIPTION_PRODUCT_ID || ''}
+              lifetimeProductId={process.env.NEXT_PUBLIC_POLAR_LIFETIME_PRODUCT_ID || ''}
+              dict={t.pricing_switcher}
+              currentPlan={userPlan}
+              isPremium={isPremium}
+            />
           </div>
         </section>
 
