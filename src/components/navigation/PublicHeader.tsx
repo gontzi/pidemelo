@@ -42,6 +42,8 @@ export default function PublicHeader({ dict }: { dict?: Record<string, string> }
                     </SignedIn>
                 </div>
             </div>
+
+            <script defer src="https://cloud.umami.is/script.js" data-website-id="2100287d-2f60-4b41-a411-265112b9daf4"></script>
         </header>
     );
 }
