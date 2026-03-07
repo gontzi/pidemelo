@@ -108,54 +108,60 @@ export default function TagsManager({
                 )}
             </div>
 
-            <div className={`space-y-4 pt-4 border-t border-zinc-100 mt-auto ${isLimitReached ? 'opacity-50 pointer-events-none' : ''}`}>
-                <div className="flex flex-col gap-4">
-                    <div className="space-y-1.5">
-                        <Label htmlFor="tag-name" className="text-[10px] uppercase tracking-widest font-bold text-zinc-400 ml-1">{dict.new_tag_name || 'Nombre'}</Label>
-                        <Input
-                            id="tag-name"
-                            value={name}
-                            onChange={e => setName(e.target.value)}
-                            placeholder={dict.new_tag_ph || 'Ej: Bug...'}
-                            disabled={isLimitReached || isPending}
-                            className="h-12 rounded-xl shadow-none border-zinc-200 bg-white focus-visible:ring-[#FF5C00] font-medium px-4 text-sm"
-                        />
-                    </div>
+            <div className="relative mt-auto pt-4 border-t border-zinc-100">
+                {isLimitReached && (
+                    <div className="absolute inset-0 z-20 bg-white/40 backdrop-blur-[2px] transition-all duration-500 rounded-xl" />
+                )}
 
-                    <div className="space-y-2">
-                        <Label className="text-[10px] uppercase tracking-widest font-bold text-zinc-400 ml-1">{dict.color || 'Color'}</Label>
-                        <div className="flex flex-wrap gap-2">
-                            {colorPresets.map((preset) => (
-                                <button
-                                    key={preset}
-                                    type="button"
-                                    disabled={isLimitReached || isPending}
-                                    onClick={() => setColor(preset)}
-                                    className={`w-8 h-8 rounded-lg border-2 transition-all hover:scale-110 active:scale-90 ${color === preset ? 'border-zinc-900 shadow-sm' : 'border-transparent'}`}
-                                    style={{ backgroundColor: preset }}
-                                />
-                            ))}
-                            <input
-                                type="color"
-                                value={color}
-                                onChange={(e) => setColor(e.target.value)}
+                <div className={`space-y-4 ${isLimitReached ? 'opacity-40 grayscale-[0.5] pointer-events-none' : ''}`}>
+                    <div className="flex flex-col gap-4">
+                        <div className="space-y-1.5">
+                            <Label htmlFor="tag-name" className="text-[10px] uppercase tracking-widest font-bold text-zinc-400 ml-1">{dict.new_tag_name || 'Nombre'}</Label>
+                            <Input
+                                id="tag-name"
+                                value={name}
+                                onChange={e => setName(e.target.value)}
+                                placeholder={dict.new_tag_ph || 'Ej: Bug...'}
                                 disabled={isLimitReached || isPending}
-                                className="w-8 h-8 rounded-lg border-2 border-transparent cursor-pointer bg-white overflow-hidden shadow-inner flex-shrink-0 p-0"
+                                className="h-12 rounded-xl shadow-none border-zinc-200 bg-white focus-visible:ring-[#FF5C00] font-medium px-4 text-sm"
                             />
                         </div>
+
+                        <div className="space-y-2">
+                            <Label className="text-[10px] uppercase tracking-widest font-bold text-zinc-400 ml-1">{dict.color || 'Color'}</Label>
+                            <div className="flex flex-wrap gap-2">
+                                {colorPresets.map((preset) => (
+                                    <button
+                                        key={preset}
+                                        type="button"
+                                        disabled={isLimitReached || isPending}
+                                        onClick={() => setColor(preset)}
+                                        className={`w-8 h-8 rounded-lg border-2 transition-all hover:scale-110 active:scale-90 ${color === preset ? 'border-zinc-900 shadow-sm' : 'border-transparent'}`}
+                                        style={{ backgroundColor: preset }}
+                                    />
+                                ))}
+                                <input
+                                    type="color"
+                                    value={color}
+                                    onChange={(e) => setColor(e.target.value)}
+                                    disabled={isLimitReached || isPending}
+                                    className="w-8 h-8 rounded-lg border-2 border-transparent cursor-pointer bg-white overflow-hidden shadow-inner flex-shrink-0 p-0"
+                                />
+                            </div>
+                        </div>
                     </div>
+
+                    {error && <p className="text-[10px] text-red-500 font-medium">{error}</p>}
+
+                    <Button
+                        type="button"
+                        onClick={handleCreate}
+                        disabled={isLimitReached || isPending || !name.trim()}
+                        className="w-full h-12 rounded-xl bg-zinc-900 text-white hover:bg-zinc-800 font-bold transition-all active:scale-95 flex items-center gap-2 text-sm shadow-md"
+                    >
+                        <Plus className="w-4 h-4" /> {dict.add_tag || 'Añadir Etiqueta'}
+                    </Button>
                 </div>
-
-                {error && <p className="text-[10px] text-red-500 font-medium">{error}</p>}
-
-                <Button
-                    type="button"
-                    onClick={handleCreate}
-                    disabled={isLimitReached || isPending || !name.trim()}
-                    className="w-full h-12 rounded-xl bg-zinc-900 text-white hover:bg-zinc-800 font-bold transition-all active:scale-95 flex items-center gap-2 text-sm shadow-md"
-                >
-                    <Plus className="w-4 h-4" /> {dict.add_tag || 'Añadir Etiqueta'}
-                </Button>
             </div>
         </div>
     );

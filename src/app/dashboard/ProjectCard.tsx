@@ -14,9 +14,10 @@ interface ProjectCardProps {
     };
     dict: Record<string, string>;
     settingsDict: Record<string, string>;
+    isPremium: boolean;
 }
 
-export default function ProjectCard({ board, dict, settingsDict }: ProjectCardProps) {
+export default function ProjectCard({ board, dict, settingsDict, isPremium }: ProjectCardProps) {
     const [copied, setCopied] = useState(false);
 
     const handleCopy = async (e: React.MouseEvent) => {
@@ -69,7 +70,7 @@ export default function ProjectCard({ board, dict, settingsDict }: ProjectCardPr
                         currentSlug={board.slug}
                         dict={settingsDict}
                         tags={board.tags}
-                        isPremium={true} // Ocultar límite visualmente en este dropdown secundario o mapear desde arriba si prefieres
+                        isPremium={isPremium}
                         trigger={
                             <button
                                 title={dict.settings_tooltip}

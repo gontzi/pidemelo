@@ -79,7 +79,7 @@ export default async function Dashboard() {
 
                 <section className="grid gap-6 md:gap-8 sm:grid-cols-2 lg:grid-cols-3">
                     {userBoards.map(board => (
-                        <ProjectCard key={board.id} board={board as any} dict={t.project_card} settingsDict={t.board_details} />
+                        <ProjectCard key={board.id} board={board as any} dict={t.project_card} settingsDict={t.board_details} isPremium={isPremium} />
                     ))}
                     {userBoards.length === 0 && (
                         <div className="col-span-full border-[3px] border-dashed border-zinc-200 rounded-[2.5rem] md:rounded-[3rem] p-10 md:p-20 flex flex-col items-center justify-center text-center bg-white/40 min-h-[300px] md:h-[400px]">
