@@ -14,13 +14,15 @@ interface ImageUploadProps {
     isBoardPremium: boolean;
     isCurrentUserAdmin: boolean;
     onUploadSuccess: (url: string) => void;
+    isDarkMode?: boolean;
 }
 
 export default function ImageUploadDropzone({
     boardId,
     isBoardPremium,
     isCurrentUserAdmin,
-    onUploadSuccess
+    onUploadSuccess,
+    isDarkMode = false
 }: ImageUploadProps) {
     const [isUploading, setIsUploading] = useState(false);
     const [error, setError] = useState<string | null>(null);
@@ -37,10 +39,10 @@ export default function ImageUploadDropzone({
                             type="button"
                             onMouseEnter={() => setIsPopoverOpen(true)}
                             onMouseLeave={() => setIsPopoverOpen(false)}
-                            className="w-full flex items-center justify-center gap-2 rounded-2xl border-2 border-dashed border-zinc-200 bg-zinc-50/50 p-4 opacity-50 cursor-not-allowed transition-all hover:bg-zinc-100/50 outline-none focus-visible:ring-2 focus-visible:ring-zinc-400 focus-visible:ring-offset-2"
+                            className={`w-full flex items-center justify-center gap-2 rounded-2xl border-2 border-dashed p-4 opacity-50 cursor-not-allowed transition-all outline-none focus-visible:ring-2 focus-visible:ring-zinc-400 focus-visible:ring-offset-2 ${isDarkMode ? 'border-zinc-800 bg-zinc-900/50 hover:bg-zinc-800/50 text-zinc-500' : 'border-zinc-200 bg-zinc-50/50 hover:bg-zinc-100/50 text-zinc-400'}`}
                         >
-                            <ImagePlus className="w-5 h-5 text-zinc-400" />
-                            <span className="text-sm font-medium text-zinc-500 text-left">
+                            <ImagePlus className="w-5 h-5" />
+                            <span className="text-sm font-medium text-left">
                                 Adjuntar imagen (Solo Pro)
                             </span>
                         </button>
@@ -117,14 +119,14 @@ export default function ImageUploadDropzone({
                 type="button"
                 onClick={() => fileInputRef.current?.click()}
                 disabled={isUploading}
-                className="w-full flex items-center justify-center gap-2 rounded-2xl border-2 border-dashed border-zinc-200 bg-white hover:bg-zinc-50 hover:border-zinc-300 p-4 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-[#FF5C00]/50 active:scale-[0.98]"
+                className={`w-full flex items-center justify-center gap-2 rounded-2xl border-2 border-dashed p-4 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-[#FF5C00]/50 active:scale-[0.98] ${isDarkMode ? 'border-zinc-800 bg-zinc-900 hover:bg-zinc-800 hover:border-zinc-700 text-zinc-400' : 'border-zinc-200 bg-white hover:bg-zinc-50 hover:border-zinc-300 text-zinc-600'}`}
             >
                 {isUploading ? (
-                    <Loader2 className="w-5 h-5 text-zinc-400 animate-spin" />
+                    <Loader2 className="w-5 h-5 animate-spin" />
                 ) : (
-                    <ImagePlus className="w-5 h-5 text-zinc-400" />
+                    <ImagePlus className="w-5 h-5" />
                 )}
-                <span className="text-sm font-medium text-zinc-600">
+                <span className="text-sm font-medium">
                     {isUploading ? "Subiendo imagen..." : "Adjuntar imagen o captura (máx 1MB)"}
                 </span>
             </button>

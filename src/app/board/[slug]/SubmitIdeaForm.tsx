@@ -107,7 +107,7 @@ export default function SubmitIdeaForm({
                                 {tags.find(t => t.id === selectedTagId)?.name}
                             </span>
                         ) : (
-                            <span className="opacity-60">{dict.select_tag || 'Seleccionar etiqueta (opcional)'}</span>
+                            <span style={{ color: isDarkMode ? '#a1a1aa' : '#71717a' }}>{dict.select_tag || 'Seleccionar etiqueta (opcional)'}</span>
                         )}
                         <ChevronDown className={`absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 transition-transform duration-200 opacity-50 ${dropdownOpen ? 'rotate-180' : ''}`} />
                     </button>
@@ -162,6 +162,7 @@ export default function SubmitIdeaForm({
                     isBoardPremium={isBoardPremium}
                     isCurrentUserAdmin={isCurrentUserAdmin}
                     onUploadSuccess={(url) => setUploadedImageUrl(url)}
+                    isDarkMode={isDarkMode}
                 />
             ) : (
                 <div className="relative inline-block mt-2">
