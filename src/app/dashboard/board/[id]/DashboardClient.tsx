@@ -108,9 +108,9 @@ export default function DashboardClient({ initialIdeas, boardId, dict }: { initi
                 </DialogContent>
             </Dialog>
             <DragDropContext onDragEnd={onDragEnd}>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 min-h-[50vh] h-full p-4 md:p-6">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 h-full p-4 md:p-6 overflow-x-auto">
                     {columnsConfig.map(col => (
-                        <div key={col.id} className={`flex flex-col rounded-[2rem] md:rounded-[2.5rem] border p-5 md:p-8 h-full ${col.color}`}>
+                        <div key={col.id} className={`flex flex-col rounded-[2rem] md:rounded-[2.5rem] border p-5 md:p-8 min-h-0 h-full ${col.color}`}>
                             <div className="flex items-center justify-between mb-6 md:mb-8 px-1 md:px-2">
                                 <h3 className="text-[10px] font-black tracking-widest text-zinc-900 uppercase opacity-60">{col.title}</h3>
                                 <span className="bg-white/80 backdrop-blur-sm border border-zinc-200/50 text-zinc-900 font-black text-[10px] px-3 py-1 rounded-full shadow-sm">
@@ -123,7 +123,10 @@ export default function DashboardClient({ initialIdeas, boardId, dict }: { initi
                                     <div
                                         ref={provided.innerRef}
                                         {...provided.droppableProps}
-                                        className={`flex-1 transition-all rounded-[1.5rem] p-1 ${snapshot.isDraggingOver ? 'bg-white/40' : ''}`}
+                                        className={`flex-1 overflow-y-auto pr-2 transition-all rounded-[1.5rem] p-1 
+                                            ${snapshot.isDraggingOver ? 'bg-white/40' : ''} 
+                                            [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-thumb]:bg-zinc-300/60 
+                                            [&::-webkit-scrollbar-thumb]:rounded-full hover:[&::-webkit-scrollbar-thumb]:bg-zinc-400/80`}
                                     >
                                         <div className="space-y-4 md:space-y-6">
                                             {ideas.filter(i => i.status === col.id).map((idea, index) => (
@@ -132,7 +135,7 @@ export default function DashboardClient({ initialIdeas, boardId, dict }: { initi
                                                         <div
                                                             ref={provided.innerRef}
                                                             {...provided.draggableProps}
-                                                            className={`p-5 md:p-6 lg:p-8 bg-white border rounded-[1.8rem] md:rounded-[2rem] group transition-all duration-300
+                                                            className={`flex-shrink-0 p-5 md:p-6 lg:p-8 bg-white border rounded-[1.8rem] md:rounded-[2rem] group transition-all duration-300
                                                                 ${snapshot.isDragging
                                                                     ? 'shadow-2xl shadow-orange-500/20 border-[#FF5C00] scale-[1.05] rotate-2'
                                                                     : 'border-zinc-200/60 shadow-sm hover:shadow-xl hover:shadow-zinc-200/50 hover:border-[#FF5C00]/20'}`}
