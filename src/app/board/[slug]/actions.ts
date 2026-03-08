@@ -37,13 +37,13 @@ async function getIpHash() {
 }
 
 export async function submitIdea(boardId: string, slug: string, formData: FormData) {
-    const title = formData.get('title') as string;
-    const description = formData.get('description') as string;
-    const tagId = formData.get('tagId') as string | null;
-
-    if (!title || !description) return { error: "Faltan campos." };
-
     try {
+        const title = formData.get('title') as string;
+        const description = formData.get('description') as string;
+        const tagId = formData.get('tagId') as string | null;
+
+        if (!title || !description) return { error: "Faltan campos." };
+
         // ⚡️ IMPORTANTE: Ahora necesitamos await porque el hash es asíncrono
         const ipHash = await getIpHash();
         const COOLDOWN_MINUTES = 5;
@@ -166,14 +166,18 @@ export async function submitIdea(boardId: string, slug: string, formData: FormDa
             }
         } catch (emailError) {
             // Manejamos silenciosamente el error para que la idea se registre igual sin fallar en el front
-            console.error("Error al enviar email a través de Resend:", emailError);
+            console.log("Error al enviar email a través de Resend:", emailError instanceof Error ? emailError.message : String(emailError));
         }
 
         revalidatePath(`/board/${slug}`);
         return { success: true };
     } catch (e) {
-        console.error(e);
-        return { error: "Hubo un error al guardar tu petición." };
+        // En Cloudflare Edge, console.error con objetos complejos crashea el worker. Lo pasamos a string.
+        const errorMsg = e instanceof Error ? e.message : String(e);
+        console.log("Error seguro capturado en submitIdea:", errorMsg);
+
+        // Devolvemos el error real para verlo en UI en vez de la caída del runtime (útil para debugear Edge)
+        return { error: `Error inesperado: ${errorMsg}` };
     }
 }
 
