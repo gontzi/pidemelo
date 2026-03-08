@@ -43,24 +43,31 @@ export async function submitIdea(boardId: string, slug: string, formData: FormDa
 
     if (!title || !description) return { error: "Faltan campos." };
 
-    // ⚡️ IMPORTANTE: Ahora necesitamos await porque el hash es asíncrono
-    const ipHash = await getIpHash();
-    const COOLDOWN_MINUTES = 5;
-
-    // Verificar cooldown
-    const recentIdea = await db.query.ideas.findFirst({
-        where: eq(ideas.authorFingerprint, ipHash),
-        orderBy: [desc(ideas.createdAt)]
-    });
-
-    if (recentIdea) {
-        const timeDiff = Date.now() - new Date(recentIdea.createdAt).getTime();
-        if (timeDiff < COOLDOWN_MINUTES * 60 * 1000) {
-            return { error: `Espera ${COOLDOWN_MINUTES} minutos antes de publicar otra idea.` };
-        }
-    }
-
     try {
+        // ⚡️ IMPORTANTE: Ahora necesitamos await porque el hash es asíncrono
+        const ipHash = await getIpHash();
+        const COOLDOWN_MINUTES = 5;
+
+        // Verificar cooldown
+        const recentIdea = await db.query.ideas.findFirst({
+            where: eq(ideas.authorFingerprint, ipHash),
+            orderBy: [desc(ideas.createdAt)]
+        });
+
+        if (recentIdea && recentIdea.createdAt) {
+            const dateVal = recentIdea.createdAt;
+            const pastMs = dateVal instanceof Date
+                ? dateVal.getTime()
+                : new Date(dateVal as string | number).getTime();
+
+            if (!isNaN(pastMs)) {
+                const timeDiff = Date.now() - pastMs;
+                if (timeDiff < COOLDOWN_MINUTES * 60 * 1000) {
+                    return { error: `Espera ${COOLDOWN_MINUTES} minutos antes de publicar otra idea.` };
+                }
+            }
+        }
+
         await db.insert(ideas).values({
             boardId,
             tagId: tagId || null,
