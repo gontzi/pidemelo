@@ -26,6 +26,7 @@ export default function PricingSwitcher({ monthlyProductId, lifetimeProductId, d
         dict.feat_1,
         dict.feat_2,
         dict.feat_3,
+        dict.feat_6,
         dict.feat_4,
         dict.feat_5
     ];

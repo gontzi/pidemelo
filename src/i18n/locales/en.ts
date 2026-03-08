@@ -165,6 +165,7 @@ export default {
         "feat_3": "Embed your board on any website (iFrame)",
         "feat_4": "Fast support (absolute priority)",
         "feat_5": "All the crazy new things we release",
+        "feat_6": "Let your users upload images/screenshots",
         "pill": "LIFETIME OR MONTHLY, YOU BOSS",
         "monthly": "MONTHLY",
         "lifetime": "LIFETIME",

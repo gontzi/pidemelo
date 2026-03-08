@@ -165,6 +165,7 @@ export default {
         "feat_3": "Inserta tu tablón en cualquier web (iFrame)",
         "feat_4": "Soporte rápido (prioridad absoluta)",
         "feat_5": "Todas las locuras que saquemos nuevas",
+        "feat_6": "Permite que tus usuarios suban imágenes/capturas",
         "pill": "VITALICIO O MENSUAL, TÚ MANDAS",
         "monthly": "MENSUAL",
         "lifetime": "LIFETIME",
