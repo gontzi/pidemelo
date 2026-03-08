@@ -4,6 +4,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Suspense } from 'react';
 import { getDictionary } from '@/i18n';
+import WidgetSkeleton from '@/components/WidgetSkeleton';
 import PricingWrapper from '@/components/landing/PricingWrapper';
 
 export const runtime = 'edge';
@@ -96,7 +97,10 @@ export default async function Home() {
               {t.landing.demo_desc}
             </p>
           </div>
-          <div className="bg-white rounded-[2.2rem] md:rounded-[3rem] border border-zinc-200 shadow-2xl shadow-zinc-200/50 p-1 sm:p-2 overflow-hidden">
+          <div className="bg-white rounded-[2.2rem] md:rounded-[3rem] border border-zinc-200 shadow-2xl shadow-zinc-200/50 p-1 sm:p-2 overflow-hidden relative">
+            <div className="absolute inset-0 z-0">
+              <WidgetSkeleton />
+            </div>
             <iframe
               src="https://pidemelo.app/widget/pidemelo?color=%23FF5C00&textColor=%2318181b&darkMode=false"
               width="100%"
@@ -104,7 +108,7 @@ export default async function Home() {
               frameBorder="0"
               loading="lazy"
               title="Feedback Board Widget"
-              className="rounded-[1.5rem] md:rounded-[2.2rem] w-full block"
+              className="rounded-[1.5rem] md:rounded-[2.2rem] w-full block relative z-10"
               style={{ overflow: 'hidden' }}
             ></iframe>
           </div>

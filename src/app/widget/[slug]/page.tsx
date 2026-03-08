@@ -1,10 +1,12 @@
+import { Suspense } from 'react';
 import { db } from "@/db";
-import { boards, ideas, users } from "@/db/schema";
+import { boards, ideas } from "@/db/schema";
 import { eq, desc } from "drizzle-orm";
 import { notFound } from "next/navigation";
 import PublicBoardClient from "../../board/[slug]/PublicBoardClient";
 import SubmitIdeaForm from "../../board/[slug]/SubmitIdeaForm";
 import { getDictionary } from "@/i18n";
+import WidgetSkeleton from "@/components/WidgetSkeleton";
 
 export const runtime = 'edge';
 export const dynamic = 'force-dynamic';
@@ -17,6 +19,17 @@ export default async function WidgetPage({
     searchParams: { color?: string, textColor?: string, darkMode?: string }
 }) {
     const t = await getDictionary();
+
+    return (
+        <div className="min-h-screen transition-colors">
+            <Suspense fallback={<WidgetSkeleton />}>
+                <WidgetContent params={params} searchParams={searchParams} t={t} />
+            </Suspense>
+        </div>
+    );
+}
+
+async function WidgetContent({ params, searchParams, t }: any) {
     const accentColor = searchParams.color ? decodeURIComponent(searchParams.color) : "#FF5C00";
     const textColor = searchParams.textColor ? decodeURIComponent(searchParams.textColor) : "#18181b";
     const isDarkMode = searchParams.darkMode === 'true';
@@ -35,7 +48,6 @@ export default async function WidgetPage({
 
     if (!board) notFound();
 
-    // El widget es una funcionalidad Pro. Si el dueño no es premium, no se muestra nada.
     const isOwnerPremium = board.user?.isPremium || board.user?.plan === 'pro' || board.user?.plan === 'lifetime';
 
     if (!isOwnerPremium) {
@@ -60,13 +72,13 @@ export default async function WidgetPage({
     const sortedIdeas = board.ideas.sort((a, b) => b.votes.length - a.votes.length);
 
     return (
-        <div className={`min-h-screen ${isDarkMode ? 'bg-zinc-950 text-zinc-50' : 'bg-white text-zinc-900'} transition-colors`}>
+        <div className={isDarkMode ? 'bg-zinc-950 text-zinc-50' : 'bg-white text-zinc-900'}>
             <main className="p-4 space-y-8">
                 {/* Minimal Header for Widget */}
                 <div className={`flex items-center justify-between pb-4 border-b ${isDarkMode ? 'border-zinc-800' : 'border-zinc-100'} transition-colors`}>
                     <div>
                         <h1 className="text-xl font-black tracking-tight">{board.name}</h1>
-                        <p className={`text-xs font-medium tracking-tight opacity-70 ${isDarkMode ? 'text-zinc-400' : ''}`}>{t.widget_page.vote_or_add}{board.name}?</p>
+                        <p className={`text-xs font-medium tracking-tight opacity-70 ${isDarkMode ? 'text-zinc-400' : ''}`}>{t.widget_page.vote_or_add} {board.name}?</p>
                     </div>
                 </div>
 
@@ -83,12 +95,27 @@ export default async function WidgetPage({
                         isDarkMode={isDarkMode}
                         dict={t.submit_idea_form}
                         tags={board.tags}
-                        isBoardPremium={true} // Si hemos pasado el guard anterior, es premium
+                        isBoardPremium={true}
                     />
                 </section>
 
+                {/* Ideas List - Ahora incluido en el widget */}
+                <PublicBoardClient
+                    initialIdeas={sortedIdeas.map(i => ({
+                        ...i,
+                        status: i.status as 'pending' | 'planned' | 'done',
+                        title: i.title ?? '',
+                        description: i.description ?? '',
+                        imageUrl: i.imageUrl
+                    }))}
+                    boardSlug={board.slug}
+                    accentColor={accentColor}
+                    textColor={textColor}
+                    dict={t.public_board_client}
+                />
+
                 {/* Watermark */}
-                <div className="text-center">
+                <div className="text-center pt-8">
                     <a
                         href="https://pidemelo.app"
                         target="_blank"

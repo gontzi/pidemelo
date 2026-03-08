@@ -4,6 +4,7 @@ import { useState, useMemo } from 'react';
 import { Copy, Check, Code, Lock, Monitor, Smartphone, Layout, Palette, Sun, Moon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
+import WidgetSkeleton from '@/components/WidgetSkeleton';
 
 type Board = {
     id: string;
@@ -286,15 +287,20 @@ export default function WidgetsClient({
                         )}
 
                         <div className={`transition-all duration-700 ease-[cubic-bezier(0.23, 1, 0.32, 1)] bg-white shadow-2xl shadow-black/5 ${viewMode === 'mobile' ? 'w-full max-w-[320px] aspect-[9/16] sm:aspect-auto sm:h-[600px] rounded-[2.5rem]' : 'w-full h-full'
-                            } overflow-hidden border border-zinc-200/50`}>
+                            } overflow-hidden border border-zinc-200/50 relative`}>
                             {isPremium ? (
-                                <iframe
-                                    src={widgetUrl}
-                                    title="Feedback Widget Preview"
-                                    className="w-full h-full"
-                                    frameBorder="0"
-                                    key={widgetUrl} // Force reload on change
-                                />
+                                <>
+                                    <iframe
+                                        src={widgetUrl}
+                                        title="Feedback Widget Preview"
+                                        className="w-full h-full relative z-10"
+                                        frameBorder="0"
+                                        key={widgetUrl} // Force reload on change
+                                    />
+                                    <div className="absolute inset-0 z-0">
+                                        <WidgetSkeleton />
+                                    </div>
+                                </>
                             ) : (
                                 <div className="w-full h-full bg-zinc-50 flex flex-col items-center justify-center p-8 md:p-12 text-center opacity-30 grayscale">
                                     <h4 className="text-xl md:text-2xl font-black text-zinc-900 mb-2">{selectedBoard?.name}</h4>
