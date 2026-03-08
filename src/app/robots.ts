@@ -6,11 +6,15 @@ export default function robots(): MetadataRoute.Robots {
             {
                 userAgent: '*',
                 allow: '/',
-                // Bloqueamos todo lo privado del dashboard
-                disallow: ['/dashboard/', '/dashboard'],
+                // Bloqueamos el acceso al dashboard y a las rutas de API
+                disallow: ['/dashboard/', '/dashboard', '/api/'],
             },
+            {
+                // Protegemos el contenido de rastreadores de IA para entrenamiento
+                userAgent: ['GPTBot', 'CCBot', 'Google-Extended', 'claudebot'],
+                disallow: '/',
+            }
         ],
         sitemap: 'https://pidemelo.app/sitemap.xml',
-        host: 'https://pidemelo.app',
     }
 }
