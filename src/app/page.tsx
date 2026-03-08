@@ -1,18 +1,14 @@
-import type { Metadata } from 'next'
+import type { Metadata } from 'next';
 import { SignedIn, SignedOut, SignInButton } from "@clerk/nextjs";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { Suspense } from 'react';
 import { getDictionary } from '@/i18n';
-import PricingSwitcher from './dashboard/billing/PricingSwitcher';
-import { auth } from '@clerk/nextjs/server';
-import { db } from '@/db';
-import { users } from '@/db/schema';
-import { eq } from 'drizzle-orm';
+import PricingWrapper from '@/components/landing/PricingWrapper';
 
 export const runtime = 'edge';
 export const dynamic = 'force-dynamic';
 
-// Metadata específica para la Landing (hereda el template de layout.tsx)
 export const metadata: Metadata = {
   title: 'Tablón de feedback y sugerencias para creadores y SaaS',
   description:
@@ -24,15 +20,6 @@ export const metadata: Metadata = {
 
 export default async function Home() {
   const t = await getDictionary();
-  const { userId } = auth();
-
-  // Recuperamos el estado del usuario de la DB para personalizar los precios
-  const userData = userId ? await db.query.users.findFirst({
-    where: eq(users.id, userId)
-  }) : null;
-
-  const isPremium = userData?.isPremium || false;
-  const userPlan = userData?.plan;
 
   return (
     <>
@@ -40,7 +27,7 @@ export default async function Home() {
         {/* Fondo de puntitos */}
         <div className="absolute inset-0 -z-10 h-full w-full bg-[#FAFAFA] bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:16px_16px] [mask-image:radial-gradient(ellipse_50%_50%_at_50%_50%,#000_70%,transparent_100%)]"></div>
 
-        <div className="max-w-4xl space-y-8 md:space-y-12 z-10 w-full animate-in fade-in slide-in-from-bottom-8 duration-1000">
+        <div className="max-w-4xl space-y-8 md:space-y-12 z-10 w-full animate-in fade-in slide-in-from-bottom-8 duration-300">
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white border border-zinc-200 text-xs md:text-sm font-bold text-zinc-600 shadow-sm transition-transform hover:rotate-1 cursor-default">
             <span className="flex h-2 w-2 rounded-full bg-[#FF5C00] animate-pulse flex-shrink-0"></span>
             {t.landing.tagline}
@@ -51,7 +38,7 @@ export default async function Home() {
             <span className="text-[#FF5C00]">{t.landing.title_highlight}</span> {t.landing.title_end}
           </h1>
 
-          <p className="text-base md:text-xl text-zinc-500 max-w-2xl mx-auto font-bold leading-tight px-2">
+          <p className="text-base md:text-xl text-zinc-600 max-w-2xl mx-auto font-bold leading-tight px-2">
             {t.landing.subtitle}
           </p>
 
@@ -115,6 +102,7 @@ export default async function Home() {
               width="100%"
               height="600px"
               frameBorder="0"
+              loading="lazy"
               className="rounded-[1.5rem] md:rounded-[2rem] w-full"
             ></iframe>
           </div>
@@ -175,14 +163,10 @@ export default async function Home() {
               </SignedIn>
             </div>
 
-            {/* Tarjeta 2: Reusamos el componente de Precios */}
-            <PricingSwitcher
-              monthlyProductId={process.env.NEXT_PUBLIC_POLAR_SUBSCRIPTION_PRODUCT_ID || ''}
-              lifetimeProductId={process.env.NEXT_PUBLIC_POLAR_LIFETIME_PRODUCT_ID || ''}
-              dict={t.pricing_switcher}
-              currentPlan={userPlan}
-              isPremium={isPremium}
-            />
+            {/* Tarjeta 2: Reusamos el componente de Precios cargado dinámicamente con streaming */}
+            <Suspense fallback={<div className="h-[500px] w-full bg-zinc-100 animate-pulse rounded-[2rem]" />}>
+              <PricingWrapper t={t} />
+            </Suspense>
           </div>
         </section>
 

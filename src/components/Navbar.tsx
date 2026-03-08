@@ -4,6 +4,7 @@ import { SignedIn, SignedOut, SignInButton, UserButton, useUser } from "@clerk/n
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { useState, useEffect } from "react";
+import { usePathname } from 'next/navigation';
 import { Menu, X, Monitor, Zap } from "lucide-react";
 import LanguageSwitcher from "./LanguageSwitcher";
 
@@ -14,6 +15,7 @@ function Rocket({ className }: { className?: string }) {
 }
 
 export default function Navbar({ dict }: { dict: Record<string, string> }) {
+    const pathname = usePathname();
     const [menuOpen, setMenuOpen] = useState(false);
     // We'll derive isPremium from user public metadata if available,
     // but keep it simple here; for full support pass it as a prop from a server component wrapper
@@ -29,6 +31,8 @@ export default function Navbar({ dict }: { dict: Record<string, string> }) {
         return () => { document.body.style.overflow = ''; };
     }, [menuOpen]);
 
+    if (pathname !== '/') return null;
+
     return (
         <>
             <nav className="sticky top-0 z-50 w-full bg-white/90 backdrop-blur-md border-b border-zinc-200/50">
@@ -42,9 +46,9 @@ export default function Navbar({ dict }: { dict: Record<string, string> }) {
 
                     {/* Desktop nav links */}
                     <div className="hidden md:flex items-center gap-2 mr-2">
-                        <Link href="/#que-es" className="text-sm font-bold text-zinc-500 hover:text-zinc-900 transition-colors px-3 py-2 rounded-xl hover:bg-zinc-50">{dict.what_is}</Link>
-                        <Link href="/#precios" className="text-sm font-bold text-zinc-500 hover:text-zinc-900 transition-colors px-3 py-2 rounded-xl hover:bg-zinc-50">{dict.plans}</Link>
-                        <Link href="/#faq" className="text-sm font-bold text-zinc-500 hover:text-zinc-900 transition-colors px-3 py-2 rounded-xl hover:bg-zinc-50">{dict.faq}</Link>
+                        <Link href="/#que-es" className="text-sm font-bold text-zinc-600 hover:text-zinc-900 transition-colors px-3 py-2 rounded-xl hover:bg-zinc-50">{dict.what_is}</Link>
+                        <Link href="/#precios" className="text-sm font-bold text-zinc-600 hover:text-zinc-900 transition-colors px-3 py-2 rounded-xl hover:bg-zinc-50">{dict.plans}</Link>
+                        <Link href="/#faq" className="text-sm font-bold text-zinc-600 hover:text-zinc-900 transition-colors px-3 py-2 rounded-xl hover:bg-zinc-50">{dict.faq}</Link>
                     </div>
 
                     {/* Right side */}
@@ -92,10 +96,11 @@ export default function Navbar({ dict }: { dict: Record<string, string> }) {
 
                         {/* Hamburger */}
                         <button
+                            aria-label={menuOpen ? "Cerrar menú" : "Abrir menú"}
                             className="p-2 rounded-xl text-zinc-600 hover:bg-zinc-100 transition-colors md:hidden"
                             onClick={() => setMenuOpen(p => !p)}
                         >
-                            {menuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+                            {menuOpen ? <X className="w-6 h-6" aria-hidden="true" /> : <Menu className="w-6 h-6" aria-hidden="true" />}
                         </button>
                     </div>
                 </div>

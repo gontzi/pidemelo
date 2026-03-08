@@ -5,17 +5,20 @@ import './globals.css'
 
 const outfit = Outfit({
   subsets: ['latin'],
-  variable: '--font-outfit'
+  variable: '--font-outfit',
+  display: 'swap',
 })
 
 const instrument = Instrument_Sans({
   subsets: ['latin'],
-  variable: '--font-instrument'
+  variable: '--font-instrument',
+  display: 'swap',
 })
 
 const jakarta = Plus_Jakarta_Sans({
   subsets: ['latin'],
-  variable: '--font-jakarta'
+  variable: '--font-jakarta',
+  display: 'swap',
 })
 
 export const metadata: Metadata = {
@@ -90,10 +93,12 @@ export default async function RootLayout({
   return (
     <ClerkProvider>
       <html lang="es">
+        <head>
+          <link rel="preconnect" href="https://clerk.pidemelo.app" />
+        </head>
         <body className={`${instrument.variable} ${outfit.variable} ${jakarta.variable} font-sans bg-[#FAFAFA] text-zinc-900 min-h-screen selection:bg-[#FF5C00]/20 selection:text-zinc-900`}>
-          <ClientWrapper navbar={<Navbar dict={t.navbar} />}>
-            {children}
-          </ClientWrapper>
+          <Navbar dict={t.navbar} />
+          {children}
         </body>
       </html>
     </ClerkProvider>
