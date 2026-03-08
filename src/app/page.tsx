@@ -96,15 +96,16 @@ export default async function Home() {
               {t.landing.demo_desc}
             </p>
           </div>
-          <div className="bg-white rounded-[2rem] md:rounded-[2.5rem] border border-zinc-200 shadow-2xl shadow-zinc-200/50 p-2 sm:p-4">
+          <div className="bg-white rounded-[2.2rem] md:rounded-[3rem] border border-zinc-200 shadow-2xl shadow-zinc-200/50 p-1 sm:p-2 overflow-hidden">
             <iframe
               src="https://pidemelo.app/widget/pidemelo?color=%23FF5C00&textColor=%2318181b&darkMode=false"
               width="100%"
-              height="600px"
+              height="820px"
               frameBorder="0"
               loading="lazy"
               title="Feedback Board Widget"
-              className="rounded-[1.5rem] md:rounded-[2rem] w-full"
+              className="rounded-[1.5rem] md:rounded-[2.2rem] w-full block"
+              style={{ overflow: 'hidden' }}
             ></iframe>
           </div>
         </section>
