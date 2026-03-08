@@ -10,6 +10,7 @@ interface ProjectCardProps {
     board: {
         id: string;
         slug: string;
+        notifyNewIdeas: boolean;
         tags?: { id: string; name: string; color: string; }[];
     };
     dict: Record<string, string>;
@@ -71,6 +72,7 @@ export default function ProjectCard({ board, dict, settingsDict, isPremium }: Pr
                         dict={settingsDict}
                         tags={board.tags}
                         isPremium={isPremium}
+                        notifyNewIdeas={board.notifyNewIdeas}
                         trigger={
                             <button
                                 title={dict.settings_tooltip}

@@ -18,6 +18,7 @@ export const boards = pgTable('boards', {
     userId: text('user_id').references(() => users.id, { onDelete: 'cascade' }).notNull(), // Clerk User ID
     name: text('name').notNull(),
     slug: text('slug').notNull().unique(),
+    notifyNewIdeas: boolean('notify_new_ideas').default(true).notNull(),
     createdAt: timestamp('created_at').defaultNow().notNull(),
 });
 

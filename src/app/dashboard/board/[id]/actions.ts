@@ -34,6 +34,18 @@ export async function updateBoardSettings(boardId: string, newName: string, form
     return { success: true };
 }
 
+export async function updateBoardNotificationPreference(boardId: string, notify: boolean) {
+    const { userId } = auth();
+    if (!userId) return { error: "Unauthorized" };
+
+    await db.update(boards)
+        .set({ notifyNewIdeas: notify })
+        .where(and(eq(boards.id, boardId), eq(boards.userId, userId)));
+
+    revalidatePath(`/dashboard/board/${boardId}`);
+    return { success: true };
+}
+
 export async function updateIdeaStatus(ideaId: string, newStatus: 'pending' | 'planned' | 'done', boardId: string) {
     const { userId } = auth();
     if (!userId) return { error: "Unauthorized" };

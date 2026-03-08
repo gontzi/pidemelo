@@ -86,7 +86,7 @@ export async function submitIdea(boardId: string, slug: string, formData: FormDa
                 with: { user: true }
             });
 
-            if (boardData && boardData.user?.email) {
+            if (boardData && boardData.notifyNewIdeas && boardData.user?.email) {
                 const ownerEmail = boardData.user.email;
                 const boardName = boardData.name;
 

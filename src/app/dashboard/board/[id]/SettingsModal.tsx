@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useTransition } from 'react';
+import { useState, useTransition, useEffect } from 'react';
 import { Settings, AlertTriangle, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -14,8 +14,9 @@ import {
     DialogTitle,
     DialogTrigger,
 } from "@/components/ui/dialog";
-import { updateBoardSettings, deleteBoard } from './actions';
+import { updateBoardSettings, deleteBoard, updateBoardNotificationPreference } from './actions';
 import TagsManager from './TagsManager';
+import { Switch } from '@/components/ui/switch';
 
 type Tag = {
     id: string;
@@ -30,7 +31,8 @@ export default function SettingsModal({
     trigger,
     dict,
     tags,
-    isPremium
+    isPremium,
+    notifyNewIdeas: initialNotifyState
 }: {
     boardId: string,
     currentName: string,
@@ -38,13 +40,20 @@ export default function SettingsModal({
     dict: Record<string, string>,
     trigger?: React.ReactNode,
     tags?: Tag[],
-    isPremium?: boolean
+    isPremium?: boolean,
+    notifyNewIdeas?: boolean
 }) {
     const [isSettingsOpen, setIsSettingsOpen] = useState(false);
     const [isDeleteOpen, setIsDeleteOpen] = useState(false);
     const [isPending, startTransition] = useTransition();
     const [error, setError] = useState<string | null>(null);
+    const [notify, setNotify] = useState(initialNotifyState ?? true);
     const router = useRouter();
+
+    // Sincronizar el estado local si la prop del servidor cambia (revalidación)
+    useEffect(() => {
+        setNotify(initialNotifyState ?? true);
+    }, [initialNotifyState]);
 
     const handleUpdate = async (formData: FormData) => {
         setError(null);
@@ -68,6 +77,19 @@ export default function SettingsModal({
                 setIsDeleteOpen(false);
                 setIsSettingsOpen(false);
                 router.push('/dashboard');
+            }
+        });
+    };
+
+    const handleNotifyChange = (checked: boolean) => {
+        // Optimistic update
+        setNotify(checked);
+        startTransition(async () => {
+            const res = await updateBoardNotificationPreference(boardId, checked);
+            if (res?.error) {
+                // Rollback on error
+                setNotify(!checked);
+                setError(res.error);
             }
         });
     };
@@ -115,6 +137,21 @@ export default function SettingsModal({
                                     />
                                 </div>
                                 {error && <p className="text-[10px] md:text-sm text-red-500 font-medium mt-2">{error}</p>}
+                            </div>
+
+                            {/* Notificaciones */}
+                            <div className="pt-4 border-t border-zinc-100">
+                                <div className="flex items-center justify-between p-4 bg-zinc-50 rounded-2xl border border-zinc-200/50">
+                                    <div className="space-y-0.5">
+                                        <Label className="text-sm font-bold text-zinc-900 leading-none">Notificaciones por correo</Label>
+                                        <p className="text-[10px] md:text-xs text-zinc-500 font-medium">Recibe un email cada vez que alguien publique una nueva idea en este tablero.</p>
+                                    </div>
+                                    <Switch
+                                        checked={notify}
+                                        onCheckedChange={handleNotifyChange}
+                                        disabled={isPending}
+                                    />
+                                </div>
                             </div>
 
                             <div className="flex flex-col sm:flex-row gap-2 md:gap-3 pt-4 md:pt-6">
