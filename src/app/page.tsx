@@ -102,7 +102,7 @@ export default async function Home() {
               <WidgetSkeleton />
             </div>
             <iframe
-              src="https://pidemelo.app/widget/pidemelo?color=%23FF5C00&textColor=%2318181b&darkMode=false"
+              src="https://pidemelo.app/widget/form/pidemelo?color=%23FF5C00&textColor=%2318181b&darkMode=false"
               width="100%"
               height="820px"
               frameBorder="0"
