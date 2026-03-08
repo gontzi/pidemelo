@@ -1,5 +1,5 @@
 import React from "react";
-import PublicHeader from "@/components/navigation/PublicHeader";
+import Navbar from '@/components/Navbar'
 import { getDictionary } from "@/i18n";
 
 export default async function BoardLayout({
@@ -11,7 +11,7 @@ export default async function BoardLayout({
 
     return (
         <div className="min-h-screen bg-[#FAFAFA] flex flex-col">
-            <PublicHeader dict={t.navbar} />
+            <Navbar dict={t.navbar} />
             <main className="flex-1">
                 {children}
             </main>
