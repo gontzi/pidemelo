@@ -1,12 +1,13 @@
 'use server'
 
 import { db } from "@/db";
-import { ideas, votes, boards } from "@/db/schema";
+import { ideas, votes, boards, users } from "@/db/schema";
 import { and, eq, desc } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { cookies, headers } from "next/headers";
 import { v4 as uuidv4 } from 'uuid';
 import { Resend } from 'resend';
+import { auth } from '@clerk/nextjs/server';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
@@ -45,26 +46,50 @@ export async function submitIdea(boardId: string, slug: string, formData: FormDa
 
         if (!title || !description) return { error: "Faltan campos." };
 
-        // ⚡️ IMPORTANTE: Ahora necesitamos await porque el hash es asíncrono
-        const ipHash = await getIpHash();
-        const COOLDOWN_MINUTES = 5;
+        // 1. Identificación y Plan
+        const { userId } = auth();
+        let isPremiumUser = false;
 
-        // Verificar cooldown
+        if (userId) {
+            const userData = await db.query.users.findFirst({
+                where: eq(users.id, userId)
+            });
+            if (userData && (userData.isPremium || userData.plan === 'pro' || userData.plan === 'lifetime')) {
+                isPremiumUser = true;
+            }
+        }
+
+        // 2. Lógica de Cooldowns
+        const COOLDOWN_SECONDS = isPremiumUser ? 30 : 180;
+
+        // Usamos ipHash como fingerprint para todos (más estricto y seguro)
+        const ipHash = await getIpHash();
+
+        // 3. Validación en Drizzle
         const recentIdea = await db.query.ideas.findFirst({
             where: eq(ideas.authorFingerprint, ipHash),
             orderBy: [desc(ideas.createdAt)]
         });
 
+        // 4. Cálculo de Tiempo y Error UI
         if (recentIdea && recentIdea.createdAt) {
-            const dateVal = recentIdea.createdAt;
-            const pastMs = dateVal instanceof Date
-                ? dateVal.getTime()
-                : new Date(dateVal as string | number).getTime();
+            const pastMs = recentIdea.createdAt instanceof Date
+                ? recentIdea.createdAt.getTime()
+                : new Date(recentIdea.createdAt).getTime();
 
             if (!isNaN(pastMs)) {
-                const timeDiff = Date.now() - pastMs;
-                if (timeDiff < COOLDOWN_MINUTES * 60 * 1000) {
-                    return { error: `Espera ${COOLDOWN_MINUTES} minutos antes de publicar otra idea.` };
+                const elapsedSeconds = Math.floor((Date.now() - pastMs) / 1000);
+
+                if (elapsedSeconds < COOLDOWN_SECONDS) {
+                    const remainingSeconds = COOLDOWN_SECONDS - elapsedSeconds;
+
+                    if (!isPremiumUser && remainingSeconds > 60) {
+                        const mins = Math.floor(remainingSeconds / 60);
+                        const secs = remainingSeconds % 60;
+                        return { error: `Estás enviando ideas muy rápido. Por favor, espera ${mins} minutos y ${secs} segundos.` };
+                    } else {
+                        return { error: `Por favor, espera ${remainingSeconds} segundos antes de enviar otra idea.` };
+                    }
                 }
             }
         }
