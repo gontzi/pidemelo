@@ -103,6 +103,7 @@ export default async function Home() {
               height="600px"
               frameBorder="0"
               loading="lazy"
+              title="Feedback Board Widget"
               className="rounded-[1.5rem] md:rounded-[2rem] w-full"
             ></iframe>
           </div>

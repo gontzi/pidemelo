@@ -37,7 +37,7 @@ export default function WidgetsClient({
         [origin, selectedBoard, accentColor, textColor, isDarkMode]);
 
     const iframeCode = useMemo(() =>
-        `<iframe src="${widgetUrl}" width="100%" height="600px" frameborder="0"></iframe>`,
+        `<iframe src="${widgetUrl}" width="100%" height="600px" frameborder="0" title="Feedback Widget"></iframe>`,
         [widgetUrl]);
 
     const handleCopy = async () => {
@@ -208,6 +208,7 @@ export default function WidgetsClient({
                         <span className="text-emerald-400">"{origin}/widget/{selectedBoard?.slug}?..."</span><br />
                         <span className="text-zinc-400 ml-4">width=</span><span className="text-emerald-400">"100%"</span><br />
                         <span className="text-zinc-400 ml-4">height=</span><span className="text-emerald-400">"600px"</span><br />
+                        <span className="text-zinc-400 ml-4">title=</span><span className="text-emerald-400">"Feedback Widget"</span><br />
                         <span className="text-indigo-400">{'/>'}</span>
                     </div>
 
@@ -289,6 +290,7 @@ export default function WidgetsClient({
                             {isPremium ? (
                                 <iframe
                                     src={widgetUrl}
+                                    title="Feedback Widget Preview"
                                     className="w-full h-full"
                                     frameBorder="0"
                                     key={widgetUrl} // Force reload on change
