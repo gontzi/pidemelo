@@ -5,6 +5,7 @@ import { updateIdeaStatus, deleteIdea } from './actions';
 import { Trash2, GripVertical, AlertTriangle } from 'lucide-react';
 import { useTransition, useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
+import ImageLightbox from '@/components/ImageLightbox';
 import {
     Dialog,
     DialogContent,
@@ -17,6 +18,7 @@ type Idea = {
     id: string;
     title: string;
     description: string;
+    imageUrl?: string | null;
     status: 'pending' | 'planned' | 'done';
     votesCount: number;
     tag: { id: string; name: string; color: string; } | null;
@@ -152,7 +154,15 @@ export default function DashboardClient({ initialIdeas, boardId, dict }: { initi
                                                                 </button>
                                                             </div>
 
-                                                            <p className="text-xs md:text-sm text-zinc-500 line-clamp-2 mb-5 md:mb-6 leading-relaxed font-bold tracking-tight">{idea.description}</p>
+                                                            <p className="text-xs md:text-sm text-zinc-500 line-clamp-2 mb-4 leading-relaxed font-bold tracking-tight">{idea.description}</p>
+
+                                                            {idea.imageUrl && (
+                                                                <ImageLightbox
+                                                                    src={idea.imageUrl}
+                                                                    alt={idea.title}
+                                                                    className="mb-5 rounded-2xl border border-zinc-100 shadow-sm"
+                                                                />
+                                                            )}
 
                                                             <div className="flex items-center justify-between">
                                                                 <span className="flex items-center gap-2 text-[9px] md:text-[10px] font-black uppercase tracking-widest text-[#FF5C00] bg-orange-50 border border-orange-100 px-3 md:px-4 py-1.5 md:py-2 rounded-full shadow-sm flex-shrink-0">

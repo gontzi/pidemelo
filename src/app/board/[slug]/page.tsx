@@ -6,6 +6,7 @@ import { notFound } from "next/navigation";
 import PublicBoardClient from "./PublicBoardClient";
 import SubmitIdeaForm from "./SubmitIdeaForm";
 import { getDictionary } from "@/i18n";
+import { auth } from "@clerk/nextjs/server";
 
 export const runtime = 'edge';
 export const dynamic = 'force-dynamic';
@@ -28,7 +29,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     const url = `https://pidemelo.app/board/${board.slug}`
 
     return {
-        title: board.name, // El template en layout lo convierte en: "Nombre del board | Pídemelo"
+        title: board.name,
         description,
         alternates: {
             canonical: url,
@@ -56,14 +57,15 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     }
 }
 
-
-
 export default async function PublicBoardPage({ params }: { params: { slug: string } }) {
     const t = await getDictionary();
+    const { userId } = auth();
+
     const board = await db.query.boards.findFirst({
         where: eq(boards.slug, params.slug),
         with: {
             tags: true,
+            user: true,
             ideas: {
                 with: { votes: true, tag: true },
                 orderBy: [desc(ideas.createdAt)]
@@ -72,6 +74,9 @@ export default async function PublicBoardPage({ params }: { params: { slug: stri
     });
 
     if (!board) notFound();
+
+    const isBoardPremium = board.user ? (board.user.isPremium || board.user.plan === 'pro' || board.user.plan === 'lifetime') : false;
+    const isCurrentUserAdmin = userId === board.userId;
 
     const sortedIdeas = board.ideas.sort((a, b) => b.votes.length - a.votes.length);
 
@@ -94,7 +99,6 @@ export default async function PublicBoardPage({ params }: { params: { slug: stri
             </header>
 
             <main className="max-w-5xl mx-auto px-4 md:px-6">
-                {/* Mobile: formulario primero (colapsable) → en desktop se mueve a la derecha */}
                 <div className="flex flex-col md:grid md:grid-cols-[1fr_340px] gap-6 md:gap-10 items-start">
 
                     {/* Left Col: Feed */}
@@ -103,7 +107,8 @@ export default async function PublicBoardPage({ params }: { params: { slug: stri
                             ...i,
                             status: i.status as 'pending' | 'planned' | 'done',
                             title: i.title ?? '',
-                            description: i.description ?? ''
+                            description: i.description ?? '',
+                            imageUrl: i.imageUrl
                         }))}
                         boardSlug={board.slug}
                         dict={t.public_board_client}
@@ -113,7 +118,14 @@ export default async function PublicBoardPage({ params }: { params: { slug: stri
                     <aside className="md:sticky md:top-20 bg-white border border-zinc-200 p-6 md:p-8 rounded-2xl md:rounded-3xl shadow-lg shadow-zinc-200/40 w-full order-first md:order-last">
                         <h2 className="font-heading text-lg md:text-xl font-bold tracking-tight mb-1">{t.public_board_page.form_title}</h2>
                         <p className="text-zinc-500 font-medium text-sm mb-5">{t.public_board_page.form_desc}</p>
-                        <SubmitIdeaForm boardId={board.id} boardSlug={board.slug} dict={t.submit_idea_form} tags={board.tags} />
+                        <SubmitIdeaForm
+                            boardId={board.id}
+                            boardSlug={board.slug}
+                            dict={t.submit_idea_form}
+                            tags={board.tags}
+                            isBoardPremium={isBoardPremium}
+                            isCurrentUserAdmin={isCurrentUserAdmin}
+                        />
                     </aside>
 
                 </div>

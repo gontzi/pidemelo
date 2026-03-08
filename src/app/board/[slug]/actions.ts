@@ -41,6 +41,7 @@ export async function submitIdea(boardId: string, slug: string, formData: FormDa
         const title = formData.get('title') as string;
         const description = formData.get('description') as string;
         const tagId = formData.get('tagId') as string | null;
+        const imageUrl = formData.get('imageUrl') as string | null;
 
         if (!title || !description) return { error: "Faltan campos." };
 
@@ -73,6 +74,7 @@ export async function submitIdea(boardId: string, slug: string, formData: FormDa
             tagId: tagId || null,
             title,
             description,
+            imageUrl,
             authorFingerprint: ipHash,
         });
 

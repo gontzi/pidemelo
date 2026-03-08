@@ -25,6 +25,7 @@ export default async function WidgetPage({
         where: eq(boards.slug, params.slug),
         with: {
             tags: true,
+            user: true,
             ideas: {
                 with: { votes: true, tag: true },
                 orderBy: [desc(ideas.createdAt)]
@@ -34,12 +35,10 @@ export default async function WidgetPage({
 
     if (!board) notFound();
 
-    // Verificar si el dueño del tablero es premium
-    const user = await db.query.users.findFirst({
-        where: eq(users.id, board.userId)
-    });
+    // El widget es una funcionalidad Pro. Si el dueño no es premium, no se muestra nada.
+    const isOwnerPremium = board.user?.isPremium || board.user?.plan === 'pro' || board.user?.plan === 'lifetime';
 
-    if (!user?.isPremium) {
+    if (!isOwnerPremium) {
         return (
             <div className="min-h-screen flex flex-col items-center justify-center p-8 text-center bg-zinc-50 border-4 border-dashed border-zinc-200">
                 <div className="w-16 h-16 bg-white rounded-2xl shadow-xl flex items-center justify-center text-3xl mb-4">🔒</div>
@@ -84,6 +83,7 @@ export default async function WidgetPage({
                         isDarkMode={isDarkMode}
                         dict={t.submit_idea_form}
                         tags={board.tags}
+                        isBoardPremium={true} // Si hemos pasado el guard anterior, es premium
                     />
                 </section>
 

@@ -27,6 +27,18 @@ const nextConfig = {
             },
         ];
     },
+
+    // 🔒 Configuración de seguridad para imágenes externas
+    images: {
+        remotePatterns: [
+            {
+                protocol: "https",
+                hostname: "ik.imagekit.io",
+                port: "",
+                pathname: "/**",
+            },
+        ],
+    },
 };
 
 export default nextConfig;

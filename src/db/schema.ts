@@ -37,6 +37,7 @@ export const ideas = pgTable('ideas', {
     description: text('description').notNull(),
     status: statusEnum('status').default('pending').notNull(),
     authorFingerprint: text('author_fingerprint').default('').notNull(),
+    imageUrl: text('image_url'),
     createdAt: timestamp('created_at').defaultNow().notNull(),
 });
 

@@ -3,11 +3,13 @@
 import { useState, useRef, useEffect } from 'react';
 import { upvoteIdea } from './actions';
 import { Search, ChevronDown } from 'lucide-react';
+import ImageLightbox from '@/components/ImageLightbox';
 
 type Idea = {
     id: string;
     title: string;
     description: string;
+    imageUrl?: string | null;
     status: 'pending' | 'planned' | 'done';
     votes: { id: string }[];
     tag: { id: string; name: string; color: string; } | null;
@@ -162,6 +164,13 @@ export default function PublicBoardClient({
                             <p className="font-medium text-xs md:text-base leading-relaxed whitespace-pre-wrap line-clamp-2 md:line-clamp-3 opacity-80" style={{ color: textColor }}>
                                 {idea.description}
                             </p>
+                            {idea.imageUrl && (
+                                <ImageLightbox
+                                    src={idea.imageUrl}
+                                    alt={idea.title}
+                                    className="mt-4 rounded-xl border border-zinc-100 shadow-sm"
+                                />
+                            )}
                         </div>
                     </div>
                 ))}

@@ -4,7 +4,8 @@ import { useState, useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { submitIdea } from './actions';
-import { ChevronDown } from 'lucide-react';
+import { ChevronDown, X } from 'lucide-react';
+import ImageUploadDropzone from '@/components/ImageUploadDropzone';
 
 type Tag = { id: string, name: string, color: string };
 
@@ -15,7 +16,9 @@ export default function SubmitIdeaForm({
     textColor = "#18181b",
     isDarkMode = false,
     dict,
-    tags
+    tags,
+    isBoardPremium = false,
+    isCurrentUserAdmin = false
 }: {
     boardId: string,
     boardSlug: string,
@@ -23,11 +26,14 @@ export default function SubmitIdeaForm({
     textColor?: string,
     isDarkMode?: boolean,
     dict: Record<string, string>,
-    tags?: Tag[]
+    tags?: Tag[],
+    isBoardPremium?: boolean,
+    isCurrentUserAdmin?: boolean
 }) {
     const [isPending, setIsPending] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [selectedTagId, setSelectedTagId] = useState<string | null>(null);
+    const [uploadedImageUrl, setUploadedImageUrl] = useState<string | null>(null);
     const [dropdownOpen, setDropdownOpen] = useState(false);
     const formRef = useRef<HTMLFormElement>(null);
     const dropdownRef = useRef<HTMLDivElement>(null);
@@ -46,6 +52,10 @@ export default function SubmitIdeaForm({
         setIsPending(true);
         setError(null);
 
+        if (uploadedImageUrl) {
+            formData.append('imageUrl', uploadedImageUrl);
+        }
+
         try {
             const res = await submitIdea(boardId, boardSlug, formData);
             if (res && res.error) {
@@ -53,6 +63,7 @@ export default function SubmitIdeaForm({
             } else {
                 formRef.current?.reset();
                 setSelectedTagId(null);
+                setUploadedImageUrl(null);
             }
         } catch (err: unknown) {
             if (err instanceof Error) {
@@ -143,6 +154,29 @@ export default function SubmitIdeaForm({
                     className={`w-full shadow-none border ${isDarkMode ? 'border-zinc-800 bg-zinc-900 placeholder:text-zinc-600 focus-visible:border-zinc-700 focus-visible:bg-zinc-800' : 'border-zinc-200 bg-[#FAFAFA] focus-visible:border-zinc-300 focus-visible:bg-white'} p-4 rounded-2xl min-h-[120px] md:min-h-[140px] outline-none font-medium text-base md:text-sm focus-visible:ring-1 resize-y transition-colors`}
                 />
             </div>
+
+            {/* Subida de Imágenes */}
+            {!uploadedImageUrl ? (
+                <ImageUploadDropzone
+                    boardId={boardId}
+                    isBoardPremium={isBoardPremium}
+                    isCurrentUserAdmin={isCurrentUserAdmin}
+                    onUploadSuccess={(url) => setUploadedImageUrl(url)}
+                />
+            ) : (
+                <div className="relative inline-block mt-2">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={uploadedImageUrl} alt="Imagen subida" className="h-24 w-24 object-cover rounded-xl border-2 border-zinc-200 shadow-sm" />
+                    <button
+                        type="button"
+                        onClick={() => setUploadedImageUrl(null)}
+                        className="absolute -top-2 -right-2 bg-zinc-900 text-white rounded-full p-1 shadow-md hover:bg-zinc-800 transition-colors"
+                    >
+                        <X className="w-4 h-4" />
+                    </button>
+                </div>
+            )}
+
             {error && (
                 <div className="p-3 bg-red-50 text-red-600 text-[10px] md:text-sm font-bold rounded-xl border border-red-100 text-center uppercase tracking-widest">
                     {error}
