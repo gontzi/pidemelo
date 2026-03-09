@@ -73,6 +73,8 @@ export default {
         "board_settings": "Board Settings ⚙️",
         "name": "Name",
         "slug": "URL (Slug)",
+        "tag_desc": "Description (Optional)",
+        "tag_desc_ph": "Short explanation...",
         "close": "Close",
         "saving": "Saving...",
         "save": "Save ✅",

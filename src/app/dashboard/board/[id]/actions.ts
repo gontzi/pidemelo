@@ -107,7 +107,7 @@ export async function deleteBoard(boardId: string) {
     return { success: true };
 }
 
-export async function createTag(boardId: string, name: string, color: string) {
+export async function createTag(boardId: string, name: string, color: string, description?: string | null) {
     const { userId } = auth();
     if (!userId) return { error: "Unauthorized" };
 
@@ -129,7 +129,8 @@ export async function createTag(boardId: string, name: string, color: string) {
     await db.insert(tags).values({
         boardId,
         name,
-        color
+        color,
+        description
     });
 
     revalidatePath(`/dashboard/board/${boardId}`);

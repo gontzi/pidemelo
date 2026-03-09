@@ -27,6 +27,7 @@ export const tags = pgTable('tags', {
     boardId: uuid('board_id').references(() => boards.id, { onDelete: 'cascade' }).notNull(),
     name: text('name').notNull(),
     color: text('color').default('#FF5C00').notNull(),
+    description: text('description'),
     createdAt: timestamp('created_at').defaultNow().notNull(),
 });
 

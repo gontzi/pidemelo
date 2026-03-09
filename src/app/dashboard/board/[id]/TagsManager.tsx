@@ -12,6 +12,7 @@ type Tag = {
     id: string;
     name: string;
     color: string;
+    description?: string | null;
 };
 
 export default function TagsManager({
@@ -27,6 +28,7 @@ export default function TagsManager({
 }) {
     const [name, setName] = useState('');
     const [color, setColor] = useState('#FF5C00');
+    const [description, setDescription] = useState('');
     const [isPending, startTransition] = useTransition();
     const [error, setError] = useState<string | null>(null);
 
@@ -36,11 +38,12 @@ export default function TagsManager({
         if (!name.trim()) return;
         setError(null);
         startTransition(async () => {
-            const res = await createTag(boardId, name, color);
+            const res = await createTag(boardId, name, color, description);
             if (res?.error) {
                 setError(res.error);
             } else {
                 setName('');
+                setDescription('');
             }
         });
     };
@@ -91,18 +94,23 @@ export default function TagsManager({
                     </div>
                 ) : (
                     tags.map(tag => (
-                        <div key={tag.id} className="flex flex-row items-center justify-between bg-white px-4 py-3 rounded-xl border border-zinc-100 shadow-sm transition-all hover:border-zinc-200">
-                            <div className="flex items-center gap-3">
-                                <span className="w-4 h-4 rounded-full border border-black/10" style={{ backgroundColor: tag.color }} />
-                                <span className="font-bold text-sm text-zinc-900">{tag.name}</span>
+                        <div key={tag.id} className="flex flex-col gap-2 bg-white px-4 py-3 rounded-xl border border-zinc-100 shadow-sm transition-all hover:border-zinc-200">
+                            <div className="flex flex-row items-center justify-between">
+                                <div className="flex items-center gap-3">
+                                    <span className="w-4 h-4 rounded-full border border-black/10" style={{ backgroundColor: tag.color }} />
+                                    <span className="font-bold text-sm text-zinc-900">{tag.name}</span>
+                                </div>
+                                <button
+                                    onClick={() => handleDelete(tag.id)}
+                                    disabled={isPending}
+                                    className="text-zinc-300 hover:text-red-500 hover:bg-red-50 p-2 rounded-lg transition-colors active:scale-95 disabled:opacity-50"
+                                >
+                                    <Trash2 className="w-4 h-4" />
+                                </button>
                             </div>
-                            <button
-                                onClick={() => handleDelete(tag.id)}
-                                disabled={isPending}
-                                className="text-zinc-300 hover:text-red-500 hover:bg-red-50 p-2 rounded-lg transition-colors active:scale-95 disabled:opacity-50"
-                            >
-                                <Trash2 className="w-4 h-4" />
-                            </button>
+                            {tag.description && (
+                                <p className="text-xs text-zinc-500 pl-7">{tag.description}</p>
+                            )}
                         </div>
                     ))
                 )}
@@ -115,7 +123,7 @@ export default function TagsManager({
 
                 <div className={`space-y-4 ${isLimitReached ? 'opacity-40 grayscale-[0.5] pointer-events-none' : ''}`}>
                     <div className="flex flex-col gap-4">
-                        <div className="space-y-1.5">
+                        <div className="space-y-1.5 flex-1">
                             <Label htmlFor="tag-name" className="text-[10px] uppercase tracking-widest font-bold text-zinc-400 ml-1">{dict.new_tag_name || 'Nombre'}</Label>
                             <Input
                                 id="tag-name"
@@ -124,6 +132,19 @@ export default function TagsManager({
                                 placeholder={dict.new_tag_ph || 'Ej: Bug...'}
                                 disabled={isLimitReached || isPending}
                                 className="h-12 rounded-xl shadow-none border-zinc-200 bg-white focus-visible:ring-[#FF5C00] font-medium px-4 text-sm"
+                            />
+                        </div>
+
+                        <div className="space-y-1.5">
+                            <Label htmlFor="tag-desc" className="text-[10px] uppercase tracking-widest font-bold text-zinc-400 ml-1">{dict.tag_desc || 'Descripción (Opcional)'}</Label>
+                            <Input
+                                id="tag-desc"
+                                value={description}
+                                onChange={e => setDescription(e.target.value)}
+                                maxLength={100}
+                                placeholder={dict.tag_desc_ph || 'Explicación breve...'}
+                                disabled={isLimitReached || isPending}
+                                className="h-10 rounded-xl shadow-none border-zinc-200 bg-white focus-visible:ring-[#FF5C00] text-xs px-4"
                             />
                         </div>
 

@@ -73,6 +73,8 @@ export default {
         "board_settings": "Ajustes del Tablón ⚙️",
         "name": "Nombre",
         "slug": "URL (Slug)",
+        "tag_desc": "Descripción (Opcional)",
+        "tag_desc_ph": "Explicación breve...",
         "close": "Cerrar",
         "saving": "Guardando...",
         "save": "Guardar ✅",

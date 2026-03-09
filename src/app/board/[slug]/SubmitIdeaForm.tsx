@@ -6,8 +6,9 @@ import { Input } from '@/components/ui/input';
 import { submitIdea } from './actions';
 import { ChevronDown, X } from 'lucide-react';
 import ImageUploadDropzone from '@/components/ImageUploadDropzone';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
-type Tag = { id: string, name: string, color: string };
+type Tag = { id: string, name: string, color: string, description?: string | null };
 
 export default function SubmitIdeaForm({
     boardId,
@@ -103,7 +104,7 @@ export default function SubmitIdeaForm({
                     >
                         {selectedTagId ? (
                             <span className="flex items-center gap-2">
-                                <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: tags.find(t => t.id === selectedTagId)?.color }} />
+                                <span className="w-3 h-3 rounded-full border border-black/10 flex-shrink-0" style={{ backgroundColor: tags.find(t => t.id === selectedTagId)?.color }} />
                                 {tags.find(t => t.id === selectedTagId)?.name}
                             </span>
                         ) : (
@@ -128,18 +129,38 @@ export default function SubmitIdeaForm({
                             >
                                 {dict.no_tag || 'Sin etiqueta'}
                             </button>
-                            {tags.map(t => (
-                                <button
-                                    key={t.id}
-                                    type="button"
-                                    onClick={() => { setSelectedTagId(t.id); setDropdownOpen(false); }}
-                                    style={{ color: isDarkMode ? '#f4f4f5' : textColor }}
-                                    className={`w-full flex items-center gap-2 px-4 py-3 text-sm font-bold transition-colors ${isDarkMode ? 'hover:bg-zinc-800/50' : 'hover:bg-zinc-50'}`}
-                                >
-                                    <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: t.color }} />
-                                    {t.name}
-                                </button>
-                            ))}
+                            <TooltipProvider delayDuration={200}>
+                                {tags.map(t => {
+                                    const button = (
+                                        <button
+                                            key={t.id}
+                                            type="button"
+                                            onClick={() => { setSelectedTagId(t.id); setDropdownOpen(false); }}
+                                            style={{ color: isDarkMode ? '#f4f4f5' : textColor }}
+                                            className={`w-full flex items-center gap-2 px-4 py-3 text-sm font-bold transition-colors ${isDarkMode ? 'hover:bg-zinc-800/50' : 'hover:bg-zinc-50'}`}
+                                        >
+                                            <span className="w-3 h-3 rounded-full border border-black/10 flex-shrink-0" style={{ backgroundColor: t.color }} />
+                                            <span className="truncate">{t.name}</span>
+                                        </button>
+                                    );
+
+                                    if (!t.description) return button;
+
+                                    return (
+                                        <Tooltip key={t.id}>
+                                            <TooltipTrigger asChild>
+                                                {button}
+                                            </TooltipTrigger>
+                                            <TooltipContent
+                                                side="right"
+                                                className={`max-w-[200px] text-xs font-medium border shadow-lg z-[60] ml-2 ${isDarkMode ? 'bg-zinc-900 border-zinc-800 text-zinc-300' : 'bg-white border-zinc-200 text-zinc-600'}`}
+                                            >
+                                                {t.description}
+                                            </TooltipContent>
+                                        </Tooltip>
+                                    );
+                                })}
+                            </TooltipProvider>
                         </div>
                     )}
                 </div>
