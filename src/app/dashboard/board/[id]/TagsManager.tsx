@@ -4,8 +4,8 @@ import { useState, useTransition } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Trash2, Plus, Lock } from 'lucide-react';
-import { createTag, deleteTag } from './actions';
+import { Trash2, Plus, Lock, Pencil } from 'lucide-react';
+import { createTag, deleteTag, updateTag } from './actions';
 import Link from 'next/link';
 
 type Tag = {
@@ -29,23 +29,47 @@ export default function TagsManager({
     const [name, setName] = useState('');
     const [color, setColor] = useState('#FF5C00');
     const [description, setDescription] = useState('');
+    const [editingId, setEditingId] = useState<string | null>(null);
     const [isPending, startTransition] = useTransition();
     const [error, setError] = useState<string | null>(null);
 
     const isLimitReached = !isPremium && tags.length >= 6;
 
-    const handleCreate = () => {
+    const handleSubmit = () => {
         if (!name.trim()) return;
         setError(null);
         startTransition(async () => {
-            const res = await createTag(boardId, name, color, description);
+            let res;
+            if (editingId) {
+                res = await updateTag(editingId, boardId, name, color, description);
+            } else {
+                res = await createTag(boardId, name, color, description);
+            }
             if (res?.error) {
                 setError(res.error);
             } else {
                 setName('');
                 setDescription('');
+                setColor('#FF5C00');
+                setEditingId(null);
             }
         });
+    };
+
+    const handleEdit = (tag: Tag) => {
+        setEditingId(tag.id);
+        setName(tag.name);
+        setColor(tag.color);
+        setDescription(tag.description || '');
+        setError(null);
+    };
+
+    const handleCancelEdit = () => {
+        setEditingId(null);
+        setName('');
+        setColor('#FF5C00');
+        setDescription('');
+        setError(null);
     };
 
     const handleDelete = (tagId: string) => {
@@ -100,13 +124,22 @@ export default function TagsManager({
                                     <span className="w-4 h-4 rounded-full border border-black/10" style={{ backgroundColor: tag.color }} />
                                     <span className="font-bold text-sm text-zinc-900">{tag.name}</span>
                                 </div>
-                                <button
-                                    onClick={() => handleDelete(tag.id)}
-                                    disabled={isPending}
-                                    className="text-zinc-300 hover:text-red-500 hover:bg-red-50 p-2 rounded-lg transition-colors active:scale-95 disabled:opacity-50"
-                                >
-                                    <Trash2 className="w-4 h-4" />
-                                </button>
+                                <div className="flex gap-1">
+                                    <button
+                                        onClick={() => handleEdit(tag)}
+                                        disabled={isPending || editingId === tag.id}
+                                        className="text-zinc-300 hover:text-blue-500 hover:bg-blue-50 p-2 rounded-lg transition-colors active:scale-95 disabled:opacity-50"
+                                    >
+                                        <Pencil className="w-4 h-4" />
+                                    </button>
+                                    <button
+                                        onClick={() => handleDelete(tag.id)}
+                                        disabled={isPending}
+                                        className="text-zinc-300 hover:text-red-500 hover:bg-red-50 p-2 rounded-lg transition-colors active:scale-95 disabled:opacity-50"
+                                    >
+                                        <Trash2 className="w-4 h-4" />
+                                    </button>
+                                </div>
                             </div>
                             {tag.description && (
                                 <p className="text-xs text-zinc-500 pl-7">{tag.description}</p>
@@ -174,14 +207,28 @@ export default function TagsManager({
 
                     {error && <p className="text-[10px] text-red-500 font-medium">{error}</p>}
 
-                    <Button
-                        type="button"
-                        onClick={handleCreate}
-                        disabled={isLimitReached || isPending || !name.trim()}
-                        className="w-full h-12 rounded-xl bg-zinc-900 text-white hover:bg-zinc-800 font-bold transition-all active:scale-95 flex items-center gap-2 text-sm shadow-md"
-                    >
-                        <Plus className="w-4 h-4" /> {dict.add_tag || 'Añadir Etiqueta'}
-                    </Button>
+                    <div className="flex gap-2">
+                        {editingId && (
+                            <Button
+                                type="button"
+                                onClick={handleCancelEdit}
+                                disabled={isPending}
+                                variant="outline"
+                                className="w-1/3 h-12 rounded-xl text-zinc-600 font-medium transition-all active:scale-95 text-xs shadow-sm bg-white"
+                            >
+                                {dict.cancel || 'Cancelar'}
+                            </Button>
+                        )}
+                        <Button
+                            type="button"
+                            onClick={handleSubmit}
+                            disabled={(!editingId && isLimitReached) || isPending || !name.trim()}
+                            className={`${editingId ? 'w-2/3' : 'w-full'} h-12 rounded-xl bg-zinc-900 text-white hover:bg-zinc-800 font-bold transition-all active:scale-95 flex items-center justify-center gap-2 text-sm shadow-md`}
+                        >
+                            {!editingId && <Plus className="w-4 h-4" />}
+                            {editingId ? (dict.save || 'Guardar') : (dict.add_tag || 'Añadir Etiqueta')}
+                        </Button>
+                    </div>
                 </div>
             </div>
         </div>

@@ -137,6 +137,24 @@ export async function createTag(boardId: string, name: string, color: string, de
     return { success: true };
 }
 
+export async function updateTag(tagId: string, boardId: string, name: string, color: string, description?: string | null) {
+    const { userId } = auth();
+    if (!userId) return { error: "Unauthorized" };
+
+    const board = await db.query.boards.findFirst({
+        where: and(eq(boards.id, boardId), eq(boards.userId, userId))
+    });
+
+    if (!board) return { error: "No permission" };
+
+    await db.update(tags)
+        .set({ name, color, description })
+        .where(and(eq(tags.id, tagId), eq(tags.boardId, boardId)));
+
+    revalidatePath(`/dashboard/board/${boardId}`);
+    return { success: true };
+}
+
 export async function deleteTag(tagId: string, boardId: string) {
     const { userId } = auth();
     if (!userId) return { error: "Unauthorized" };
