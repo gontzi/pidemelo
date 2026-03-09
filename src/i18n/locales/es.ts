@@ -95,7 +95,9 @@ export default {
         "yes_delete_idea": "Sí, borrar 🗑️",
         "cancel": "Cancelar",
         "vote": "VOTO",
-        "votes": "VOTOS"
+        "votes": "VOTOS",
+        "idea_description": "Descripción",
+        "close": "Cerrar"
     },
     "widgets_page": {
         "title": "Widgets",
