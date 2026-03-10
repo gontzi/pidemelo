@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import Link from "next/link";
 import { createBoard } from "./actions";
+import { Search } from "lucide-react";
 
 export const runtime = 'edge';
 export const dynamic = 'force-dynamic';
@@ -30,10 +31,32 @@ export default async function Dashboard() {
     const isLimitReached = !isPremium && userBoards.length >= 3;
 
     return (
-        <div className="min-h-screen bg-[#F3F4F6] px-4 py-8">
-            <div className="max-w-6xl mx-auto space-y-12 md:space-y-20">
+        <div className="min-h-screen bg-[#F3F4F6] px-5 py-8 md:px-8 lg:py-12">
+            <div className="max-w-6xl mx-auto space-y-10 md:space-y-16">
 
-                <section className="flex flex-col lg:flex-row lg:items-end justify-between gap-6 md:gap-8">
+                {/* Mobile Specific Header */}
+                <div className="lg:hidden space-y-6">
+                    <div className="flex items-center justify-between">
+                        <div className="space-y-1">
+                            <h1 className="text-4xl font-black tracking-tighter text-zinc-900 leading-none">
+                                Tus Chiringuitos 🚀
+                            </h1>
+                            <p className="text-[10px] uppercase tracking-[0.2em] font-black text-zinc-400">
+                                {isPremium ? t.dashboard_index.unlimited_projects : `${userBoards.length}/3${t.dashboard_index.projects_used}`}
+                            </p>
+                        </div>
+                    </div>
+                    <div className="relative group">
+                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-zinc-400 group-focus-within:text-[#FF5C00] transition-all" />
+                        <Input
+                            placeholder="Buscar mis tablones..."
+                            className="h-14 pl-12 bg-white border-none rounded-2xl shadow-[0_4px_20px_rgb(0,0,0,0.03)] focus-visible:ring-[#FF5C00] font-bold text-base"
+                        />
+                    </div>
+                </div>
+
+                {/* Desktop Header */}
+                <section className="hidden lg:flex flex-col lg:flex-row lg:items-end justify-between gap-6 md:gap-8">
                     <div className="space-y-2">
                         <div className="flex items-center gap-3">
                             <p className="text-[10px] uppercase tracking-[0.3em] font-black text-zinc-400">{t.dashboard_index.admin}</p>
@@ -77,7 +100,7 @@ export default async function Dashboard() {
                     </div>
                 </section>
 
-                <section className="grid gap-6 md:gap-8 sm:grid-cols-2 lg:grid-cols-3">
+                <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
                     {userBoards.map(board => (
                         <ProjectCard key={board.id} board={board as any} dict={t.project_card} settingsDict={t.board_details} isPremium={isPremium} />
                     ))}

@@ -32,7 +32,9 @@ export default function SettingsModal({
     dict,
     tags,
     isPremium,
-    notifyNewIdeas: initialNotifyState
+    notifyNewIdeas: initialNotifyState,
+    open: externalOpen,
+    onOpenChange: setExternalOpen
 }: {
     boardId: string,
     currentName: string,
@@ -41,9 +43,15 @@ export default function SettingsModal({
     trigger?: React.ReactNode,
     tags?: Tag[],
     isPremium?: boolean,
-    notifyNewIdeas?: boolean
+    notifyNewIdeas?: boolean,
+    open?: boolean,
+    onOpenChange?: (open: boolean) => void
 }) {
-    const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+    const [internalOpen, setInternalOpen] = useState(false);
+    
+    const isSettingsOpen = externalOpen !== undefined ? externalOpen : internalOpen;
+    const setIsSettingsOpen = setExternalOpen !== undefined ? setExternalOpen : setInternalOpen;
+
     const [isDeleteOpen, setIsDeleteOpen] = useState(false);
     const [isPending, startTransition] = useTransition();
     const [error, setError] = useState<string | null>(null);

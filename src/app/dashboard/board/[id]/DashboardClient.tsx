@@ -2,9 +2,10 @@
 
 import { DragDropContext, Droppable, Draggable, DropResult } from '@hello-pangea/dnd';
 import { updateIdeaStatus, deleteIdea } from './actions';
-import { Trash2, GripVertical, AlertTriangle, X } from 'lucide-react';
+import { Trash2, GripVertical, AlertTriangle, X, ChevronUp } from 'lucide-react';
 import { useTransition, useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
+import { cn } from "@/lib/utils";
 import ImageLightbox from '@/components/ImageLightbox';
 import {
     Dialog,
@@ -13,6 +14,14 @@ import {
     DialogHeader,
     DialogTitle,
 } from "@/components/ui/dialog";
+import {
+    ContextMenu,
+    ContextMenuContent,
+    ContextMenuItem,
+    ContextMenuTrigger,
+    ContextMenuSeparator,
+} from "@/components/ui/context-menu";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 type Idea = {
     id: string;
@@ -71,8 +80,90 @@ export default function DashboardClient({ initialIdeas, boardId, dict }: { initi
         setIdeaToDelete(null);
     };
 
+    const MobileIdeaCard = ({ idea }: { idea: Idea }) => (
+        <ContextMenu>
+            <ContextMenuTrigger asChild>
+                <div 
+                    onClick={() => setSelectedIdea(idea)}
+                    className="bg-white border border-zinc-200/60 p-5 rounded-[2rem] shadow-sm active:scale-[0.98] transition-all flex items-center justify-between gap-4 relative overflow-hidden"
+                >
+                    <div className="flex-1 min-w-0 space-y-2">
+                        <div className="flex items-center gap-2">
+                            {idea.tag && (
+                                <span className="inline-flex items-center gap-1 text-[8px] font-black uppercase tracking-widest border border-zinc-100 px-2 py-0.5 rounded-full">
+                                    <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: idea.tag.color }} />
+                                    {idea.tag.name}
+                                </span>
+                            )}
+                        </div>
+                        <h4 className="font-black text-lg text-zinc-900 leading-tight tracking-tight uppercase break-words [word-break:break-word] whitespace-normal line-clamp-2">{idea.title}</h4>
+                    </div>
+                    
+                    <div className="flex items-center gap-3">
+                        <div className="flex flex-col items-center justify-center bg-zinc-50 border border-zinc-100 rounded-2xl p-2 min-w-[50px] h-12">
+                            <ChevronUp className="w-3 h-3 text-[#FF5C00]" />
+                            <span className="text-xs font-black text-[#FF5C00]">{idea.votesCount}</span>
+                        </div>
+                        {/* Three dots indicator for context menu */}
+                        <div className="flex flex-col gap-1 opacity-20 mr-1">
+                            <div className="w-1 h-1 rounded-full bg-zinc-900" />
+                            <div className="w-1 h-1 rounded-full bg-zinc-900" />
+                            <div className="w-1 h-1 rounded-full bg-zinc-900" />
+                        </div>
+                    </div>
+                </div>
+            </ContextMenuTrigger>
+            <ContextMenuContent className="w-64 rounded-2xl p-2 shadow-2xl border-none bg-white/95 backdrop-blur-xl">
+                <div className="px-4 py-2 text-[10px] font-black text-zinc-400 uppercase tracking-widest leading-none mb-1">Mover a...</div>
+                {idea.status !== 'pending' && (
+                    <ContextMenuItem 
+                        onClick={(e) => { 
+                            e.stopPropagation(); 
+                            setIdeas(prev => prev.map(i => i.id === idea.id ? { ...i, status: 'pending' } : i));
+                            startTransition(() => updateIdeaStatus(idea.id, 'pending', boardId)); 
+                        }}
+                        className="rounded-xl py-3 px-4 font-bold text-zinc-700 focus:bg-orange-50 focus:text-[#FF5C00] active:scale-95 transition-transform"
+                    >
+                        🤔 {dict.col_pending.split(' ')[1] || 'Pendiente'}
+                    </ContextMenuItem>
+                )}
+                {idea.status !== 'planned' && (
+                    <ContextMenuItem 
+                        onClick={(e) => { 
+                            e.stopPropagation(); 
+                            setIdeas(prev => prev.map(i => i.id === idea.id ? { ...i, status: 'planned' } : i));
+                            startTransition(() => updateIdeaStatus(idea.id, 'planned', boardId)); 
+                        }}
+                        className="rounded-xl py-3 px-4 font-bold text-zinc-700 focus:bg-orange-50 focus:text-[#FF5C00] active:scale-95 transition-transform"
+                    >
+                        🏗️ {dict.col_planned.split(' ')[1] || 'Planeado'}
+                    </ContextMenuItem>
+                )}
+                {idea.status !== 'done' && (
+                    <ContextMenuItem 
+                        onClick={(e) => { 
+                            e.stopPropagation(); 
+                            setIdeas(prev => prev.map(i => i.id === idea.id ? { ...i, status: 'done' } : i));
+                            startTransition(() => updateIdeaStatus(idea.id, 'done', boardId)); 
+                        }}
+                        className="rounded-xl py-3 px-4 font-bold text-zinc-700 focus:bg-orange-50 focus:text-[#FF5C00] active:scale-95 transition-transform"
+                    >
+                        ✅ {dict.col_done.split(' ')[1] || 'Completado'}
+                    </ContextMenuItem>
+                )}
+                <ContextMenuSeparator className="bg-zinc-100 my-1" />
+                <ContextMenuItem 
+                    onClick={(e) => { e.stopPropagation(); handleDelete(idea.id); }}
+                    className="rounded-xl py-3 px-4 font-bold text-red-500 focus:bg-red-50 focus:text-red-600"
+                >
+                    <Trash2 className="w-4 h-4 mr-3 opacity-60" /> {dict.cancel}
+                </ContextMenuItem>
+            </ContextMenuContent>
+        </ContextMenu>
+    );
+
     return (
-        <>
+        <div className="h-full flex flex-col">
             <Dialog open={!!ideaToDelete} onOpenChange={(open) => !open && setIdeaToDelete(null)}>
                 <DialogContent className="w-[90vw] sm:max-w-sm rounded-[2rem] md:rounded-[2.5rem] p-6 md:p-8 border-none shadow-2xl">
                     <div className="flex flex-col items-center text-center space-y-4">
@@ -110,9 +201,8 @@ export default function DashboardClient({ initialIdeas, boardId, dict }: { initi
             </Dialog>
 
             <Dialog open={!!selectedIdea} onOpenChange={(open) => !open && setSelectedIdea(null)}>
-                <DialogContent className="w-[95vw] sm:max-w-2xl rounded-[2.5rem] md:rounded-[3.5rem] p-0 border-none shadow-2xl overflow-hidden bg-white z-[100] [&>button]:hidden duration-500 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=open]:fade-in-0 data-[state=closed]:fade-out-0 data-[state=open]:zoom-in-95 data-[state=closed]:zoom-out-95 data-[state=open]:slide-in-from-top-[48%] data-[state=closed]:slide-out-to-top-[48%] data-[state=open]:slide-in-from-left-1/2 data-[state=closed]:slide-out-to-left-1/2">
+                <DialogContent className="w-[92vw] sm:max-w-2xl rounded-[2.5rem] md:rounded-[3.5rem] p-0 border-none shadow-2xl overflow-hidden bg-white z-[100] [&>button]:hidden duration-500 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=open]:fade-in-0 data-[state=closed]:fade-out-0 data-[state=open]:zoom-in-95 data-[state=closed]:zoom-out-95">
                     <div className="flex flex-col h-full max-h-[90vh]">
-                        {/* Header Image if exists */}
                         {selectedIdea?.imageUrl && (
                             <div className="relative w-full aspect-video md:aspect-[21/9] overflow-hidden group">
                                 <ImageLightbox
@@ -130,8 +220,7 @@ export default function DashboardClient({ initialIdeas, boardId, dict }: { initi
                             <DialogDescription>{selectedIdea?.description}</DialogDescription>
                         </div>
 
-                        <div className="relative px-6 md:px-12 py-8 md:py-12 overflow-y-auto [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-thumb]:bg-zinc-300/60 [&::-webkit-scrollbar-thumb]:rounded-full hover:[&::-webkit-scrollbar-thumb]:bg-zinc-400/80">
-
+                        <div className="relative px-5 md:px-12 py-6 md:py-12 overflow-y-auto [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-thumb]:bg-zinc-300/60 [&::-webkit-scrollbar-thumb]:rounded-full hover:[&::-webkit-scrollbar-thumb]:bg-zinc-400/80">
                             <div className="space-y-6 md:space-y-8">
                                 <div className="space-y-4">
                                     <div className="flex flex-wrap items-center gap-3">
@@ -150,7 +239,7 @@ export default function DashboardClient({ initialIdeas, boardId, dict }: { initi
                                             {selectedIdea?.status === 'pending' ? dict.col_pending : selectedIdea?.status === 'planned' ? dict.col_planned : dict.col_done}
                                         </span>
                                     </div>
-                                    <h2 className="text-3xl md:text-5xl font-black tracking-tighter text-zinc-900 leading-[0.9] pt-2">
+                                    <h2 className="text-2xl md:text-5xl font-black tracking-tighter text-zinc-900 leading-normal pt-2 break-all [word-break:break-word] [hyphens:auto]">
                                         {selectedIdea?.title}
                                     </h2>
                                 </div>
@@ -177,95 +266,179 @@ export default function DashboardClient({ initialIdeas, boardId, dict }: { initi
                     </div>
                 </DialogContent>
             </Dialog>
-            <DragDropContext onDragEnd={onDragEnd}>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 h-full p-4 md:p-6 overflow-x-auto">
-                    {columnsConfig.map(col => (
-                        <div key={col.id} className={`flex flex-col rounded-[2rem] md:rounded-[2.5rem] border p-5 md:p-8 min-h-0 h-full ${col.color}`}>
-                            <div className="flex items-center justify-between mb-6 md:mb-8 px-1 md:px-2">
-                                <h3 className="text-[10px] font-black tracking-widest text-zinc-900 uppercase opacity-60">{col.title}</h3>
-                                <span className="bg-white/80 backdrop-blur-sm border border-zinc-200/50 text-zinc-900 font-black text-[10px] px-3 py-1 rounded-full shadow-sm">
-                                    {ideas.filter(i => i.status === col.id).length}
-                                </span>
-                            </div>
 
-                            <Droppable droppableId={col.id}>
-                                {(provided, snapshot) => (
-                                    <div
-                                        ref={provided.innerRef}
-                                        {...provided.droppableProps}
-                                        className={`flex-1 overflow-y-auto pr-2 transition-all rounded-[1.5rem] p-1 
-                                            ${snapshot.isDraggingOver ? 'bg-white/40' : ''} 
-                                            [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-thumb]:bg-zinc-300/60 
-                                            [&::-webkit-scrollbar-thumb]:rounded-full hover:[&::-webkit-scrollbar-thumb]:bg-zinc-400/80`}
-                                    >
-                                        <div className="space-y-4 md:space-y-6">
-                                            {ideas.filter(i => i.status === col.id).map((idea, index) => (
-                                                <Draggable key={idea.id} draggableId={idea.id} index={index}>
-                                                    {(provided, snapshot) => (
-                                                        <div
-                                                            ref={provided.innerRef}
-                                                            {...provided.draggableProps}
-                                                            onClick={() => setSelectedIdea(idea)}
-                                                            className={`flex-shrink-0 p-5 md:p-6 lg:p-8 bg-white border rounded-[1.8rem] md:rounded-[2rem] group transition-all duration-300 cursor-pointer
-                                                                ${snapshot.isDragging
-                                                                    ? 'shadow-2xl shadow-orange-500/20 border-[#FF5C00] scale-[1.05] rotate-2'
-                                                                    : 'border-zinc-200/60 shadow-sm hover:shadow-xl hover:shadow-zinc-200/50 hover:border-[#FF5C00]/20'}`}
-                                                            style={provided.draggableProps.style}
-                                                        >
-                                                            <div className="flex justify-between items-start gap-3 mb-3 md:mb-4">
-                                                                <div
-                                                                    {...provided.dragHandleProps}
-                                                                    className="cursor-grab active:cursor-grabbing p-1.5 md:p-2 -ml-2 -mt-1 md:-ml-3 md:-mt-2 text-zinc-200 hover:text-[#FF5C00] transition-colors rounded-xl flex-shrink-0"
-                                                                >
-                                                                    <GripVertical className="w-4 h-4 md:w-5 md:h-5" />
-                                                                </div>
-                                                                <h4 className="font-black text-lg md:text-xl text-zinc-900 leading-tight flex-1 tracking-tighter">{idea.title}</h4>
-                                                                <button
-                                                                    onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleDelete(idea.id); }}
-                                                                    className="text-zinc-300 md:text-zinc-200 hover:text-white hover:bg-red-500 p-2 rounded-xl transition-all shrink-0 -mt-1 -mr-1 md:-mt-2 md:-mr-3 md:opacity-0 md:group-hover:opacity-100 active:scale-95"
-                                                                >
-                                                                    <Trash2 className="w-4 h-4" />
-                                                                </button>
-                                                            </div>
-
-                                                            <p className="text-xs md:text-sm text-zinc-500 line-clamp-2 mb-4 leading-relaxed font-bold tracking-tight">{idea.description}</p>
-
-                                                            {idea.imageUrl && (
-                                                                <div className="pointer-events-none">
-                                                                    <ImageLightbox
-                                                                        src={idea.imageUrl}
-                                                                        alt={idea.title}
-                                                                        className="mb-5 rounded-2xl border border-zinc-100 shadow-sm"
-                                                                    />
-                                                                </div>
-                                                            )}
-
-                                                            <div className="flex items-center justify-between">
-                                                                <span className="flex items-center gap-2 text-[9px] md:text-[10px] font-black uppercase tracking-widest text-[#FF5C00] bg-orange-50 border border-orange-100 px-3 md:px-4 py-1.5 md:py-2 rounded-full shadow-sm flex-shrink-0">
-                                                                    <span className="text-xs md:text-sm">▲</span> {idea.votesCount} {idea.votesCount === 1 ? dict.vote : dict.votes}
-                                                                </span>
-                                                                {idea.tag && (
-                                                                    <span
-                                                                        className="flex items-center gap-1.5 text-[9px] md:text-[10px] font-black uppercase tracking-widest border border-zinc-100 px-3 py-1.5 md:py-2 rounded-full shadow-sm max-w-[120px] truncate"
-                                                                    >
-                                                                        <span className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: idea.tag.color }} />
-                                                                        <span className="truncate">{idea.tag.name}</span>
-                                                                    </span>
-                                                                )}
-                                                            </div>
-                                                        </div>
-                                                    )}
-                                                </Draggable>
-                                            ))}
-                                            {provided.placeholder}
-                                        </div>
-                                    </div>
-                                )}
-                            </Droppable>
-                        </div>
-                    ))}
+            {/* Mobile View with Vertical Drag & Drop */}
+            <div className="lg:hidden flex-1 flex flex-col min-h-0 bg-[#F3F4F6] overflow-x-hidden w-full max-w-full">
+                {/* Horizontal Section Navigator (Sticky) */}
+                <div className="sticky top-0 z-30 bg-white/80 backdrop-blur-xl px-4 py-3 border-b border-zinc-200/50">
+                    <div className="flex bg-zinc-100 p-0.5 rounded-xl h-12">
+                        {columnsConfig.map((col) => (
+                            <button
+                                key={col.id}
+                                onClick={() => {
+                                    document.getElementById(`mobile-col-${col.id}`)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                                }}
+                                className="flex-1 rounded-lg font-black text-[9px] uppercase tracking-tighter transition-all active:scale-95 flex items-center justify-center gap-1"
+                            >
+                                {col.id === 'pending' ? '🤔' : col.id === 'planned' ? '🏗️' : '✅'} 
+                                <span className="truncate">{col.title.replace(/[🤔🏗️✅]/g, '').trim()}</span>
+                            </button>
+                        ))}
+                    </div>
                 </div>
-            </DragDropContext>
-        </>
+                
+                <div className="flex-1 overflow-y-auto overflow-x-hidden p-4 pb-32 max-w-full">
+                    <DragDropContext onDragEnd={onDragEnd}>
+                        <div className="space-y-10">
+                            {columnsConfig.map((col) => (
+                                <div key={col.id} id={`mobile-col-${col.id}`} className="space-y-4">
+                                    <div className="flex items-center justify-between px-1">
+                                        <div className="flex items-center gap-2">
+                                            <h3 className="text-[10px] font-black tracking-widest text-zinc-400 uppercase">
+                                                {col.id === 'pending' ? '🤔' : col.id === 'planned' ? '🏗️' : '✅'} {col.title.replace(/[🤔🏗️✅]/g, '').trim()}
+                                            </h3>
+                                        </div>
+                                        <span className="bg-white px-2 py-0.5 rounded-full text-[9px] font-black border border-zinc-200 text-zinc-400">
+                                            {ideas.filter(i => i.status === col.id).length}
+                                        </span>
+                                    </div>
+
+                                    <Droppable droppableId={col.id}>
+                                        {(provided, snapshot) => (
+                                            <div
+                                                ref={provided.innerRef}
+                                                {...provided.droppableProps}
+                                                className={cn(
+                                                    "space-y-4 min-h-[100px] transition-all rounded-[2.5rem] p-1",
+                                                    snapshot.isDraggingOver ? "bg-zinc-200/50 ring-2 ring-dashed ring-zinc-300 ring-offset-4" : ""
+                                                )}
+                                            >
+                                                {ideas.filter(i => i.status === col.id).map((idea, index) => (
+                                                    <Draggable key={idea.id} draggableId={idea.id} index={index}>
+                                                        {(provided, snapshot) => (
+                                                            <div
+                                                                ref={provided.innerRef}
+                                                                {...provided.draggableProps}
+                                                                {...provided.dragHandleProps}
+                                                                className={cn(
+                                                                    "transition-all",
+                                                                    snapshot.isDragging ? "z-50" : ""
+                                                                )}
+                                                            >
+                                                                <MobileIdeaCard idea={idea} />
+                                                            </div>
+                                                        )}
+                                                    </Draggable>
+                                                ))}
+                                                {provided.placeholder}
+                                                {ideas.filter(i => i.status === col.id).length === 0 && !snapshot.isDraggingOver && (
+                                                    <div className="py-12 border-2 border-dashed border-zinc-200 rounded-[2.5rem] flex flex-col items-center justify-center text-center opacity-40">
+                                                        <span className="text-4xl mb-2">🏜️</span>
+                                                        <p className="font-black uppercase tracking-widest text-[8px]">{dict.col_pending.split(' ')[0]} vacío</p>
+                                                    </div>
+                                                )}
+                                            </div>
+                                        )}
+                                    </Droppable>
+                                </div>
+                            ))}
+                        </div>
+                    </DragDropContext>
+                </div>
+            </div>
+
+            {/* Desktop Kanban View */}
+            <div className="hidden lg:block h-full">
+                <DragDropContext onDragEnd={onDragEnd}>
+                    <div className="grid grid-cols-3 gap-6 h-[calc(100vh-140px)] p-6 overflow-x-auto">
+                        {columnsConfig.map(col => (
+                            <div key={col.id} className={`flex flex-col rounded-[2.5rem] border p-8 min-h-0 h-full ${col.color}`}>
+                                <div className="flex items-center justify-between mb-8 px-2">
+                                    <h3 className="text-[10px] font-black tracking-widest text-zinc-900 uppercase opacity-60">{col.title}</h3>
+                                    <span className="bg-white/80 backdrop-blur-sm border border-zinc-200/50 text-zinc-900 font-black text-[10px] px-3 py-1 rounded-full shadow-sm">
+                                        {ideas.filter(i => i.status === col.id).length}
+                                    </span>
+                                </div>
+
+                                <Droppable droppableId={col.id}>
+                                    {(provided, snapshot) => (
+                                        <div
+                                            ref={provided.innerRef}
+                                            {...provided.droppableProps}
+                                            className={`flex-1 overflow-y-auto pr-2 transition-all rounded-[1.5rem] p-1 
+                                                ${snapshot.isDraggingOver ? 'bg-white/40' : ''} 
+                                                [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-thumb]:bg-zinc-300/60 
+                                                [&::-webkit-scrollbar-thumb]:rounded-full hover:[&::-webkit-scrollbar-thumb]:bg-zinc-400/80`}
+                                        >
+                                            <div className="space-y-6">
+                                                {ideas.filter(i => i.status === col.id).map((idea, index) => (
+                                                    <Draggable key={idea.id} draggableId={idea.id} index={index}>
+                                                        {(provided, snapshot) => (
+                                                            <div
+                                                                ref={provided.innerRef}
+                                                                {...provided.draggableProps}
+                                                                onClick={() => setSelectedIdea(idea)}
+                                                                className={`flex-shrink-0 p-8 bg-white border rounded-[2rem] group transition-all duration-300 cursor-pointer
+                                                                    ${snapshot.isDragging
+                                                                        ? 'shadow-2xl shadow-orange-500/20 border-[#FF5C00] scale-[1.05] rotate-2'
+                                                                        : 'border-zinc-200/60 shadow-sm hover:shadow-xl hover:shadow-zinc-200/50 hover:border-[#FF5C00]/20'}`}
+                                                                style={provided.draggableProps.style}
+                                                            >
+                                                                <div className="flex justify-between items-start gap-4 mb-4">
+                                                                    <div
+                                                                        {...provided.dragHandleProps}
+                                                                        className="cursor-grab active:cursor-grabbing p-2 -ml-3 -mt-2 text-zinc-200 hover:text-[#FF5C00] transition-colors rounded-xl flex-shrink-0"
+                                                                    >
+                                                                        <GripVertical className="w-5 h-5" />
+                                                                    </div>
+                                                                    <h4 className="font-black text-xl text-zinc-900 leading-tight flex-1 tracking-tighter uppercase">{idea.title}</h4>
+                                                                    <button
+                                                                        onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleDelete(idea.id); }}
+                                                                        className="text-zinc-200 hover:text-white hover:bg-red-500 p-2 rounded-xl transition-all shrink-0 -mt-2 -mr-3 md:opacity-0 md:group-hover:opacity-100 active:scale-95"
+                                                                    >
+                                                                        <Trash2 className="w-4 h-4" />
+                                                                    </button>
+                                                                </div>
+
+                                                                <p className="text-sm text-zinc-500 line-clamp-2 mb-4 leading-relaxed font-bold tracking-tight">{idea.description}</p>
+
+                                                                {idea.imageUrl && (
+                                                                    <div className="pointer-events-none">
+                                                                        <ImageLightbox
+                                                                            src={idea.imageUrl}
+                                                                            alt={idea.title}
+                                                                            className="mb-5 rounded-2xl border border-zinc-100 shadow-sm"
+                                                                        />
+                                                                    </div>
+                                                                )}
+
+                                                                <div className="flex items-center justify-between">
+                                                                    <span className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-[#FF5C00] bg-orange-50 border border-orange-100 px-4 py-2 rounded-full shadow-sm flex-shrink-0">
+                                                                        <span className="text-sm">▲</span> {idea.votesCount} {idea.votesCount === 1 ? dict.vote : dict.votes}
+                                                                    </span>
+                                                                    {idea.tag && (
+                                                                        <span
+                                                                            className="flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest border border-zinc-100 px-3 py-2 rounded-full shadow-sm max-w-[120px] truncate"
+                                                                        >
+                                                                            <span className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: idea.tag.color }} />
+                                                                            <span className="truncate">{idea.tag.name}</span>
+                                                                        </span>
+                                                                    )}
+                                                                </div>
+                                                            </div>
+                                                        )}
+                                                    </Draggable>
+                                                ))}
+                                                {provided.placeholder}
+                                            </div>
+                                        </div>
+                                    )}
+                                </Droppable>
+                            </div>
+                        ))}
+                    </div>
+                </DragDropContext>
+            </div>
+        </div>
     );
 }
