@@ -130,7 +130,10 @@ export default {
         "pro_feature": "PRO FEATURE",
         "interactive_preview": "Interactive Preview",
         "desktop_view": "Desktop View",
-        "mobile_view": "Mobile View"
+        "mobile_view": "Mobile View",
+        "language": "Widget Language",
+        "spanish": "Spanish",
+        "english": "English"
     },
     "billing_page": {
         "title_thanks": "Thank you for",
@@ -207,9 +210,20 @@ export default {
     "submit_idea_form": {
         "title_placeholder": "Ex. Add a button that gives me free coffee...",
         "desc_placeholder": "Tell me your drama, let's see if we can do something...",
+        "select_tag": "Select tag (optional)",
+        "no_tag": "No tag",
         "error_fallback": "Something went wrong",
         "submitting": "SUBMITTING...",
         "submit_btn": "DROP MY IDEA 🚀"
+    },
+    "image_upload": {
+        "attach": "Attach image or screenshot (max 1MB)",
+        "attach_pro": "Attach image (Pro only)",
+        "uploading": "Uploading image...",
+        "error_size": "Image is over 1MB.",
+        "error_connection": "Server connection failed.",
+        "pro_title": "Pro / Lifetime Feature",
+        "pro_desc": "The owner of this board does not have an active premium plan to allow image uploads."
     },
     "widget_page": {
         "disabled_title": "Widget Disabled",

@@ -17,6 +17,7 @@ export default function SubmitIdeaForm({
     textColor = "#18181b",
     isDarkMode = false,
     dict,
+    imageDict,
     tags,
     isBoardPremium = false,
     isCurrentUserAdmin = false
@@ -26,7 +27,8 @@ export default function SubmitIdeaForm({
     accentColor?: string,
     textColor?: string,
     isDarkMode?: boolean,
-    dict: Record<string, string>,
+    dict: any,
+    imageDict: any,
     tags?: Tag[],
     isBoardPremium?: boolean,
     isCurrentUserAdmin?: boolean
@@ -108,7 +110,7 @@ export default function SubmitIdeaForm({
                                 {tags.find(t => t.id === selectedTagId)?.name}
                             </span>
                         ) : (
-                            <span style={{ color: isDarkMode ? '#a1a1aa' : '#71717a' }}>{dict.select_tag || 'Seleccionar etiqueta (opcional)'}</span>
+                            <span style={{ color: isDarkMode ? '#a1a1aa' : '#71717a' }}>{dict.select_tag}</span>
                         )}
                         <ChevronDown className={`absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 transition-transform duration-200 opacity-50 ${dropdownOpen ? 'rotate-180' : ''}`} />
                     </button>
@@ -127,7 +129,7 @@ export default function SubmitIdeaForm({
                                 style={{ color: isDarkMode ? '#a1a1aa' : '#71717a' }}
                                 className={`w-full text-left px-4 py-3 text-sm font-medium transition-colors ${isDarkMode ? 'hover:bg-zinc-800/50' : 'hover:bg-zinc-50'}`}
                             >
-                                {dict.no_tag || 'Sin etiqueta'}
+                                {dict.no_tag}
                             </button>
                             <TooltipProvider delayDuration={200}>
                                 {tags.map(t => {
@@ -184,6 +186,7 @@ export default function SubmitIdeaForm({
                     isCurrentUserAdmin={isCurrentUserAdmin}
                     onUploadSuccess={(url) => setUploadedImageUrl(url)}
                     isDarkMode={isDarkMode}
+                    dict={imageDict}
                 />
             ) : (
                 <div className="relative inline-block mt-2">

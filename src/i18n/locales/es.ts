@@ -130,7 +130,10 @@ export default {
         "pro_feature": "PRO FEATURE",
         "interactive_preview": "Vista Previa Interactiva",
         "desktop_view": "Vista Escritorio",
-        "mobile_view": "Vista Móvil"
+        "mobile_view": "Vista Móvil",
+        "language": "Idioma del Widget",
+        "spanish": "Español",
+        "english": "Inglés"
     },
     "billing_page": {
         "title_thanks": "¡Gracias por",
@@ -207,9 +210,20 @@ export default {
     "submit_idea_form": {
         "title_placeholder": "Ej. Poner un botón que me dé café gratis...",
         "desc_placeholder": "Cuéntame tu drama, a ver si podemos hacer algo...",
+        "select_tag": "Seleccionar etiqueta (opcional)",
+        "no_tag": "Sin etiqueta",
         "error_fallback": "Algo salió mal",
         "submitting": "ENVIANDO...",
         "submit_btn": "SOLTAR MI IDEA 🚀"
+    },
+    "image_upload": {
+        "attach": "Adjuntar imagen o captura (máx 1MB)",
+        "attach_pro": "Adjuntar imagen (Solo Pro)",
+        "uploading": "Subiendo imagen...",
+        "error_size": "La imagen pesa más de 1MB.",
+        "error_connection": "Fallo en la conexión al servidor.",
+        "pro_title": "Función Pro / Lifetime",
+        "pro_desc": "El dueño de este tablero no dispone de un plan premium activo para permitir el envío de imágenes."
     },
     "widget_page": {
         "disabled_title": "Widget Desactivado",

@@ -15,9 +15,10 @@ export default async function WidgetBoardPage({
     searchParams
 }: {
     params: { slug: string },
-    searchParams: { color?: string, textColor?: string, darkMode?: string }
+    searchParams: { color?: string, textColor?: string, darkMode?: string, lang?: string }
 }) {
-    const t = await getDictionary();
+    const lang = (searchParams.lang === 'en' || searchParams.lang === 'es') ? searchParams.lang : 'es';
+    const t = await getDictionary(lang);
 
     return (
         <div className="min-h-screen transition-colors">

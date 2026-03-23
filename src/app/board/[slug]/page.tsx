@@ -122,6 +122,7 @@ export default async function PublicBoardPage({ params }: { params: { slug: stri
                             boardId={board.id}
                             boardSlug={board.slug}
                             dict={t.submit_idea_form}
+                            imageDict={t.image_upload}
                             tags={board.tags}
                             isBoardPremium={isBoardPremium}
                             isCurrentUserAdmin={isCurrentUserAdmin}

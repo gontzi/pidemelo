@@ -15,6 +15,15 @@ interface ImageUploadProps {
     isCurrentUserAdmin: boolean;
     onUploadSuccess: (url: string) => void;
     isDarkMode?: boolean;
+    dict: {
+        attach: string;
+        attach_pro: string;
+        uploading: string;
+        error_size: string;
+        error_connection: string;
+        pro_title: string;
+        pro_desc: string;
+    };
 }
 
 export default function ImageUploadDropzone({
@@ -22,7 +31,8 @@ export default function ImageUploadDropzone({
     isBoardPremium,
     isCurrentUserAdmin,
     onUploadSuccess,
-    isDarkMode = false
+    isDarkMode = false,
+    dict
 }: ImageUploadProps) {
     const [isUploading, setIsUploading] = useState(false);
     const [error, setError] = useState<string | null>(null);
@@ -43,7 +53,7 @@ export default function ImageUploadDropzone({
                         >
                             <ImagePlus className="w-5 h-5" />
                             <span className="text-sm font-medium text-left">
-                                Adjuntar imagen (Solo Pro)
+                                {dict.attach_pro}
                             </span>
                         </button>
                     </PopoverTrigger>
@@ -59,9 +69,9 @@ export default function ImageUploadDropzone({
                                 <Lock className="w-5 h-5 text-[#FF5C00]" />
                             </div>
                             <div className="space-y-1">
-                                <h4 className="font-bold text-sm text-zinc-900 leading-tight">Función Pro / Lifetime</h4>
+                                <h4 className="font-bold text-sm text-zinc-900 leading-tight">{dict.pro_title}</h4>
                                 <p className="text-xs text-zinc-500 leading-relaxed font-medium">
-                                    El dueño de este tablero no dispone de un plan premium activo para permitir el envío de imágenes.
+                                    {dict.pro_desc}
                                 </p>
                             </div>
                         </div>
@@ -77,7 +87,7 @@ export default function ImageUploadDropzone({
         if (!file) return;
 
         if (file.size > 1 * 1024 * 1024) {
-            setError("La imagen pesa más de 1MB.");
+            setError(dict.error_size);
             return;
         }
 
@@ -97,7 +107,7 @@ export default function ImageUploadDropzone({
                 onUploadSuccess(result.url);
             }
         } catch (err) {
-            setError("Fallo en la conexión al servidor.");
+            setError(dict.error_connection);
         } finally {
             setIsUploading(false);
             if (fileInputRef.current) fileInputRef.current.value = '';
@@ -127,7 +137,7 @@ export default function ImageUploadDropzone({
                     <ImagePlus className="w-5 h-5" />
                 )}
                 <span className="text-sm font-medium">
-                    {isUploading ? "Subiendo imagen..." : "Adjuntar imagen o captura (máx 1MB)"}
+                    {isUploading ? dict.uploading : dict.attach}
                 </span>
             </button>
 
