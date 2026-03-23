@@ -30,6 +30,7 @@ export default function WidgetsClient({
     const [viewMode, setViewMode] = useState<'desktop' | 'mobile'>('desktop');
     const [widgetType, setWidgetType] = useState<'form' | 'board'>('form');
     const [lang, setLang] = useState<'es' | 'en'>('es');
+    const [widgetVersion, setWidgetVersion] = useState<'normal' | 'lite'>('normal');
 
     const selectedBoard = useMemo(() =>
         boards.find(b => b.id === selectedBoardId),
@@ -38,8 +39,8 @@ export default function WidgetsClient({
     const origin = typeof window !== 'undefined' ? window.location.origin : 'https://pidemelo.app';
 
     const widgetUrl = useMemo(() =>
-        `${origin}/widget/${widgetType}/${selectedBoard?.slug}?color=${encodeURIComponent(accentColor)}&textColor=${encodeURIComponent(textColor)}&darkMode=${isDarkMode}&lang=${lang}`,
-        [origin, widgetType, selectedBoard, accentColor, textColor, isDarkMode, lang]);
+        `${origin}/widget/${widgetType}/${selectedBoard?.slug}?color=${encodeURIComponent(accentColor)}&textColor=${encodeURIComponent(textColor)}&darkMode=${isDarkMode}&lang=${lang}&version=${widgetVersion}`,
+        [origin, widgetType, selectedBoard, accentColor, textColor, isDarkMode, lang, widgetVersion]);
 
     const iframeCode = useMemo(() =>
         `<iframe src="${widgetUrl}" width="100%" height="${widgetType === 'form' ? '400px' : '700px'}" frameborder="0" title="Feedback ${widgetType === 'form' ? 'Form' : 'Board'}"></iframe>`,
@@ -258,6 +259,25 @@ export default function WidgetsClient({
                                         className={`flex-1 h-10 flex items-center justify-center gap-2 rounded-[1rem] text-[10px] uppercase tracking-widest font-black transition-all ${lang === 'en' ? 'bg-zinc-950 text-white shadow-sm' : 'text-zinc-500 hover:text-zinc-700'}`}
                                     >
                                         <span>🇺🇸</span> {dict.english}
+                                    </button>
+                                </div>
+                            </div>
+
+                            {/* Version */}
+                            <div className="space-y-3">
+                                <label className="text-[10px] uppercase font-black tracking-widest text-zinc-500 px-1">{dict.widget_version}</label>
+                                <div className="flex bg-zinc-100/50 p-1.5 rounded-[1.25rem] w-full border border-zinc-200/50">
+                                    <button
+                                        onClick={() => setWidgetVersion('normal')}
+                                        className={`flex-1 h-10 flex items-center justify-center gap-2 rounded-[1rem] text-[10px] uppercase tracking-widest font-black transition-all ${widgetVersion === 'normal' ? 'bg-white text-zinc-950 shadow-sm border border-zinc-200/50' : 'text-zinc-500 hover:text-zinc-700'}`}
+                                    >
+                                        <span>✨</span> {dict.version_normal}
+                                    </button>
+                                    <button
+                                        onClick={() => setWidgetVersion('lite')}
+                                        className={`flex-1 h-10 flex items-center justify-center gap-2 rounded-[1rem] text-[10px] uppercase tracking-widest font-black transition-all ${widgetVersion === 'lite' ? 'bg-zinc-950 text-white shadow-sm' : 'text-zinc-500 hover:text-zinc-700'}`}
+                                    >
+                                        <span>⚡</span> {dict.version_lite}
                                     </button>
                                 </div>
                             </div>

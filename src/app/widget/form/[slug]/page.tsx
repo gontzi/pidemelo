@@ -15,9 +15,10 @@ export default async function WidgetPage({
     searchParams
 }: {
     params: { slug: string },
-    searchParams: { color?: string, textColor?: string, darkMode?: string, lang?: string }
+    searchParams: { color?: string, textColor?: string, darkMode?: string, lang?: string, version?: string }
 }) {
     const lang = (searchParams.lang === 'en' || searchParams.lang === 'es') ? searchParams.lang : 'es';
+    const widgetVersion = searchParams.version === 'lite' ? 'lite' : 'normal';
     const t = await getDictionary(lang);
 
     return (
@@ -33,6 +34,7 @@ async function FormContent({ params, searchParams, t }: any) {
     const accentColor = searchParams.color ? decodeURIComponent(searchParams.color) : "#FF5C00";
     const textColor = searchParams.textColor ? decodeURIComponent(searchParams.textColor) : "#18181b";
     const isDarkMode = searchParams.darkMode === 'true';
+    const widgetVersion = searchParams.version === 'lite' ? 'lite' : 'normal';
 
     const board = await db.query.boards.findFirst({
         where: eq(boards.slug, params.slug),
@@ -74,18 +76,22 @@ async function FormContent({ params, searchParams, t }: any) {
         <div className={`min-h-screen ${isDarkMode ? 'bg-zinc-950 text-zinc-50' : 'bg-white text-zinc-900'} transition-colors`}>
             <main className="p-4 space-y-8">
                 {/* Minimal Header for Widget */}
-                <div className={`flex items-center justify-between pb-4 border-b ${isDarkMode ? 'border-zinc-800' : 'border-zinc-100'} transition-colors`}>
-                    <div>
-                        <h1 className="text-xl font-black tracking-tight">{board.name}</h1>
-                        <p className={`text-xs font-medium tracking-tight opacity-70 ${isDarkMode ? 'text-zinc-400' : ''}`}>{t.widget_page.vote_or_add}{board.name}?</p>
+                {widgetVersion !== 'lite' && (
+                    <div className={`flex items-center justify-between pb-4 border-b ${isDarkMode ? 'border-zinc-800' : 'border-zinc-100'} transition-colors`}>
+                        <div>
+                            <h1 className="text-xl font-black tracking-tight">{board.name}</h1>
+                            <p className={`text-xs font-medium tracking-tight opacity-70 ${isDarkMode ? 'text-zinc-400' : ''}`}>{t.widget_page.vote_or_add}{board.name}?</p>
+                        </div>
                     </div>
-                </div>
+                )}
 
                 {/* Form at Top for Widget to save space */}
                 <section className={`${isDarkMode ? 'bg-zinc-900 border-zinc-800' : 'bg-zinc-50/50 border-zinc-100'} border p-6 rounded-2xl transition-colors`}>
-                    <h2 className="text-sm font-bold tracking-tight mb-4 flex items-center gap-2">
-                        <span>💡</span> {t.widget_page.suggest}
-                    </h2>
+                    {widgetVersion !== 'lite' && (
+                        <h2 className="text-sm font-bold tracking-tight mb-4 flex items-center gap-2">
+                            <span>💡</span> {t.widget_page.suggest}
+                        </h2>
+                    )}
                     <SubmitIdeaForm
                         boardId={board.id}
                         boardSlug={board.slug}
@@ -94,6 +100,7 @@ async function FormContent({ params, searchParams, t }: any) {
                         isDarkMode={isDarkMode}
                         dict={t.submit_idea_form}
                         imageDict={t.image_upload}
+                        widgetVersion={widgetVersion}
                         tags={board.tags}
                         isBoardPremium={true} // Si hemos pasado el guard anterior, es premium
                     />

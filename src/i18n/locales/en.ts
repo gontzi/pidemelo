@@ -133,7 +133,10 @@ export default {
         "mobile_view": "Mobile View",
         "language": "Widget Language",
         "spanish": "Spanish",
-        "english": "English"
+        "english": "English",
+        "widget_version": "Widget Version",
+        "version_normal": "Normal",
+        "version_lite": "Lite / Mini"
     },
     "billing_page": {
         "title_thanks": "Thank you for",

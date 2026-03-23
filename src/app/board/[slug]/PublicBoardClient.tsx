@@ -21,6 +21,7 @@ export default function PublicBoardClient({
     accentColor = "#FF5C00",
     textColor = "#18181b",
     isDarkMode = false,
+    widgetVersion = 'normal',
     dict
 }: {
     initialIdeas: Idea[],
@@ -28,6 +29,7 @@ export default function PublicBoardClient({
     accentColor?: string,
     textColor?: string,
     isDarkMode?: boolean,
+    widgetVersion?: 'normal' | 'lite',
     dict: Record<string, string>
 }) {
     const [searchQuery, setSearchQuery] = useState('');
@@ -63,7 +65,8 @@ export default function PublicBoardClient({
     return (
         <section className="space-y-6" style={{ color: isDarkMode ? '#f4f4f5' : textColor }}>
             {/* Cabecera con título y filtros */}
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+            {widgetVersion !== 'lite' && (
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <h2 className="font-[family-name:var(--font-jakarta)] text-2xl font-bold tracking-tight inline-flex items-center gap-2" style={{ color: isDarkMode ? '#f4f4f5' : textColor }}>
                     {dict.showing} <span>🔥</span>
                 </h2>
@@ -121,7 +124,8 @@ export default function PublicBoardClient({
                         )}
                     </div>
                 </div>
-            </div>
+                </div>
+            )}
 
             {/* Lista de ideas */}
             <div className="space-y-3 md:space-y-4">
@@ -148,14 +152,14 @@ export default function PublicBoardClient({
                                 <h3 className="font-[family-name:var(--font-jakarta)] text-lg md:text-xl font-bold tracking-tight truncate leading-tight" style={{ color: isDarkMode ? '#f4f4f5' : textColor }}>
                                     {idea.title}
                                 </h3>
-                                {idea.status !== 'pending' && (
+                                {idea.status !== 'pending' && widgetVersion !== 'lite' && (
                                     <span className={`w-fit px-2 md:px-3 py-0.5 md:py-1 rounded-full text-[9px] md:text-[11px] uppercase font-black md:font-bold tracking-wider 
                                         ${idea.status === 'done' ? 'bg-green-100 text-green-700 border border-green-200' :
                                             idea.status === 'planned' ? 'bg-amber-100 text-amber-700 border border-amber-200' : ''}`}>
                                         {idea.status === 'done' ? dict.tag_done : dict.tag_planned}
                                     </span>
                                 )}
-                                {idea.tag && (
+                                {idea.tag && widgetVersion !== 'lite' && (
                                     <span
                                         className="w-fit flex items-center gap-1.5 px-2 md:px-3 py-0.5 md:py-1 rounded-full text-[9px] md:text-[11px] uppercase font-black tracking-wider border border-zinc-200 bg-white"
                                     >
@@ -164,10 +168,10 @@ export default function PublicBoardClient({
                                     </span>
                                 )}
                             </div>
-                            <p className="font-medium text-xs md:text-base leading-relaxed whitespace-pre-wrap line-clamp-2 md:line-clamp-3 opacity-80" style={{ color: isDarkMode ? '#d4d4d8' : textColor }}>
+                            <p className={`font-medium text-xs md:text-base leading-relaxed whitespace-pre-wrap ${widgetVersion === 'lite' ? 'line-clamp-1 opacity-60' : 'line-clamp-2 md:line-clamp-3 opacity-80'}`} style={{ color: isDarkMode ? '#d4d4d8' : textColor }}>
                                 {idea.description}
                             </p>
-                            {idea.imageUrl && (
+                            {idea.imageUrl && widgetVersion !== 'lite' && (
                                 <ImageLightbox
                                     src={idea.imageUrl}
                                     alt={idea.title}

@@ -15,9 +15,10 @@ export default async function WidgetBoardPage({
     searchParams
 }: {
     params: { slug: string },
-    searchParams: { color?: string, textColor?: string, darkMode?: string, lang?: string }
+    searchParams: { color?: string, textColor?: string, darkMode?: string, lang?: string, version?: string }
 }) {
     const lang = (searchParams.lang === 'en' || searchParams.lang === 'es') ? searchParams.lang : 'es';
+    const widgetVersion = searchParams.version === 'lite' ? 'lite' : 'normal';
     const t = await getDictionary(lang);
 
     return (
@@ -33,6 +34,7 @@ async function BoardContent({ params, searchParams, t }: any) {
     const accentColor = searchParams.color ? decodeURIComponent(searchParams.color) : "#FF5C00";
     const textColor = searchParams.textColor ? decodeURIComponent(searchParams.textColor) : "#18181b";
     const isDarkMode = searchParams.darkMode === 'true';
+    const widgetVersion = searchParams.version === 'lite' ? 'lite' : 'normal';
 
     const board = await db.query.boards.findFirst({
         where: eq(boards.slug, params.slug),
@@ -85,6 +87,7 @@ async function BoardContent({ params, searchParams, t }: any) {
                     accentColor={accentColor}
                     textColor={textColor}
                     isDarkMode={isDarkMode}
+                    widgetVersion={widgetVersion}
                     dict={t.public_board_client}
                 />
             </div>

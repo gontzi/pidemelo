@@ -20,7 +20,8 @@ export default function SubmitIdeaForm({
     imageDict,
     tags,
     isBoardPremium = false,
-    isCurrentUserAdmin = false
+    isCurrentUserAdmin = false,
+    widgetVersion = 'normal'
 }: {
     boardId: string,
     boardSlug: string,
@@ -31,7 +32,8 @@ export default function SubmitIdeaForm({
     imageDict: any,
     tags?: Tag[],
     isBoardPremium?: boolean,
-    isCurrentUserAdmin?: boolean
+    isCurrentUserAdmin?: boolean,
+    widgetVersion?: 'normal' | 'lite'
 }) {
     const [isPending, setIsPending] = useState(false);
     const [error, setError] = useState<string | null>(null);

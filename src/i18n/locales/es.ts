@@ -133,7 +133,10 @@ export default {
         "mobile_view": "Vista Móvil",
         "language": "Idioma del Widget",
         "spanish": "Español",
-        "english": "Inglés"
+        "english": "Inglés",
+        "widget_version": "Versión del Widget",
+        "version_normal": "Normal",
+        "version_lite": "Lite / Mini"
     },
     "billing_page": {
         "title_thanks": "¡Gracias por",
