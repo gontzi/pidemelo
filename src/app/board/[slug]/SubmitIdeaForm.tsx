@@ -97,7 +97,7 @@ export default function SubmitIdeaForm({
                         onClick={() => setDropdownOpen(p => !p)}
                         style={{
                             borderColor: dropdownOpen ? accentColor : (isDarkMode ? '#27272a' : '#e4e4e7'),
-                            color: isDarkMode ? '#f4f4f5' : textColor,
+                            color: isDarkMode ? '#f4f4f5' : '#18181b',
                             backgroundColor: isDarkMode ? '#18181b' : '#FAFAFA'
                         }}
                         className="w-full h-12 md:h-14 pl-4 pr-10 rounded-2xl border text-base md:text-sm font-medium focus:outline-none transition-all cursor-pointer shadow-sm flex items-center gap-2 relative"
@@ -136,7 +136,7 @@ export default function SubmitIdeaForm({
                                             key={t.id}
                                             type="button"
                                             onClick={() => { setSelectedTagId(t.id); setDropdownOpen(false); }}
-                                            style={{ color: isDarkMode ? '#f4f4f5' : textColor }}
+                                            style={{ color: isDarkMode ? '#f4f4f5' : '#18181b' }}
                                             className={`w-full flex items-center gap-2 px-4 py-3 text-sm font-bold transition-colors ${isDarkMode ? 'hover:bg-zinc-800/50' : 'hover:bg-zinc-50'}`}
                                         >
                                             <span className="w-3 h-3 rounded-full border border-black/10 flex-shrink-0" style={{ backgroundColor: t.color }} />
