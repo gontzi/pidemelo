@@ -49,7 +49,7 @@ export default function ProjectCard({ board, dict, settingsDict, isPremium }: Pr
     return (
         <ContextMenu>
             <ContextMenuTrigger asChild>
-                <div className="bg-white border border-zinc-200/60 rounded-[2.5rem] p-8 md:p-10 transition-all duration-300 hover:border-[#FF5C00]/20 hover:shadow-xl hover:shadow-zinc-200/40 group flex flex-col min-h-[240px] md:h-[320px] relative overflow-hidden">
+                <div className="bg-white border border-zinc-200/60 rounded-[2.5rem] p-8 md:p-10 transition-all duration-300 hover:border-[#FF5C00]/20 hover:shadow-xl hover:shadow-zinc-200/40 group flex flex-col min-h-[240px] md:min-h-[320px] relative overflow-hidden">
                     <div className="flex-1">
                         <div className="space-y-1 mb-6">
                             <p className="text-[10px] uppercase tracking-[0.2em] font-black text-zinc-400">{dict.project}</p>
@@ -68,7 +68,10 @@ export default function ProjectCard({ board, dict, settingsDict, isPremium }: Pr
                             ))}
                         </div>
 
-                        <div className="hidden md:flex items-center gap-1 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-300">
+                        </div>
+
+                    <div className="hidden md:flex items-center justify-between mb-6 transition-opacity duration-300">
+                        <div className="flex items-center gap-1">
                             <button
                                 onClick={handleCopy}
                                 title={dict.copy_link}
@@ -85,25 +88,25 @@ export default function ProjectCard({ board, dict, settingsDict, isPremium }: Pr
                             >
                                 <ExternalLink className="w-5 h-5" />
                             </Link>
-
-                            <SettingsModal
-                                boardId={board.id}
-                                currentName={board.name}
-                                currentSlug={board.slug}
-                                dict={settingsDict}
-                                tags={board.tags}
-                                isPremium={isPremium}
-                                notifyNewIdeas={board.notifyNewIdeas}
-                                trigger={
-                                    <button
-                                        title={dict.settings_tooltip}
-                                        className="p-3 rounded-2xl text-zinc-400 hover:text-[#FF5C00] hover:bg-orange-50 transition-all active:scale-95"
-                                    >
-                                        <Settings className="w-5 h-5" />
-                                    </button>
-                                }
-                            />
                         </div>
+
+                        <SettingsModal
+                            boardId={board.id}
+                            currentName={board.name}
+                            currentSlug={board.slug}
+                            dict={settingsDict}
+                            tags={board.tags}
+                            isPremium={isPremium}
+                            notifyNewIdeas={board.notifyNewIdeas}
+                            trigger={
+                                <button
+                                    title={dict.settings_tooltip}
+                                    className="p-3 rounded-2xl text-zinc-400 hover:text-[#FF5C00] hover:bg-orange-50 transition-all active:scale-95"
+                                >
+                                    <Settings className="w-5 h-5" />
+                                </button>
+                            }
+                        />
                     </div>
 
                     <div className="pt-6 border-t border-zinc-50 flex items-center justify-between">
