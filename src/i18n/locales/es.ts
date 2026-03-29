@@ -52,19 +52,23 @@ export default {
         "unlimited_projects": "♾️ Proyectos ilimitados",
         "projects_used": " Proyectos usados",
         "my_boards": "Mis Tableros",
+        "my_boards_subtitle": "Gestiona tus tablones de sugerencias y conecta con tu comunidad.",
         "upgrade_pro": "⚡ Subir a Pro para crear más",
         "new_board": "Nuevo Chiringuito",
         "project_name_ph": "Nombre del proyecto...",
         "create_btn": "CREAR 🚀",
         "empty_title": "Tu imperio de feedback empieza aquí. No lo dejes vacío. 👇",
-        "empty_subtitle": "Crea tu primer tablero arriba"
+        "empty_subtitle": "Crea tu primer tablero arriba",
+        "create_first_btn": "Crea tu primer tablón"
     },
     "project_card": {
         "project": "Proyecto",
         "copy_link": "Copiar enlace público",
         "view_public": "Ver página pública",
         "settings_tooltip": "Ajustes y configuración",
-        "manage": "GESTIONAR"
+        "manage": "GESTIONAR",
+        "ideas": "IDEA(S)",
+        "no_tags": "SIN ETIQUETAS"
     },
     "board_details": {
         "back_to_dashboard": "Volver al dashboard",

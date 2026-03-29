@@ -52,19 +52,23 @@ export default {
         "unlimited_projects": "♾️ Unlimited projects",
         "projects_used": " Projects used",
         "my_boards": "My Boards",
+        "my_boards_subtitle": "Manage your suggestion boards and connect with your community.",
         "upgrade_pro": "⚡ Upgrade to Pro to create more",
         "new_board": "New Shack",
         "project_name_ph": "Project name...",
         "create_btn": "CREATE 🚀",
         "empty_title": "Your feedback empire starts here. Don't leave it empty. 👇",
-        "empty_subtitle": "Create your first board above"
+        "empty_subtitle": "Create your first board above",
+        "create_first_btn": "Create your first board"
     },
     "project_card": {
         "project": "Project",
         "copy_link": "Copy public link",
         "view_public": "View public page",
         "settings_tooltip": "Settings and config",
-        "manage": "MANAGE"
+        "manage": "MANAGE",
+        "ideas": "IDEA(S)",
+        "no_tags": "NO TAGS"
     },
     "board_details": {
         "back_to_dashboard": "Back to dashboard",
