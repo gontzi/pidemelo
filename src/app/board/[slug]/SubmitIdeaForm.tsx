@@ -4,7 +4,7 @@ import { useState, useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { submitIdea } from './actions';
-import { ChevronDown, X } from 'lucide-react';
+import { ChevronDown, X, Check } from 'lucide-react';
 import ImageUploadDropzone from '@/components/ImageUploadDropzone';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
@@ -95,23 +95,37 @@ export default function SubmitIdeaForm({
             {/* Full-screen animations (only really show over the widget since widget is an iframe) */}
             {(showSuccess || showError) && (
                 <div 
-                    className="fixed inset-0 z-[200] flex flex-col items-center justify-center animate-in fade-in zoom-in-95 duration-500" 
+                    className="fixed inset-0 z-[200] flex flex-col items-center justify-center animate-in fade-in duration-500 overflow-hidden" 
                     style={{ 
-                        backgroundColor: showSuccess ? accentColor : (isDarkMode ? '#7f1d1d' : '#fef2f2'),
-                        color: showSuccess ? '#ffffff' : (isDarkMode ? '#fca5a5' : '#dc2626')
+                        backgroundColor: showSuccess ? accentColor : (isDarkMode ? '#09090b' : '#ffffff')
                     }}
                 >
+                    {showSuccess && (
+                         <div className="absolute inset-0 opacity-30 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-white/40 via-transparent to-transparent pointer-events-none" />
+                    )}
                     {showSuccess ? (
-                        <div className="flex flex-col items-center text-center px-4 animate-bounce">
-                            <span className="text-6xl mb-4">🚀</span>
-                            <h3 className="text-2xl font-black mb-2" style={{ color: '#ffffff' }}>¡Enviado!</h3>
-                            <p className="text-sm font-medium opacity-90" style={{ color: '#ffffff' }}>Tu idea está en camino a las estrellas.</p>
+                        <div className="flex flex-col items-center text-center px-6 animate-in slide-in-from-bottom-8 duration-700 ease-out relative z-10 w-full max-w-sm mx-auto">
+                            <div className="w-16 h-16 mb-6 rounded-full bg-white/20 flex items-center justify-center backdrop-blur-md shadow-[0_8px_30px_rgb(0,0,0,0.12)] border border-white/30">
+                                <Check className="w-8 h-8 text-white stroke-[3] animate-in zoom-in duration-500 delay-150" />
+                            </div>
+                            <h3 className="font-[family-name:var(--font-jakarta)] text-2xl md:text-3xl font-extrabold tracking-tight mb-2 text-white drop-shadow-sm w-full text-balance">
+                                {dict.success_title || '¡Idea recibida!'}
+                            </h3>
+                            <p className="text-sm md:text-base font-medium text-white/90 max-w-[260px] mx-auto leading-relaxed text-balance">
+                                {dict.success_desc || 'Ya está guardada. Ojalá llegue muy lejos.'}
+                            </p>
                         </div>
                     ) : (
-                        <div className="flex flex-col items-center text-center px-4 animate-pulse">
-                            <X className="w-16 h-16 mb-4" />
-                            <h3 className="text-2xl font-black mb-2">Ups, algo falló</h3>
-                            <p className="text-sm font-medium opacity-90">{error}</p>
+                        <div className="flex flex-col items-center text-center px-6 animate-in zoom-in-95 duration-500 relative z-10 w-full max-w-sm mx-auto">
+                            <div className="w-16 h-16 mb-6 rounded-[2rem] bg-red-100 flex items-center justify-center shadow-sm border border-red-200">
+                                <X className="w-8 h-8 text-red-600 stroke-[3]" />
+                            </div>
+                            <h3 className={`font-[family-name:var(--font-jakarta)] text-2xl font-extrabold tracking-tight mb-2 text-balance ${isDarkMode ? 'text-zinc-50' : 'text-zinc-900'}`}>
+                                Ups, algo falló
+                            </h3>
+                            <p className="text-sm font-medium opacity-80 max-w-[260px] mx-auto text-balance" style={{ color: isDarkMode ? '#a1a1aa' : '#52525b' }}>
+                                {error}
+                            </p>
                         </div>
                     )}
                 </div>
