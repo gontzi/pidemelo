@@ -37,6 +37,8 @@ export default function SubmitIdeaForm({
 }) {
     const [isPending, setIsPending] = useState(false);
     const [error, setError] = useState<string | null>(null);
+    const [showSuccess, setShowSuccess] = useState(false);
+    const [showError, setShowError] = useState(false);
     const [selectedTagId, setSelectedTagId] = useState<string | null>(null);
     const [uploadedImageUrl, setUploadedImageUrl] = useState<string | null>(null);
     const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -56,6 +58,7 @@ export default function SubmitIdeaForm({
     async function handleSubmit(formData: FormData) {
         setIsPending(true);
         setError(null);
+        setShowError(false);
 
         if (uploadedImageUrl) {
             formData.append('imageUrl', uploadedImageUrl);
@@ -65,10 +68,14 @@ export default function SubmitIdeaForm({
             const res = await submitIdea(boardId, boardSlug, formData);
             if (res && res.error) {
                 setError(res.error);
+                setShowError(true);
+                setTimeout(() => setShowError(false), 3000);
             } else {
                 formRef.current?.reset();
                 setSelectedTagId(null);
                 setUploadedImageUrl(null);
+                setShowSuccess(true);
+                setTimeout(() => setShowSuccess(false), 3000);
             }
         } catch (err: unknown) {
             if (err instanceof Error) {
@@ -76,13 +83,39 @@ export default function SubmitIdeaForm({
             } else {
                 setError(dict.error_fallback);
             }
+            setShowError(true);
+            setTimeout(() => setShowError(false), 3000);
         } finally {
             setIsPending(false);
         }
     }
 
     return (
-        <form ref={formRef} action={handleSubmit} className="space-y-4">
+        <form ref={formRef} action={handleSubmit} className="space-y-4 relative">
+            {/* Full-screen animations (only really show over the widget since widget is an iframe) */}
+            {(showSuccess || showError) && (
+                <div 
+                    className="fixed inset-0 z-[200] flex flex-col items-center justify-center animate-in fade-in zoom-in-95 duration-500" 
+                    style={{ 
+                        backgroundColor: showSuccess ? accentColor : (isDarkMode ? '#7f1d1d' : '#fef2f2'),
+                        color: showSuccess ? '#ffffff' : (isDarkMode ? '#fca5a5' : '#dc2626')
+                    }}
+                >
+                    {showSuccess ? (
+                        <div className="flex flex-col items-center text-center px-4 animate-bounce">
+                            <span className="text-6xl mb-4">🚀</span>
+                            <h3 className="text-2xl font-black mb-2" style={{ color: '#ffffff' }}>¡Enviado!</h3>
+                            <p className="text-sm font-medium opacity-90" style={{ color: '#ffffff' }}>Tu idea está en camino a las estrellas.</p>
+                        </div>
+                    ) : (
+                        <div className="flex flex-col items-center text-center px-4 animate-pulse">
+                            <X className="w-16 h-16 mb-4" />
+                            <h3 className="text-2xl font-black mb-2">Ups, algo falló</h3>
+                            <p className="text-sm font-medium opacity-90">{error}</p>
+                        </div>
+                    )}
+                </div>
+            )}
             <div>
                 <Input
                     name="title"

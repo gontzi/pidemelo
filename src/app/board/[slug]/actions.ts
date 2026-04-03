@@ -9,8 +9,6 @@ import { v4 as uuidv4 } from 'uuid';
 import { Resend } from 'resend';
 import { auth } from '@clerk/nextjs/server';
 
-const resend = new Resend(process.env.RESEND_API_KEY);
-
 function getFingerprint() {
     const cookieStore = cookies();
     let fingerprint = cookieStore.get('voter-id')?.value;
@@ -184,12 +182,17 @@ export async function submitIdea(boardId: string, slug: string, formData: FormDa
                     </div>`;
                 }
 
-                await resend.emails.send({
-                    from: 'Pídemelo <hola@pidemelo.app>',
-                    to: ownerEmail,
-                    subject,
-                    html,
-                });
+                if (process.env.RESEND_API_KEY) {
+                    const resend = new Resend(process.env.RESEND_API_KEY);
+                    await resend.emails.send({
+                        from: 'Pídemelo <hola@pidemelo.app>',
+                        to: ownerEmail,
+                        subject,
+                        html,
+                    });
+                } else {
+                    console.log("Aviso: No hay RESEND_API_KEY configurada. Notificación por email saltada.");
+                }
             }
         } catch (emailError) {
             // Manejamos silenciosamente el error para que la idea se registre igual sin fallar en el front
