@@ -63,11 +63,11 @@ export default function PublicBoardClient({
     });
 
     return (
-        <section className="space-y-6" style={{ color: isDarkMode ? '#f4f4f5' : textColor }}>
+        <section className="space-y-6" style={{ color: isDarkMode ? '#f4f4f5' : '#18181b' }}>
             {/* Cabecera con título y filtros */}
             {widgetVersion !== 'lite' && (
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                <h2 className="font-[family-name:var(--font-jakarta)] text-2xl font-bold tracking-tight inline-flex items-center gap-2" style={{ color: isDarkMode ? '#f4f4f5' : textColor }}>
+                <h2 className="font-[family-name:var(--font-jakarta)] text-2xl font-bold tracking-tight inline-flex items-center gap-2" style={{ color: isDarkMode ? '#f4f4f5' : '#18181b' }}>
                     {dict.showing} <span>🔥</span>
                 </h2>
 
@@ -82,7 +82,7 @@ export default function PublicBoardClient({
                             style={{
                                 outlineColor: accentColor,
                                 boxShadow: `0 0 0 2px ${accentColor}10`,
-                                color: isDarkMode ? '#f4f4f5' : textColor
+                                color: isDarkMode ? '#f4f4f5' : '#18181b'
                             } as React.CSSProperties}
                             className={`h-11 pl-9 pr-4 rounded-2xl border ${isDarkMode ? 'border-zinc-800 bg-zinc-900 placeholder:text-zinc-600 focus-visible:bg-zinc-800' : 'border-zinc-200 bg-[#FAFAFA] focus-visible:bg-white'} text-sm font-medium focus:outline-none transition-colors w-full sm:w-64 shadow-sm`}
                         />
@@ -92,7 +92,7 @@ export default function PublicBoardClient({
                         <button
                             type="button"
                             onClick={() => setDropdownOpen(p => !p)}
-                            style={{ borderColor: dropdownOpen ? accentColor : (isDarkMode ? '#27272a' : undefined), color: isDarkMode ? '#f4f4f5' : textColor, backgroundColor: isDarkMode ? '#18181b' : '#FAFAFA' } as React.CSSProperties}
+                            style={{ borderColor: dropdownOpen ? accentColor : (isDarkMode ? '#27272a' : undefined), color: isDarkMode ? '#f4f4f5' : '#18181b', backgroundColor: isDarkMode ? '#18181b' : '#FAFAFA' } as React.CSSProperties}
                             className={`h-11 pl-4 pr-10 rounded-2xl border ${isDarkMode ? 'border-zinc-800 hover:border-zinc-700 hover:bg-zinc-900' : 'border-zinc-200 hover:border-zinc-300 hover:bg-white'} text-sm font-bold focus:outline-none transition-all cursor-pointer shadow-sm flex items-center gap-2 min-w-[160px] relative`}
                         >
                             <span>{filterOptions.find(o => o.value === statusFilter)?.emoji}</span>
@@ -111,7 +111,7 @@ export default function PublicBoardClient({
                                             key={option.value}
                                             type="button"
                                             onClick={() => { setStatusFilter(option.value); setDropdownOpen(false); }}
-                                            style={isActive ? { color: accentColor, backgroundColor: `${accentColor}10` } : { color: isDarkMode ? '#f4f4f5' : textColor }}
+                                            style={isActive ? { color: accentColor, backgroundColor: `${accentColor}10` } : { color: isDarkMode ? '#f4f4f5' : '#18181b' }}
                                             className={`w-full flex items-center gap-3 px-4 py-2.5 text-sm font-bold ${isDarkMode ? 'hover:bg-zinc-800/50' : 'hover:bg-zinc-50'} transition-colors text-left`}
                                         >
                                             <span>{option.emoji}</span>
@@ -149,7 +149,7 @@ export default function PublicBoardClient({
 
                         <div className="flex-1 min-w-0 flex flex-col justify-center">
                             <div className="flex flex-col sm:flex-row sm:items-center gap-1.5 md:gap-3 mb-1.5 md:mb-2 text-left">
-                                <h3 className="font-[family-name:var(--font-jakarta)] text-lg md:text-xl font-bold tracking-tight truncate leading-tight" style={{ color: isDarkMode ? '#f4f4f5' : textColor }}>
+                                <h3 className="font-[family-name:var(--font-jakarta)] text-lg md:text-xl font-bold tracking-tight truncate leading-tight" style={{ color: isDarkMode ? '#f4f4f5' : '#18181b' }}>
                                     {idea.title}
                                 </h3>
                                 {idea.status !== 'pending' && widgetVersion !== 'lite' && (
@@ -168,7 +168,7 @@ export default function PublicBoardClient({
                                     </span>
                                 )}
                             </div>
-                            <p className={`font-medium text-xs md:text-base leading-relaxed whitespace-pre-wrap ${widgetVersion === 'lite' ? 'line-clamp-1 opacity-60' : 'line-clamp-2 md:line-clamp-3 opacity-80'}`} style={{ color: isDarkMode ? '#d4d4d8' : textColor }}>
+                            <p className={`font-medium text-xs md:text-base leading-relaxed whitespace-pre-wrap ${widgetVersion === 'lite' ? 'line-clamp-1 opacity-60' : 'line-clamp-2 md:line-clamp-3 opacity-80'}`} style={{ color: isDarkMode ? '#d4d4d8' : '#18181b' }}>
                                 {idea.description}
                             </p>
                             {idea.imageUrl && widgetVersion !== 'lite' && (
@@ -185,8 +185,8 @@ export default function PublicBoardClient({
                 {filteredIdeas.length === 0 && (
                     <div className={`p-16 text-center border-2 rounded-3xl border-dashed ${isDarkMode ? 'bg-zinc-900/50 border-zinc-800' : 'bg-white border-zinc-200'}`}>
                         <span className="text-4xl block mb-4">👀</span>
-                        <p className="font-bold text-lg" style={{ color: isDarkMode ? '#f4f4f5' : textColor }}>{dict.empty_title}</p>
-                        <p className="font-medium mt-1 opacity-60" style={{ color: isDarkMode ? '#d4d4d8' : textColor }}>{dict.empty_desc}</p>
+                        <p className="font-bold text-lg" style={{ color: isDarkMode ? '#f4f4f5' : '#18181b' }}>{dict.empty_title}</p>
+                        <p className="font-medium mt-1 opacity-60" style={{ color: isDarkMode ? '#d4d4d8' : '#18181b' }}>{dict.empty_desc}</p>
                     </div>
                 )}
             </div>
