@@ -99,7 +99,7 @@ export default async function PublicBoardPage({ params }: { params: { slug: stri
             </header>
 
             <main className="max-w-5xl mx-auto px-4 md:px-6">
-                <div className="flex flex-col md:grid md:grid-cols-[1fr_340px] gap-6 md:gap-10 items-start">
+                <div className="flex flex-col lg:grid lg:grid-cols-[1fr_340px] gap-6 lg:gap-10 items-start">
 
                     {/* Left Col: Feed */}
                     <PublicBoardClient
@@ -115,7 +115,7 @@ export default async function PublicBoardPage({ params }: { params: { slug: stri
                     />
 
                     {/* Right Col / Mobile Bottom: Formulario */}
-                    <aside className="md:sticky md:top-20 bg-white border border-zinc-200 p-6 md:p-8 rounded-2xl md:rounded-3xl shadow-lg shadow-zinc-200/40 w-full order-first md:order-last">
+                    <aside className="lg:sticky lg:top-20 bg-white border border-zinc-200 p-6 md:p-8 rounded-2xl md:rounded-3xl shadow-lg shadow-zinc-200/40 w-full order-first lg:order-last">
                         <h2 className="font-heading text-lg md:text-xl font-bold tracking-tight mb-1">{t.public_board_page.form_title}</h2>
                         <p className="text-zinc-500 font-medium text-sm mb-5">{t.public_board_page.form_desc}</p>
                         <SubmitIdeaForm

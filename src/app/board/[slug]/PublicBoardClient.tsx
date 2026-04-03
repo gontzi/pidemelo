@@ -71,7 +71,7 @@ export default function PublicBoardClient({
                     {dict.showing} <span>🔥</span>
                 </h2>
 
-                <div className="flex flex-col sm:flex-row gap-3">
+                <div className="flex flex-col sm:flex-row flex-wrap gap-3">
                     <div className="relative">
                         <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400" />
                         <input
@@ -148,7 +148,7 @@ export default function PublicBoardClient({
                         </form>
 
                         <div className="flex-1 min-w-0 flex flex-col justify-center">
-                            <div className="flex flex-col sm:flex-row sm:items-center gap-1.5 md:gap-3 mb-1.5 md:mb-2 text-left">
+                            <div className="flex flex-col sm:flex-row sm:items-center flex-wrap gap-1.5 md:gap-3 mb-1.5 md:mb-2 text-left min-w-0">
                                 <h3 className="font-[family-name:var(--font-jakarta)] text-lg md:text-xl font-bold tracking-tight truncate leading-tight" style={{ color: isDarkMode ? '#f4f4f5' : '#18181b' }}>
                                     {idea.title}
                                 </h3>
@@ -168,7 +168,7 @@ export default function PublicBoardClient({
                                     </span>
                                 )}
                             </div>
-                            <p className={`font-medium text-xs md:text-base leading-relaxed whitespace-pre-wrap ${widgetVersion === 'lite' ? 'line-clamp-1 opacity-60' : 'line-clamp-2 md:line-clamp-3 opacity-80'}`} style={{ color: isDarkMode ? '#d4d4d8' : '#18181b' }}>
+                            <p className={`font-medium text-xs md:text-base leading-relaxed whitespace-pre-wrap break-words ${widgetVersion === 'lite' ? 'line-clamp-1 opacity-60' : 'line-clamp-2 md:line-clamp-3 opacity-80'}`} style={{ color: isDarkMode ? '#d4d4d8' : '#18181b' }}>
                                 {idea.description}
                             </p>
                             {idea.imageUrl && widgetVersion !== 'lite' && (
