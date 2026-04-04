@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import { db } from "@/db";
 import { boards, ideas } from "@/db/schema";
-import { eq, desc } from "drizzle-orm";
+import { eq, desc, ne } from "drizzle-orm";
 import { notFound } from "next/navigation";
 import PublicBoardClient from "./PublicBoardClient";
 import SubmitIdeaForm from "./SubmitIdeaForm";
@@ -67,6 +67,7 @@ export default async function PublicBoardPage({ params }: { params: { slug: stri
             tags: true,
             user: true,
             ideas: {
+                where: ne(ideas.status, 'archivado'),
                 with: { votes: true, tag: true },
                 orderBy: [desc(ideas.createdAt)]
             }
@@ -105,7 +106,7 @@ export default async function PublicBoardPage({ params }: { params: { slug: stri
                     <PublicBoardClient
                         initialIdeas={sortedIdeas.map(i => ({
                             ...i,
-                            status: i.status as 'pending' | 'planned' | 'done',
+                            status: i.status as 'en_revision' | 'planeado' | 'en_progreso' | 'completado' | 'descartado',
                             title: i.title ?? '',
                             description: i.description ?? '',
                             imageUrl: i.imageUrl

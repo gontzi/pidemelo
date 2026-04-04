@@ -1,6 +1,6 @@
 import { db } from "@/db";
 import { boards, ideas } from "@/db/schema";
-import { eq, desc } from "drizzle-orm";
+import { eq, desc, ne } from "drizzle-orm";
 import { notFound } from "next/navigation";
 import PublicBoardClient from "../../../board/[slug]/PublicBoardClient";
 import { getDictionary } from "@/i18n";
@@ -41,6 +41,7 @@ async function BoardContent({ params, searchParams, t }: any) {
         with: {
             user: true,
             ideas: {
+                where: ne(ideas.status, 'archivado'),
                 with: { votes: true, tag: true },
                 orderBy: [desc(ideas.createdAt)]
             }
@@ -78,7 +79,7 @@ async function BoardContent({ params, searchParams, t }: any) {
                 <PublicBoardClient
                     initialIdeas={sortedIdeas.map(i => ({
                         ...i,
-                        status: i.status as 'pending' | 'planned' | 'done',
+                        status: i.status as 'en_revision' | 'planeado' | 'en_progreso' | 'completado' | 'descartado',
                         title: i.title ?? '',
                         description: i.description ?? '',
                         imageUrl: i.imageUrl
