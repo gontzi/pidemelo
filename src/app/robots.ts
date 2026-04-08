@@ -6,8 +6,15 @@ export default function robots(): MetadataRoute.Robots {
             {
                 userAgent: '*',
                 allow: '/',
-                // Bloqueamos el acceso al dashboard y a las rutas de API
-                disallow: ['/dashboard/', '/dashboard', '/api/'],
+                disallow: [
+                    '/dashboard',
+                    '/api',
+                    '/admin',
+                    '/login',
+                    '/sign-in',
+                    '/settings',
+                    '/*?_clerk_status', // Clerk callback params
+                ],
             },
             {
                 // Protegemos el contenido de rastreadores de IA para entrenamiento

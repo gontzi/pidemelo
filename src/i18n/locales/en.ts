@@ -1,4 +1,11 @@
 export default {
+    "seo": {
+        "title": "Pídemelo — Feedback and suggestion board for creators and SaaS",
+        "description": "Collect feedback from your community, manage suggestions, and publish your public roadmap effortlessly. The ultimate feedback tool.",
+        "keywords": "feedback tool, suggestion board, public roadmap, feedback management, feature requests, SaaS feedback tool, vote ideas, product roadmap",
+        "board_title": "%s | Suggestion Board",
+        "board_description": "Vote and submit your ideas for \"%s\". Let the community decide what comes next."
+    },
     "landing": {
         "tagline": "The good old bulletin board, but fancy.",
         "title_start": "Stop guessing what",

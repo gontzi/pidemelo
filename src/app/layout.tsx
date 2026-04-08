@@ -1,7 +1,10 @@
 import type { Metadata } from 'next'
-import { Outfit, Instrument_Sans, Plus_Jakarta_Sans } from 'next/font/google'
+import { Outfit, Instrument_Sans } from 'next/font/google'
 import { ClerkProvider } from '@clerk/nextjs'
 import './globals.css'
+import { getDictionary, getLocale } from '@/i18n'
+import ClientWrapper from '@/components/ClientWrapper'
+import Navbar from '@/components/Navbar'
 
 const outfit = Outfit({
   subsets: ['latin'],
@@ -12,12 +15,6 @@ const outfit = Outfit({
 const instrument = Instrument_Sans({
   subsets: ['latin'],
   variable: '--font-instrument',
-  display: 'swap',
-})
-
-const jakarta = Plus_Jakarta_Sans({
-  subsets: ['latin'],
-  variable: '--font-jakarta',
   display: 'swap',
 })
 
@@ -41,6 +38,17 @@ export const metadata: Metadata = {
   ],
   authors: [{ name: 'Gontzi', url: 'https://ka0s.site/me' }],
   creator: 'Gontzi — TuNuevoSoftware',
+  verification: {
+    google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION,
+  },
+  alternates: {
+    canonical: '/',
+    languages: {
+      es: '/?lang=es',
+      en: '/?lang=en',
+      'x-default': '/',
+    },
+  },
   openGraph: {
     type: 'website',
     locale: 'es_ES',
@@ -79,24 +87,21 @@ export const metadata: Metadata = {
   },
 }
 
-import ClientWrapper from '@/components/ClientWrapper'
-import Navbar from '@/components/Navbar'
-import { getDictionary } from '@/i18n'
-
 export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
   const t = await getDictionary();
+  const locale = await getLocale();
 
   return (
     <ClerkProvider>
-      <html lang="es">
+      <html lang={locale}>
         <head>
           <link rel="preconnect" href="https://clerk.pidemelo.app" />
         </head>
-        <body className={`${instrument.variable} ${outfit.variable} ${jakarta.variable} font-sans bg-[#FAFAFA] text-zinc-900 min-h-screen selection:bg-[#FF5C00]/20 selection:text-zinc-900`}>
+        <body className={`${instrument.variable} ${outfit.variable} font-sans bg-[#FAFAFA] text-zinc-900 min-h-screen selection:bg-[#FF5C00]/20 selection:text-zinc-900`}>
           <Navbar dict={t.navbar} />
           {children}
         </body>

@@ -1,4 +1,11 @@
 export default {
+    "seo": {
+        "title": "Pídemelo — Tablón de sugerencias para creadores y SaaS",
+        "description": "Recoge el feedback de tu comunidad, gestiona sugerencias y publica tu roadmap público sin complicaciones. La herramienta de feedback definitiva.",
+        "keywords": "feedback tool, tablón de sugerencias, roadmap público, gestión de feedback, feature requests, herramienta feedback SaaS, votar ideas, product roadmap",
+        "board_title": "%s | Tablón de sugerencias",
+        "board_description": "Vota y envía tus ideas para \"%s\". Deja que la comunidad decida qué viene después."
+    },
     "landing": {
         "tagline": "El tablón de anuncios de toda la vida, pero en fino.",
         "title_start": "Deja de adivinar qué",

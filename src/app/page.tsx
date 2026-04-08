@@ -7,23 +7,48 @@ import { getDictionary } from '@/i18n';
 import WidgetSkeleton from '@/components/WidgetSkeleton';
 import PricingWrapper from '@/components/landing/PricingWrapper';
 
+import JsonLd from '@/components/JsonLd';
+
 export const runtime = 'edge';
 export const dynamic = 'force-dynamic';
 
-export const metadata: Metadata = {
-  title: 'Tablón de feedback y sugerencias para creadores y SaaS',
-  description:
-    'Recoge el feedback de tu comunidad, gestiona sugerencias y publica tu roadmap público sin complicaciones. La herramienta de feedback definitiva para creadores y SaaS independientes.',
-  alternates: {
-    canonical: 'https://pidemelo.app',
-  },
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getDictionary();
+  return {
+    title: t.seo.title,
+    description: t.seo.description,
+    keywords: t.seo.keywords,
+    alternates: {
+      canonical: 'https://pidemelo.app',
+      languages: {
+        'es': 'https://pidemelo.app/?lang=es',
+        'en': 'https://pidemelo.app/?lang=en',
+        'x-default': 'https://pidemelo.app',
+      }
+    },
+  }
 }
 
 export default async function Home() {
   const t = await getDictionary();
 
+  const softwareSchema = {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "Pídemelo",
+    "operatingSystem": "Web",
+    "applicationCategory": "BusinessApplication",
+    "description": t.seo.description,
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "EUR"
+    }
+  };
+
   return (
     <>
+      <JsonLd schema={softwareSchema} />
       <main className="flex min-h-screen flex-col items-center justify-center px-5 py-12 text-center overflow-hidden relative pt-28 md:pt-36">
         {/* Fondo de puntitos */}
         <div className="absolute inset-0 -z-10 h-full w-full bg-[#FAFAFA] bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:16px_16px] [mask-image:radial-gradient(ellipse_50%_50%_at_50%_50%,#000_70%,transparent_100%)]"></div>

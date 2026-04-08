@@ -8,52 +8,77 @@ import SubmitIdeaForm from "./SubmitIdeaForm";
 import { getDictionary } from "@/i18n";
 import { auth } from "@clerk/nextjs/server";
 
+import JsonLd from "@/components/JsonLd";
+
 export const runtime = 'edge';
 export const dynamic = 'force-dynamic';
 
 type Props = { params: { slug: string } }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-    const board = await db.query.boards.findFirst({
-        where: eq(boards.slug, params.slug),
-    })
+    const t = await getDictionary();
+    
+    try {
+        const board = await db.query.boards.findFirst({
+            where: eq(boards.slug, params.slug),
+            with: {
+                ideas: { limit: 1 }
+            }
+        })
 
-    if (!board) {
-        return {
-            title: 'Tablero no encontrado',
+        if (!board) {
+            return {
+                title: t.not_found.title,
+                robots: { index: false }
+            }
         }
-    }
 
-    const title = `${board.name} — Tablón de sugerencias`
-    const description = `Vota y envía tus ideas para "${board.name}". Deja que la comunidad decida qué viene después.`
-    const url = `https://pidemelo.app/board/${board.slug}`
+        const hasContent = board.ideas.length > 0;
+        const title = t.seo.board_title.replace('%s', board.name);
+        const description = t.seo.board_description.replace('%s', board.name);
+        const url = `https://pidemelo.app/board/${board.slug}`
 
-    return {
-        title: board.name,
-        description,
-        alternates: {
-            canonical: url,
-        },
-        openGraph: {
-            type: 'website',
-            url,
-            title,
+        return {
+            title: board.name,
             description,
-            images: [
-                {
-                    url: '/og-image.png',
-                    width: 1200,
-                    height: 630,
-                    alt: title,
-                },
-            ],
-        },
-        twitter: {
-            card: 'summary_large_image',
-            title,
-            description,
-            images: ['/og-image.png'],
-        },
+            robots: {
+                index: hasContent,
+                follow: true,
+            },
+            alternates: {
+                canonical: url,
+                languages: {
+                    'es': `${url}?lang=es`,
+                    'en': `${url}?lang=en`,
+                    'x-default': url,
+                }
+            },
+            openGraph: {
+                type: 'website',
+                url,
+                title,
+                description,
+                images: [
+                    {
+                        url: '/og-image.png',
+                        width: 1200,
+                        height: 630,
+                        alt: title,
+                    },
+                ],
+            },
+            twitter: {
+                card: 'summary_large_image',
+                title,
+                description,
+                images: ['/og-image.png'],
+            },
+        }
+    } catch (error) {
+        return {
+            title: 'Pídemelo',
+            robots: { index: false }
+        }
     }
 }
 
@@ -80,8 +105,26 @@ export default async function PublicBoardPage({ params }: { params: { slug: stri
 
     const sortedIdeas = board.ideas.sort((a, b) => b.votes.length - a.votes.length);
 
+    const collectionSchema = {
+        "@context": "https://schema.org",
+        "@type": "CollectionPage",
+        "name": board.name,
+        "description": t.seo.board_description.replace('%s', board.name),
+        "url": `https://pidemelo.app/board/${board.slug}`,
+        "mainEntity": {
+            "@type": "ItemList",
+            "itemListElement": sortedIdeas.slice(0, 10).map((idea, index) => ({
+                "@type": "ListItem",
+                "position": index + 1,
+                "name": idea.title,
+                "description": idea.description
+            }))
+        }
+    };
+
     return (
         <div className="min-h-screen pb-16 md:pb-24">
+            <JsonLd schema={collectionSchema} />
 
             {/* Header */}
             <header className="bg-white border-b border-zinc-200 py-10 md:py-16 mb-6 md:mb-10 shadow-sm">
