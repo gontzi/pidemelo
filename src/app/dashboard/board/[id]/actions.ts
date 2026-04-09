@@ -46,7 +46,7 @@ export async function updateBoardNotificationPreference(boardId: string, notify:
     return { success: true };
 }
 
-export async function updateIdeaStatus(ideaId: string, newStatus: 'pending' | 'planned' | 'done', boardId: string) {
+export async function updateIdeaStatus(ideaId: string, newStatus: 'en_revision' | 'planeado' | 'en_progreso' | 'completado' | 'descartado' | 'archivado', boardId: string) {
     const { userId } = auth();
     if (!userId) return { error: "Unauthorized" };
 

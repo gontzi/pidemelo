@@ -99,8 +99,9 @@ export default {
         "changed_my_mind": "I changed my mind"
     },
     "board_client": {
-        "col_pending": "🤔 Pending",
+        "col_pending": "🤔 Under Review",
         "col_planned": "🏗️ Planned",
+        "col_in_progress": "⚙️ In Progress",
         "col_done": "✅ Done",
         "delete_idea_title": "Delete this request?",
         "delete_idea_desc": "This action cannot be undone and accumulated votes will be lost forever.",
@@ -213,10 +214,14 @@ export default {
         "showing": "Showing",
         "search_placeholder": "Search requests...",
         "filter_all": "All statuses",
-        "filter_pending": "Pending",
+        "filter_pending": "Under Review",
         "filter_planned": "Planned",
+        "filter_in_progress": "In Progress",
         "filter_done": "Done",
+        "filter_discarded": "Discarded",
         "tag_planned": "Planned",
+        "tag_in_progress": "In Progress",
+        "tag_discarded": "Discarded",
         "tag_done": "Done",
         "empty_title": "We couldn't find anything.",
         "empty_desc": "Try with other filters or be the first to propose it."

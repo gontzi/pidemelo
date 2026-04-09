@@ -1,6 +1,6 @@
 import { pgTable, text, timestamp, uuid, pgEnum, boolean } from "drizzle-orm/pg-core";
 
-export const statusEnum = pgEnum('status', ['pending', 'planned', 'done']);
+export const statusEnum = pgEnum('status', ['en_revision', 'planeado', 'en_progreso', 'completado', 'descartado', 'archivado']);
 
 export const users = pgTable('users', {
     id: text('id').primaryKey(), // Clerk User ID
@@ -37,7 +37,7 @@ export const ideas = pgTable('ideas', {
     tagId: uuid('tag_id').references(() => tags.id, { onDelete: 'set null' }),
     title: text('title').notNull(),
     description: text('description').notNull(),
-    status: statusEnum('status').default('pending').notNull(),
+    status: statusEnum('status').default('en_revision').notNull(),
     authorFingerprint: text('author_fingerprint').default('').notNull(),
     imageUrl: text('image_url'),
     createdAt: timestamp('created_at').defaultNow().notNull(),

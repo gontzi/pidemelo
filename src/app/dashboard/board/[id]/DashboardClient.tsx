@@ -2,7 +2,7 @@
 
 import { DragDropContext, Droppable, Draggable, DropResult } from '@hello-pangea/dnd';
 import { updateIdeaStatus, deleteIdea } from './actions';
-import { Trash2, GripVertical, AlertTriangle, X, ChevronUp } from 'lucide-react';
+import { Trash2, GripVertical, AlertTriangle, X, ChevronUp, Archive, MoreVertical, ArchiveX, Reply } from 'lucide-react';
 import { useTransition, useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { cn } from "@/lib/utils";
@@ -21,29 +21,30 @@ import {
     ContextMenuTrigger,
     ContextMenuSeparator,
 } from "@/components/ui/context-menu";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 type Idea = {
     id: string;
     title: string;
     description: string;
     imageUrl?: string | null;
-    status: 'pending' | 'planned' | 'done';
+    status: 'en_revision' | 'planeado' | 'en_progreso' | 'completado' | 'descartado' | 'archivado';
     votesCount: number;
     tag: { id: string; name: string; color: string; } | null;
 };
 
 export default function DashboardClient({ initialIdeas, boardId, dict }: { initialIdeas: Idea[], boardId: string, dict: Record<string, string> }) {
     const columnsConfig = [
-        { id: 'pending', title: dict.col_pending, color: 'bg-zinc-100/50 border-zinc-200/50' },
-        { id: 'planned', title: dict.col_planned, color: 'bg-orange-50/50 border-orange-100/40' },
-        { id: 'done', title: dict.col_done, color: 'bg-green-50/50 border-green-100/40' }
+        { id: 'en_revision', title: dict.col_pending, color: 'bg-zinc-100/50 border-zinc-200/50' },
+        { id: 'planeado', title: dict.col_planned, color: 'bg-orange-50/50 border-orange-100/40' },
+        { id: 'en_progreso', title: dict.col_in_progress || '⚙️ EN PROGRESO', color: 'bg-blue-50/50 border-blue-100/40' },
+        { id: 'completado', title: dict.col_done, color: 'bg-green-50/50 border-green-100/40' }
     ] as const;
 
     const [isPending, startTransition] = useTransition();
     const [ideas, setIdeas] = useState(initialIdeas);
     const [ideaToDelete, setIdeaToDelete] = useState<string | null>(null);
     const [selectedIdea, setSelectedIdea] = useState<Idea | null>(null);
+    const [viewTab, setViewTab] = useState<'activas' | 'descartadas' | 'archivadas'>('activas');
 
     useEffect(() => {
         setIdeas(initialIdeas);
@@ -62,8 +63,8 @@ export default function DashboardClient({ initialIdeas, boardId, dict }: { initi
             idea.id === ideaId ? { ...idea, status: destinationStatus } : idea
         ));
 
-        startTransition(async () => {
-            await updateIdeaStatus(ideaId, destinationStatus, boardId);
+        startTransition(() => {
+            updateIdeaStatus(ideaId, destinationStatus, boardId);
         });
     };
 
@@ -74,16 +75,22 @@ export default function DashboardClient({ initialIdeas, boardId, dict }: { initi
     const confirmDelete = () => {
         if (!ideaToDelete) return;
         setIdeas(prev => prev.filter(idea => idea.id !== ideaToDelete));
-        startTransition(async () => {
-            await deleteIdea(ideaToDelete, boardId);
+        startTransition(() => {
+            deleteIdea(ideaToDelete, boardId);
         });
         setIdeaToDelete(null);
+    };
+
+    const updateStatus = (id: string, newStatus: Idea['status'], e?: React.MouseEvent) => {
+        if (e) e.stopPropagation();
+        setIdeas(prev => prev.map(i => i.id === id ? { ...i, status: newStatus } : i));
+        startTransition(() => { updateIdeaStatus(id, newStatus, boardId); });
     };
 
     const MobileIdeaCard = ({ idea }: { idea: Idea }) => (
         <ContextMenu>
             <ContextMenuTrigger asChild>
-                <div 
+                <div
                     onClick={() => setSelectedIdea(idea)}
                     className="bg-white border border-zinc-200/60 p-5 rounded-[2rem] shadow-sm active:scale-[0.98] transition-all flex items-center justify-between gap-4 relative overflow-hidden"
                 >
@@ -98,64 +105,37 @@ export default function DashboardClient({ initialIdeas, boardId, dict }: { initi
                         </div>
                         <h4 className="font-black text-lg text-zinc-900 leading-tight tracking-tight uppercase break-words [word-break:break-word] whitespace-normal line-clamp-2">{idea.title}</h4>
                     </div>
-                    
+
                     <div className="flex items-center gap-3">
                         <div className="flex flex-col items-center justify-center bg-zinc-50 border border-zinc-100 rounded-2xl p-2 min-w-[50px] h-12">
                             <ChevronUp className="w-3 h-3 text-[#FF5C00]" />
                             <span className="text-xs font-black text-[#FF5C00]">{idea.votesCount}</span>
-                        </div>
-                        {/* Three dots indicator for context menu */}
-                        <div className="flex flex-col gap-1 opacity-20 mr-1">
-                            <div className="w-1 h-1 rounded-full bg-zinc-900" />
-                            <div className="w-1 h-1 rounded-full bg-zinc-900" />
-                            <div className="w-1 h-1 rounded-full bg-zinc-900" />
                         </div>
                     </div>
                 </div>
             </ContextMenuTrigger>
             <ContextMenuContent className="w-64 rounded-2xl p-2 shadow-2xl border-none bg-white/95 backdrop-blur-xl">
                 <div className="px-4 py-2 text-[10px] font-black text-zinc-400 uppercase tracking-widest leading-none mb-1">Mover a...</div>
-                {idea.status !== 'pending' && (
-                    <ContextMenuItem 
-                        onClick={(e) => { 
-                            e.stopPropagation(); 
-                            setIdeas(prev => prev.map(i => i.id === idea.id ? { ...i, status: 'pending' } : i));
-                            startTransition(() => updateIdeaStatus(idea.id, 'pending', boardId)); 
-                        }}
-                        className="rounded-xl py-3 px-4 font-bold text-zinc-700 focus:bg-orange-50 focus:text-[#FF5C00] active:scale-95 transition-transform"
-                    >
-                        🤔 {dict.col_pending.split(' ')[1] || 'Pendiente'}
+                {['en_revision', 'planeado', 'en_progreso', 'completado'].map((st) => (
+                    idea.status !== st && (
+                        <ContextMenuItem key={st} onClick={(e) => updateStatus(idea.id, st as any, e)} className="rounded-xl py-3 px-4 font-bold text-zinc-700 focus:bg-orange-50 focus:text-[#FF5C00] active:scale-95 transition-transform">
+                            {st === 'en_revision' ? '🤔 REVISIÓN' : st === 'planeado' ? '🏗️ PLANEADO' : st === 'en_progreso' ? '⚙️ PROGRESO' : '✅ COMPLETADO'}
+                        </ContextMenuItem>
+                    )
+                ))}
+
+                {idea.status !== 'descartado' && (
+                    <ContextMenuItem onClick={(e) => updateStatus(idea.id, 'descartado', e)} className="rounded-xl py-3 px-4 font-bold text-zinc-700 focus:bg-orange-50 focus:text-[#FF5C00] active:scale-95 transition-transform">
+                        ❌ {dict.filter_discarded || 'Descartar'}
                     </ContextMenuItem>
                 )}
-                {idea.status !== 'planned' && (
-                    <ContextMenuItem 
-                        onClick={(e) => { 
-                            e.stopPropagation(); 
-                            setIdeas(prev => prev.map(i => i.id === idea.id ? { ...i, status: 'planned' } : i));
-                            startTransition(() => updateIdeaStatus(idea.id, 'planned', boardId)); 
-                        }}
-                        className="rounded-xl py-3 px-4 font-bold text-zinc-700 focus:bg-orange-50 focus:text-[#FF5C00] active:scale-95 transition-transform"
-                    >
-                        🏗️ {dict.col_planned.split(' ')[1] || 'Planeado'}
-                    </ContextMenuItem>
-                )}
-                {idea.status !== 'done' && (
-                    <ContextMenuItem 
-                        onClick={(e) => { 
-                            e.stopPropagation(); 
-                            setIdeas(prev => prev.map(i => i.id === idea.id ? { ...i, status: 'done' } : i));
-                            startTransition(() => updateIdeaStatus(idea.id, 'done', boardId)); 
-                        }}
-                        className="rounded-xl py-3 px-4 font-bold text-zinc-700 focus:bg-orange-50 focus:text-[#FF5C00] active:scale-95 transition-transform"
-                    >
-                        ✅ {dict.col_done.split(' ')[1] || 'Completado'}
+                {idea.status !== 'archivado' && (
+                    <ContextMenuItem onClick={(e) => updateStatus(idea.id, 'archivado', e)} className="rounded-xl py-3 px-4 font-bold text-purple-600 focus:bg-purple-50 active:scale-95 transition-transform">
+                        🗃️ Archivar
                     </ContextMenuItem>
                 )}
                 <ContextMenuSeparator className="bg-zinc-100 my-1" />
-                <ContextMenuItem 
-                    onClick={(e) => { e.stopPropagation(); handleDelete(idea.id); }}
-                    className="rounded-xl py-3 px-4 font-bold text-red-500 focus:bg-red-50 focus:text-red-600"
-                >
+                <ContextMenuItem onClick={(e) => { e.stopPropagation(); handleDelete(idea.id); }} className="rounded-xl py-3 px-4 font-bold text-red-500 focus:bg-red-50 focus:text-red-600">
                     <Trash2 className="w-4 h-4 mr-3 opacity-60" /> {dict.cancel}
                 </ContextMenuItem>
             </ContextMenuContent>
@@ -236,7 +216,7 @@ export default function DashboardClient({ initialIdeas, boardId, dict }: { initi
                                             </span>
                                         )}
                                         <span className="text-[10px] md:text-xs font-black uppercase tracking-[0.2em] text-zinc-400 border border-zinc-100 px-4 py-2 rounded-full">
-                                            {selectedIdea?.status === 'pending' ? dict.col_pending : selectedIdea?.status === 'planned' ? dict.col_planned : dict.col_done}
+                                            {selectedIdea?.status?.replace('_', ' ').toUpperCase()}
                                         </span>
                                     </div>
                                     <h2 className="text-2xl md:text-5xl font-black tracking-tighter text-zinc-900 leading-normal pt-2 break-all [word-break:break-word] [hyphens:auto]">
@@ -250,6 +230,20 @@ export default function DashboardClient({ initialIdeas, boardId, dict }: { initi
                                     </p>
                                     <div className="text-base md:text-xl text-zinc-600 font-medium leading-relaxed whitespace-pre-wrap tracking-tight">
                                         {selectedIdea?.description}
+                                    </div>
+                                </div>
+
+                                <div className="space-y-3 pt-6 border-t border-zinc-100">
+                                    <p className="text-[10px] md:text-xs font-black uppercase tracking-[0.2em] text-zinc-400 flex items-center gap-2">
+                                        <span className="w-8 h-px bg-zinc-200" /> Acciones de Estado
+                                    </p>
+                                    <div className="flex flex-wrap gap-2">
+                                        <Button size="sm" variant="outline" onClick={() => updateStatus(selectedIdea!.id, 'en_revision')} className="rounded-full font-bold text-xs uppercase tracking-widest">Revisión</Button>
+                                        <Button size="sm" variant="outline" onClick={() => updateStatus(selectedIdea!.id, 'planeado')} className="rounded-full font-bold text-xs uppercase tracking-widest">Planeado</Button>
+                                        <Button size="sm" variant="outline" onClick={() => updateStatus(selectedIdea!.id, 'en_progreso')} className="rounded-full font-bold text-xs uppercase tracking-widest">Progreso</Button>
+                                        <Button size="sm" variant="outline" onClick={() => updateStatus(selectedIdea!.id, 'completado')} className="rounded-full font-bold text-xs uppercase tracking-widest">Completado</Button>
+                                        <Button size="sm" variant="outline" onClick={() => updateStatus(selectedIdea!.id, 'descartado')} className="rounded-full font-bold text-xs text-red-500 border-red-200 hover:bg-red-50 uppercase tracking-widest">Descartar</Button>
+                                        <Button size="sm" variant="outline" onClick={() => updateStatus(selectedIdea!.id, 'archivado')} className="rounded-full font-bold text-xs text-purple-600 border-purple-200 hover:bg-purple-50 uppercase tracking-widest">Archivar</Button>
                                     </div>
                                 </div>
                             </div>
@@ -267,38 +261,143 @@ export default function DashboardClient({ initialIdeas, boardId, dict }: { initi
                 </DialogContent>
             </Dialog>
 
+            {/* Premium Pill Tabs UI */}
+            <div className="px-6 md:px-10 mt-8 mb-6">
+                <div className="bg-zinc-100 p-1.5 rounded-3xl inline-flex gap-1 shadow-inner border border-zinc-200/50">
+                    <button
+                        onClick={() => setViewTab('activas')}
+                        className={cn(
+                            "px-6 md:px-8 py-3 rounded-2xl text-[10px] md:text-xs font-black uppercase tracking-[0.2em] transition-all flex items-center gap-2",
+                            viewTab === 'activas'
+                                ? "bg-white text-zinc-950 shadow-sm border border-zinc-200/50"
+                                : "text-zinc-400 hover:text-zinc-600"
+                        )}
+                    >
+                        🚀 {dict.filter_all?.split(' ')[0] || 'Activas'}
+                    </button>
+                    <button
+                        onClick={() => setViewTab('descartadas')}
+                        className={cn(
+                            "px-6 md:px-8 py-3 rounded-2xl text-[10px] md:text-xs font-black uppercase tracking-[0.2em] transition-all flex items-center gap-2",
+                            viewTab === 'descartadas'
+                                ? "bg-white text-zinc-950 shadow-sm border border-zinc-200/50"
+                                : "text-zinc-400 hover:text-zinc-600"
+                        )}
+                    >
+                        💨 {dict.filter_discarded || 'Descartadas'}
+                    </button>
+                    <button
+                        onClick={() => setViewTab('archivadas')}
+                        className={cn(
+                            "px-6 md:px-8 py-3 rounded-2xl text-[10px] md:text-xs font-black uppercase tracking-[0.2em] transition-all flex items-center gap-2",
+                            viewTab === 'archivadas'
+                                ? "bg-white text-zinc-950 shadow-sm border border-zinc-200/50"
+                                : "text-zinc-400 hover:text-zinc-600"
+                        )}
+                    >
+                        🗃️ Archivadas
+                    </button>
+                </div>
+            </div>
+
             {/* Mobile View with Vertical Drag & Drop */}
             <div className="lg:hidden flex-1 flex flex-col min-h-0 bg-[#F3F4F6] overflow-x-hidden w-full max-w-full">
-                {/* Horizontal Section Navigator (Sticky) */}
-                <div className="sticky top-0 z-30 bg-white/80 backdrop-blur-xl px-4 py-3 border-b border-zinc-200/50">
-                    <div className="flex bg-zinc-100 p-0.5 rounded-xl h-12">
-                        {columnsConfig.map((col) => (
-                            <button
-                                key={col.id}
-                                onClick={() => {
-                                    document.getElementById(`mobile-col-${col.id}`)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                                }}
-                                className="flex-1 rounded-lg font-black text-[9px] uppercase tracking-tighter transition-all active:scale-95 flex items-center justify-center gap-1"
-                            >
-                                {col.id === 'pending' ? '🤔' : col.id === 'planned' ? '🏗️' : '✅'} 
-                                <span className="truncate">{col.title.replace(/[🤔🏗️✅]/g, '').trim()}</span>
-                            </button>
-                        ))}
-                    </div>
-                </div>
-                
-                <div className="flex-1 overflow-y-auto overflow-x-hidden p-4 pb-32 max-w-full">
-                    <DragDropContext onDragEnd={onDragEnd}>
-                        <div className="space-y-10">
+                {viewTab === 'activas' && (
+                    <div className="sticky top-0 z-30 bg-white/80 backdrop-blur-xl px-4 py-3 border-b border-zinc-200/50">
+                        <div className="flex bg-zinc-100 p-0.5 rounded-xl h-12 hide-scrollbar overflow-x-auto gap-1">
                             {columnsConfig.map((col) => (
-                                <div key={col.id} id={`mobile-col-${col.id}`} className="space-y-4">
-                                    <div className="flex items-center justify-between px-1">
-                                        <div className="flex items-center gap-2">
-                                            <h3 className="text-[10px] font-black tracking-widest text-zinc-400 uppercase">
-                                                {col.id === 'pending' ? '🤔' : col.id === 'planned' ? '🏗️' : '✅'} {col.title.replace(/[🤔🏗️✅]/g, '').trim()}
-                                            </h3>
+                                <button
+                                    key={col.id}
+                                    onClick={() => {
+                                        document.getElementById(`mobile-col-${col.id}`)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                                    }}
+                                    className="flex-1 min-w-[80px] rounded-lg font-black text-[9px] uppercase tracking-tighter transition-all active:scale-95 flex items-center justify-center gap-1"
+                                >
+                                    <span className="truncate">{col.title.replace(/[🤔🏗️✅⚙️]/g, '').trim()}</span>
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+                )}
+
+                <div className="flex-1 overflow-y-auto overflow-x-hidden p-4 pb-32 max-w-full">
+                    {viewTab === 'activas' ? (
+                        <DragDropContext onDragEnd={onDragEnd}>
+                            <div className="space-y-10">
+                                {columnsConfig.map((col) => (
+                                    <div key={col.id} id={`mobile-col-${col.id}`} className="space-y-4">
+                                        <div className="flex items-center justify-between px-1">
+                                            <div className="flex items-center gap-2">
+                                                <h3 className="text-[10px] font-black tracking-widest text-zinc-400 uppercase">
+                                                    {col.title}
+                                                </h3>
+                                            </div>
+                                            <span className="bg-white px-2 py-0.5 rounded-full text-[9px] font-black border border-zinc-200 text-zinc-400">
+                                                {ideas.filter(i => i.status === col.id).length}
+                                            </span>
                                         </div>
-                                        <span className="bg-white px-2 py-0.5 rounded-full text-[9px] font-black border border-zinc-200 text-zinc-400">
+
+                                        <Droppable droppableId={col.id}>
+                                            {(provided, snapshot) => (
+                                                <div
+                                                    ref={provided.innerRef}
+                                                    {...provided.droppableProps}
+                                                    className={cn(
+                                                        "space-y-4 min-h-[100px] transition-all rounded-[2.5rem] p-1",
+                                                        snapshot.isDraggingOver ? "bg-zinc-200/50 ring-2 ring-dashed ring-zinc-300 ring-offset-4" : ""
+                                                    )}
+                                                >
+                                                    {ideas.filter(i => i.status === col.id).map((idea, index) => (
+                                                        <Draggable key={idea.id} draggableId={idea.id} index={index}>
+                                                            {(provided, snapshot) => (
+                                                                <div
+                                                                    ref={provided.innerRef}
+                                                                    {...provided.draggableProps}
+                                                                    {...provided.dragHandleProps}
+                                                                    className={cn(
+                                                                        "transition-all",
+                                                                        snapshot.isDragging ? "z-50" : ""
+                                                                    )}
+                                                                >
+                                                                    <MobileIdeaCard idea={idea} />
+                                                                </div>
+                                                            )}
+                                                        </Draggable>
+                                                    ))}
+                                                    {provided.placeholder}
+                                                </div>
+                                            )}
+                                        </Droppable>
+                                    </div>
+                                ))}
+                            </div>
+                        </DragDropContext>
+                    ) : (
+                        <div className="space-y-4">
+                            {ideas.filter(i => i.status === (viewTab === 'descartadas' ? 'descartado' : 'archivado')).map(idea => (
+                                <MobileIdeaCard key={idea.id} idea={idea} />
+                            ))}
+                            {ideas.filter(i => i.status === (viewTab === 'descartadas' ? 'descartado' : 'archivado')).length === 0 && (
+                                <div className="py-24 flex flex-col items-center justify-center text-zinc-400 opacity-60">
+                                    <span className="text-4xl mb-4">{viewTab === 'descartadas' ? '💨' : '🗃️'}</span>
+                                    <p className="font-bold text-xs tracking-widest uppercase">Nada en esta sección</p>
+                                </div>
+                            )}
+                        </div>
+                    )}
+                </div>
+            </div>
+
+            {/* Desktop Kanban View */}
+            <div className="hidden lg:block h-full">
+                {viewTab === 'activas' ? (
+                    <DragDropContext onDragEnd={onDragEnd}>
+                        <div className="grid grid-cols-4 gap-6 h-[calc(100vh-200px)] p-6 overflow-x-auto">
+                            {columnsConfig.map(col => (
+                                <div key={col.id} className={`flex flex-col rounded-[2.5rem] border p-8 min-h-0 h-full ${col.color}`}>
+                                    <div className="flex items-center justify-between mb-8 px-2">
+                                        <h3 className="text-[10px] font-black tracking-widest text-zinc-900 uppercase opacity-60">{col.title}</h3>
+                                        <span className="bg-white/80 backdrop-blur-sm border border-zinc-200/50 text-zinc-900 font-black text-[10px] px-3 py-1 rounded-full shadow-sm">
                                             {ideas.filter(i => i.status === col.id).length}
                                         </span>
                                     </div>
@@ -308,35 +407,72 @@ export default function DashboardClient({ initialIdeas, boardId, dict }: { initi
                                             <div
                                                 ref={provided.innerRef}
                                                 {...provided.droppableProps}
-                                                className={cn(
-                                                    "space-y-4 min-h-[100px] transition-all rounded-[2.5rem] p-1",
-                                                    snapshot.isDraggingOver ? "bg-zinc-200/50 ring-2 ring-dashed ring-zinc-300 ring-offset-4" : ""
-                                                )}
+                                                className={`flex-1 overflow-y-auto pr-2 transition-all rounded-[1.5rem] p-1 
+                                                    ${snapshot.isDraggingOver ? 'bg-white/40' : ''} 
+                                                    [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-thumb]:bg-zinc-300/60 
+                                                    [&::-webkit-scrollbar-thumb]:rounded-full hover:[&::-webkit-scrollbar-thumb]:bg-zinc-400/80`}
                                             >
-                                                {ideas.filter(i => i.status === col.id).map((idea, index) => (
-                                                    <Draggable key={idea.id} draggableId={idea.id} index={index}>
-                                                        {(provided, snapshot) => (
-                                                            <div
-                                                                ref={provided.innerRef}
-                                                                {...provided.draggableProps}
-                                                                {...provided.dragHandleProps}
-                                                                className={cn(
-                                                                    "transition-all",
-                                                                    snapshot.isDragging ? "z-50" : ""
-                                                                )}
-                                                            >
-                                                                <MobileIdeaCard idea={idea} />
-                                                            </div>
-                                                        )}
-                                                    </Draggable>
-                                                ))}
-                                                {provided.placeholder}
-                                                {ideas.filter(i => i.status === col.id).length === 0 && !snapshot.isDraggingOver && (
-                                                    <div className="py-12 border-2 border-dashed border-zinc-200 rounded-[2.5rem] flex flex-col items-center justify-center text-center opacity-40">
-                                                        <span className="text-4xl mb-2">🏜️</span>
-                                                        <p className="font-black uppercase tracking-widest text-[8px]">{dict.col_pending.split(' ')[0]} vacío</p>
-                                                    </div>
-                                                )}
+                                                <div className="space-y-6">
+                                                    {ideas.filter(i => i.status === col.id).map((idea, index) => (
+                                                        <Draggable key={idea.id} draggableId={idea.id} index={index}>
+                                                            {(provided, snapshot) => (
+                                                                <div
+                                                                    ref={provided.innerRef}
+                                                                    {...provided.draggableProps}
+                                                                    onClick={() => setSelectedIdea(idea)}
+                                                                    className={`flex-shrink-0 p-8 bg-white border rounded-[2rem] group transition-all duration-300 cursor-pointer
+                                                                        ${snapshot.isDragging
+                                                                            ? 'shadow-2xl shadow-orange-500/20 border-[#FF5C00] scale-[1.05] rotate-2'
+                                                                            : 'border-zinc-200/60 shadow-sm hover:shadow-xl hover:shadow-zinc-200/50 hover:border-[#FF5C00]/20'}`}
+                                                                    style={provided.draggableProps.style}
+                                                                >
+                                                                    <div className="flex justify-between items-start gap-4 mb-4">
+                                                                        <div
+                                                                            {...provided.dragHandleProps}
+                                                                            className="cursor-grab active:cursor-grabbing p-2 -ml-3 -mt-2 text-zinc-200 hover:text-[#FF5C00] transition-colors rounded-xl flex-shrink-0"
+                                                                        >
+                                                                            <GripVertical className="w-5 h-5" />
+                                                                        </div>
+                                                                        <h4 className="font-black text-xl text-zinc-900 leading-tight flex-1 tracking-tighter uppercase">{idea.title}</h4>
+                                                                        <button
+                                                                            onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleDelete(idea.id); }}
+                                                                            className="text-zinc-200 hover:text-white hover:bg-red-500 p-2 rounded-xl transition-all shrink-0 -mt-2 -mr-3 md:opacity-0 md:group-hover:opacity-100 active:scale-95"
+                                                                        >
+                                                                            <Trash2 className="w-4 h-4" />
+                                                                        </button>
+                                                                    </div>
+
+                                                                    <p className="text-sm text-zinc-500 line-clamp-2 mb-4 leading-relaxed font-bold tracking-tight">{idea.description}</p>
+
+                                                                    {idea.imageUrl && (
+                                                                        <div className="pointer-events-none">
+                                                                            <ImageLightbox
+                                                                                src={idea.imageUrl}
+                                                                                alt={idea.title}
+                                                                                className="mb-5 rounded-2xl border border-zinc-100 shadow-sm"
+                                                                            />
+                                                                        </div>
+                                                                    )}
+
+                                                                    <div className="flex items-center justify-between">
+                                                                        <span className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-[#FF5C00] bg-orange-50 border border-orange-100 px-4 py-2 rounded-full shadow-sm flex-shrink-0">
+                                                                            <span className="text-sm">▲</span> {idea.votesCount} {idea.votesCount === 1 ? dict.vote : dict.votes}
+                                                                        </span>
+                                                                        {idea.tag && (
+                                                                            <span
+                                                                                className="flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest border border-zinc-100 px-3 py-2 rounded-full shadow-sm max-w-[120px] truncate"
+                                                                            >
+                                                                                <span className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: idea.tag.color }} />
+                                                                                <span className="truncate">{idea.tag.name}</span>
+                                                                            </span>
+                                                                        )}
+                                                                    </div>
+                                                                </div>
+                                                            )}
+                                                        </Draggable>
+                                                    ))}
+                                                    {provided.placeholder}
+                                                </div>
                                             </div>
                                         )}
                                     </Droppable>
@@ -344,100 +480,65 @@ export default function DashboardClient({ initialIdeas, boardId, dict }: { initi
                             ))}
                         </div>
                     </DragDropContext>
-                </div>
-            </div>
-
-            {/* Desktop Kanban View */}
-            <div className="hidden lg:block h-full">
-                <DragDropContext onDragEnd={onDragEnd}>
-                    <div className="grid grid-cols-3 gap-6 h-[calc(100vh-140px)] p-6 overflow-x-auto">
-                        {columnsConfig.map(col => (
-                            <div key={col.id} className={`flex flex-col rounded-[2.5rem] border p-8 min-h-0 h-full ${col.color}`}>
-                                <div className="flex items-center justify-between mb-8 px-2">
-                                    <h3 className="text-[10px] font-black tracking-widest text-zinc-900 uppercase opacity-60">{col.title}</h3>
-                                    <span className="bg-white/80 backdrop-blur-sm border border-zinc-200/50 text-zinc-900 font-black text-[10px] px-3 py-1 rounded-full shadow-sm">
-                                        {ideas.filter(i => i.status === col.id).length}
-                                    </span>
-                                </div>
-
-                                <Droppable droppableId={col.id}>
-                                    {(provided, snapshot) => (
-                                        <div
-                                            ref={provided.innerRef}
-                                            {...provided.droppableProps}
-                                            className={`flex-1 overflow-y-auto pr-2 transition-all rounded-[1.5rem] p-1 
-                                                ${snapshot.isDraggingOver ? 'bg-white/40' : ''} 
-                                                [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-thumb]:bg-zinc-300/60 
-                                                [&::-webkit-scrollbar-thumb]:rounded-full hover:[&::-webkit-scrollbar-thumb]:bg-zinc-400/80`}
-                                        >
-                                            <div className="space-y-6">
-                                                {ideas.filter(i => i.status === col.id).map((idea, index) => (
-                                                    <Draggable key={idea.id} draggableId={idea.id} index={index}>
-                                                        {(provided, snapshot) => (
-                                                            <div
-                                                                ref={provided.innerRef}
-                                                                {...provided.draggableProps}
-                                                                onClick={() => setSelectedIdea(idea)}
-                                                                className={`flex-shrink-0 p-8 bg-white border rounded-[2rem] group transition-all duration-300 cursor-pointer
-                                                                    ${snapshot.isDragging
-                                                                        ? 'shadow-2xl shadow-orange-500/20 border-[#FF5C00] scale-[1.05] rotate-2'
-                                                                        : 'border-zinc-200/60 shadow-sm hover:shadow-xl hover:shadow-zinc-200/50 hover:border-[#FF5C00]/20'}`}
-                                                                style={provided.draggableProps.style}
-                                                            >
-                                                                <div className="flex justify-between items-start gap-4 mb-4">
-                                                                    <div
-                                                                        {...provided.dragHandleProps}
-                                                                        className="cursor-grab active:cursor-grabbing p-2 -ml-3 -mt-2 text-zinc-200 hover:text-[#FF5C00] transition-colors rounded-xl flex-shrink-0"
-                                                                    >
-                                                                        <GripVertical className="w-5 h-5" />
-                                                                    </div>
-                                                                    <h4 className="font-black text-xl text-zinc-900 leading-tight flex-1 tracking-tighter uppercase">{idea.title}</h4>
-                                                                    <button
-                                                                        onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleDelete(idea.id); }}
-                                                                        className="text-zinc-200 hover:text-white hover:bg-red-500 p-2 rounded-xl transition-all shrink-0 -mt-2 -mr-3 md:opacity-0 md:group-hover:opacity-100 active:scale-95"
-                                                                    >
-                                                                        <Trash2 className="w-4 h-4" />
-                                                                    </button>
-                                                                </div>
-
-                                                                <p className="text-sm text-zinc-500 line-clamp-2 mb-4 leading-relaxed font-bold tracking-tight">{idea.description}</p>
-
-                                                                {idea.imageUrl && (
-                                                                    <div className="pointer-events-none">
-                                                                        <ImageLightbox
-                                                                            src={idea.imageUrl}
-                                                                            alt={idea.title}
-                                                                            className="mb-5 rounded-2xl border border-zinc-100 shadow-sm"
-                                                                        />
-                                                                    </div>
-                                                                )}
-
-                                                                <div className="flex items-center justify-between">
-                                                                    <span className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-[#FF5C00] bg-orange-50 border border-orange-100 px-4 py-2 rounded-full shadow-sm flex-shrink-0">
-                                                                        <span className="text-sm">▲</span> {idea.votesCount} {idea.votesCount === 1 ? dict.vote : dict.votes}
-                                                                    </span>
-                                                                    {idea.tag && (
-                                                                        <span
-                                                                            className="flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest border border-zinc-100 px-3 py-2 rounded-full shadow-sm max-w-[120px] truncate"
-                                                                        >
-                                                                            <span className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: idea.tag.color }} />
-                                                                            <span className="truncate">{idea.tag.name}</span>
-                                                                        </span>
-                                                                    )}
-                                                                </div>
-                                                            </div>
-                                                        )}
-                                                    </Draggable>
-                                                ))}
-                                                {provided.placeholder}
-                                            </div>
+                ) : (
+                    <div className="flex-1 overflow-y-auto px-12 py-8 bg-zinc-50/30">
+                        <div className="max-w-5xl mx-auto space-y-4">
+                            {ideas.filter(i => i.status === (viewTab === 'descartadas' ? 'descartado' : 'archivado')).map(idea => (
+                                <div key={idea.id} className="bg-white border border-zinc-200/60 p-6 rounded-[2rem] shadow-sm flex items-center justify-between gap-6 group hover:border-[#FF5C00]/20 transition-all">
+                                    <div className="flex items-center gap-6 flex-1 min-w-0">
+                                        <div className="flex flex-col items-center justify-center bg-zinc-50 border border-zinc-100 rounded-2xl p-2 min-w-[50px] h-12 shrink-0">
+                                            <ChevronUp className="w-3 h-3 text-zinc-400" />
+                                            <span className="text-xs font-black text-zinc-400">{idea.votesCount}</span>
                                         </div>
-                                    )}
-                                </Droppable>
-                            </div>
-                        ))}
+                                        <div className="flex-1 min-w-0">
+                                            <h4 onClick={() => setSelectedIdea(idea)} className="font-black text-lg text-zinc-900 uppercase tracking-tighter cursor-pointer hover:underline truncate">{idea.title}</h4>
+                                            <p className="text-[10px] text-zinc-400 font-bold uppercase tracking-widest mt-1 italic flex items-center gap-2">
+                                                <span className="w-4 h-px bg-zinc-200" />
+                                                {viewTab === 'descartadas' ? 'Fuera de prioridad' : 'En el archivo'}
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                        <Button
+                                            variant="outline"
+                                            size="sm"
+                                            onClick={() => updateStatus(idea.id, 'en_revision')}
+                                            className="rounded-full font-black text-[10px] tracking-[0.2em] uppercase h-10 px-6 border-zinc-200 hover:bg-orange-50 hover:text-[#FF5C00] hover:border-[#FF5C00]/30 transition-all active:scale-95 flex items-center gap-2"
+                                        >
+                                            <Reply className="w-3 h-3" /> Restaurar
+                                        </Button>
+
+                                        {viewTab === 'descartadas' && (
+                                            <Button
+                                                variant="ghost"
+                                                size="sm"
+                                                onClick={() => updateStatus(idea.id, 'archivado')}
+                                                className="rounded-full font-black text-[10px] tracking-[0.2em] uppercase h-10 px-6 text-purple-600 hover:bg-purple-50 transition-all active:scale-95 flex items-center gap-2"
+                                            >
+                                                <Archive className="w-3 h-3" /> Archivar
+                                            </Button>
+                                        )}
+
+                                        <Button
+                                            variant="ghost"
+                                            size="sm"
+                                            onClick={() => handleDelete(idea.id)}
+                                            className="rounded-full text-zinc-300 hover:text-red-500 hover:bg-red-50 h-10 w-10 p-0 transition-all active:scale-95"
+                                        >
+                                            <Trash2 className="w-4 h-4" />
+                                        </Button>
+                                    </div>
+                                </div>
+                            ))}
+                            {ideas.filter(i => i.status === (viewTab === 'descartadas' ? 'descartado' : 'archivado')).length === 0 && (
+                                <div className="py-32 flex flex-col items-center justify-center text-zinc-400 border-2 border-dashed border-zinc-200 rounded-[3rem] opacity-40">
+                                    <span className="text-4xl mb-4">{viewTab === 'descartadas' ? '💨' : '🗃️'}</span>
+                                    <p className="font-black text-xs tracking-widest uppercase">Vacío</p>
+                                </div>
+                            )}
+                        </div>
                     </div>
-                </DragDropContext>
+                )}
             </div>
         </div>
     );

@@ -10,7 +10,7 @@ type Idea = {
     title: string;
     description: string;
     imageUrl?: string | null;
-    status: 'pending' | 'planned' | 'done';
+    status: 'en_revision' | 'planeado' | 'en_progreso' | 'completado' | 'descartado';
     votes: { id: string }[];
     tag: { id: string; name: string; color: string; } | null;
 };
@@ -33,7 +33,7 @@ export default function PublicBoardClient({
     dict: Record<string, string>
 }) {
     const [searchQuery, setSearchQuery] = useState('');
-    const [statusFilter, setStatusFilter] = useState<'all' | 'pending' | 'planned' | 'done'>('all');
+    const [statusFilter, setStatusFilter] = useState<'all' | 'en_revision' | 'planeado' | 'en_progreso' | 'completado' | 'descartado'>('all');
     const [dropdownOpen, setDropdownOpen] = useState(false);
     const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -49,10 +49,12 @@ export default function PublicBoardClient({
     }, []);
 
     const filterOptions = [
-        { value: 'all', label: dict.filter_all, emoji: '🗂️' },
-        { value: 'pending', label: dict.filter_pending, emoji: '🤔' },
-        { value: 'planned', label: dict.filter_planned, emoji: '🏗️' },
-        { value: 'done', label: dict.filter_done, emoji: '✅' },
+        { value: 'all', label: dict.filter_all || 'Todas', emoji: '🗂️' },
+        { value: 'en_revision', label: dict.filter_pending || 'En Revisión', emoji: '🤔' },
+        { value: 'planeado', label: dict.filter_planned || 'Planeado', emoji: '🏗️' },
+        { value: 'en_progreso', label: dict.filter_in_progress || 'En Progreso', emoji: '⚙️' },
+        { value: 'completado', label: dict.filter_done || 'Completado', emoji: '✅' },
+        { value: 'descartado', label: dict.filter_discarded || 'Descartadas', emoji: '💨' }
     ] as const;
 
     const filteredIdeas = initialIdeas.filter(idea => {
@@ -67,63 +69,63 @@ export default function PublicBoardClient({
             {/* Cabecera con título y filtros */}
             {widgetVersion !== 'lite' && (
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                <h2 className="font-[family-name:var(--font-jakarta)] text-2xl font-bold tracking-tight inline-flex items-center gap-2" style={{ color: isDarkMode ? '#f4f4f5' : '#18181b' }}>
-                    {dict.showing} <span>🔥</span>
-                </h2>
+                    <h2 className="font-[family-name:var(--font-jakarta)] text-2xl font-bold tracking-tight inline-flex items-center gap-2" style={{ color: isDarkMode ? '#f4f4f5' : '#18181b' }}>
+                        {dict.showing} <span>🔥</span>
+                    </h2>
 
-                <div className="flex flex-col sm:flex-row flex-wrap gap-3">
-                    <div className="relative">
-                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400" />
-                        <input
-                            type="text"
-                            placeholder={dict.search_placeholder}
-                            value={searchQuery}
-                            onChange={(e) => setSearchQuery(e.target.value)}
-                            style={{
-                                outlineColor: accentColor,
-                                boxShadow: `0 0 0 2px ${accentColor}10`,
-                                color: isDarkMode ? '#f4f4f5' : '#18181b'
-                            } as React.CSSProperties}
-                            className={`h-11 pl-9 pr-4 rounded-2xl border ${isDarkMode ? 'border-zinc-800 bg-zinc-900 placeholder:text-zinc-600 focus-visible:bg-zinc-800' : 'border-zinc-200 bg-[#FAFAFA] focus-visible:bg-white'} text-sm font-medium focus:outline-none transition-colors w-full sm:w-64 shadow-sm`}
-                        />
-                    </div>
-                    {/* Custom Dropdown */}
-                    <div className="relative" ref={dropdownRef}>
-                        <button
-                            type="button"
-                            onClick={() => setDropdownOpen(p => !p)}
-                            style={{ borderColor: dropdownOpen ? accentColor : (isDarkMode ? '#27272a' : undefined), color: isDarkMode ? '#f4f4f5' : '#18181b', backgroundColor: isDarkMode ? '#18181b' : '#FAFAFA' } as React.CSSProperties}
-                            className={`h-11 pl-4 pr-10 rounded-2xl border ${isDarkMode ? 'border-zinc-800 hover:border-zinc-700 hover:bg-zinc-900' : 'border-zinc-200 hover:border-zinc-300 hover:bg-white'} text-sm font-bold focus:outline-none transition-all cursor-pointer shadow-sm flex items-center gap-2 min-w-[160px] relative`}
-                        >
-                            <span>{filterOptions.find(o => o.value === statusFilter)?.emoji}</span>
-                            <span className="flex-1 text-left">{filterOptions.find(o => o.value === statusFilter)?.label}</span>
-                            <ChevronDown
-                                className={`absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400 transition-transform duration-200 ${dropdownOpen ? 'rotate-180' : ''}`}
+                    <div className="flex flex-col sm:flex-row flex-wrap gap-3">
+                        <div className="relative">
+                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400" />
+                            <input
+                                type="text"
+                                placeholder={dict.search_placeholder}
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
+                                style={{
+                                    outlineColor: accentColor,
+                                    boxShadow: `0 0 0 2px ${accentColor}10`,
+                                    color: isDarkMode ? '#f4f4f5' : '#18181b'
+                                } as React.CSSProperties}
+                                className={`h-11 pl-9 pr-4 rounded-2xl border ${isDarkMode ? 'border-zinc-800 bg-zinc-900 placeholder:text-zinc-600 focus-visible:bg-zinc-800' : 'border-zinc-200 bg-[#FAFAFA] focus-visible:bg-white'} text-sm font-medium focus:outline-none transition-colors w-full sm:w-64 shadow-sm`}
                             />
-                        </button>
+                        </div>
+                        {/* Custom Dropdown */}
+                        <div className="relative" ref={dropdownRef}>
+                            <button
+                                type="button"
+                                onClick={() => setDropdownOpen(p => !p)}
+                                style={{ borderColor: dropdownOpen ? accentColor : (isDarkMode ? '#27272a' : undefined), color: isDarkMode ? '#f4f4f5' : '#18181b', backgroundColor: isDarkMode ? '#18181b' : '#FAFAFA' } as React.CSSProperties}
+                                className={`h-11 pl-4 pr-10 rounded-2xl border ${isDarkMode ? 'border-zinc-800 hover:border-zinc-700 hover:bg-zinc-900' : 'border-zinc-200 hover:border-zinc-300 hover:bg-white'} text-sm font-bold focus:outline-none transition-all cursor-pointer shadow-sm flex items-center gap-2 min-w-[160px] relative`}
+                            >
+                                <span>{filterOptions.find(o => o.value === statusFilter)?.emoji}</span>
+                                <span className="flex-1 text-left">{filterOptions.find(o => o.value === statusFilter)?.label}</span>
+                                <ChevronDown
+                                    className={`absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400 transition-transform duration-200 ${dropdownOpen ? 'rotate-180' : ''}`}
+                                />
+                            </button>
 
-                        {dropdownOpen && (
-                            <div className={`absolute top-[calc(100%+8px)] right-0 z-50 ${isDarkMode ? 'bg-zinc-900 border-zinc-800 shadow-black/50' : 'bg-white border-zinc-200 shadow-zinc-200/60'} border rounded-2xl shadow-xl py-2 min-w-full overflow-hidden animate-in fade-in slide-in-from-top-2 duration-150`}>
-                                {filterOptions.map(option => {
-                                    const isActive = statusFilter === option.value;
-                                    return (
-                                        <button
-                                            key={option.value}
-                                            type="button"
-                                            onClick={() => { setStatusFilter(option.value); setDropdownOpen(false); }}
-                                            style={isActive ? { color: accentColor, backgroundColor: `${accentColor}10` } : { color: isDarkMode ? '#f4f4f5' : '#18181b' }}
-                                            className={`w-full flex items-center gap-3 px-4 py-2.5 text-sm font-bold ${isDarkMode ? 'hover:bg-zinc-800/50' : 'hover:bg-zinc-50'} transition-colors text-left`}
-                                        >
-                                            <span>{option.emoji}</span>
-                                            <span>{option.label}</span>
-                                            {isActive && <span className="ml-auto w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ backgroundColor: accentColor }} />}
-                                        </button>
-                                    );
-                                })}
-                            </div>
-                        )}
+                            {dropdownOpen && (
+                                <div className={`absolute top-[calc(100%+8px)] right-0 z-50 ${isDarkMode ? 'bg-zinc-900 border-zinc-800 shadow-black/50' : 'bg-white border-zinc-200 shadow-zinc-200/60'} border rounded-2xl shadow-xl py-2 min-w-full overflow-hidden animate-in fade-in slide-in-from-top-2 duration-150`}>
+                                    {filterOptions.map(option => {
+                                        const isActive = statusFilter === option.value;
+                                        return (
+                                            <button
+                                                key={option.value}
+                                                type="button"
+                                                onClick={() => { setStatusFilter(option.value); setDropdownOpen(false); }}
+                                                style={isActive ? { color: accentColor, backgroundColor: `${accentColor}10` } : { color: isDarkMode ? '#f4f4f5' : '#18181b' }}
+                                                className={`w-full flex items-center gap-3 px-4 py-2.5 text-sm font-bold ${isDarkMode ? 'hover:bg-zinc-800/50' : 'hover:bg-zinc-50'} transition-colors text-left`}
+                                            >
+                                                <span>{option.emoji}</span>
+                                                <span>{option.label}</span>
+                                                {isActive && <span className="ml-auto w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ backgroundColor: accentColor }} />}
+                                            </button>
+                                        );
+                                    })}
+                                </div>
+                            )}
+                        </div>
                     </div>
-                </div>
                 </div>
             )}
 
@@ -152,11 +154,16 @@ export default function PublicBoardClient({
                                 <h3 className="font-[family-name:var(--font-jakarta)] text-lg md:text-xl font-bold tracking-tight truncate leading-tight" style={{ color: isDarkMode ? '#f4f4f5' : '#18181b' }}>
                                     {idea.title}
                                 </h3>
-                                {idea.status !== 'pending' && widgetVersion !== 'lite' && (
+                                {idea.status !== 'en_revision' && widgetVersion !== 'lite' && (
                                     <span className={`w-fit px-2 md:px-3 py-0.5 md:py-1 rounded-full text-[9px] md:text-[11px] uppercase font-black md:font-bold tracking-wider 
-                                        ${idea.status === 'done' ? 'bg-green-100 text-green-700 border border-green-200' :
-                                            idea.status === 'planned' ? 'bg-amber-100 text-amber-700 border border-amber-200' : ''}`}>
-                                        {idea.status === 'done' ? dict.tag_done : dict.tag_planned}
+                                        ${idea.status === 'completado' ? 'bg-green-100 text-green-700 border border-green-200' :
+                                            idea.status === 'planeado' ? 'bg-amber-100 text-amber-700 border border-amber-200' :
+                                                idea.status === 'en_progreso' ? 'bg-blue-100 text-blue-700 border border-blue-200' :
+                                                    idea.status === 'descartado' ? 'bg-zinc-100 text-zinc-500 border border-zinc-200' : ''}`}>
+                                        {idea.status === 'completado' ? (dict.tag_done || 'Completado') :
+                                            idea.status === 'planeado' ? (dict.tag_planned || 'Planeado') :
+                                                idea.status === 'en_progreso' ? (dict.tag_in_progress || 'En Progreso') :
+                                                    idea.status === 'descartado' ? (dict.tag_discarded || 'Descartado') : ''}
                                     </span>
                                 )}
                                 {idea.tag && widgetVersion !== 'lite' && (
