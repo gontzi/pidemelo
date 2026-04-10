@@ -3,7 +3,7 @@ import { SignedIn, SignedOut, SignInButton } from "@clerk/nextjs";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Suspense } from 'react';
-import { getDictionary } from '@/i18n';
+import { getDictionary, getLocale } from '@/i18n';
 import WidgetSkeleton from '@/components/WidgetSkeleton';
 import PricingWrapper from '@/components/landing/PricingWrapper';
 
@@ -31,6 +31,7 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function Home() {
   const t = await getDictionary();
+  const locale = await getLocale();
 
   const softwareSchema = {
     "@context": "https://schema.org",
@@ -127,7 +128,7 @@ export default async function Home() {
               <WidgetSkeleton />
             </div>
             <iframe
-              src="https://pidemelo.app/widget/form/pidemelo?color=%23FF5C00&textColor=%2318181b&darkMode=false"
+              src={`https://pidemelo.app/widget/form/pidemelo?color=%23FF5C00&textColor=%2318181b&darkMode=false&lang=${locale}`}
               width="100%"
               height="820px"
               frameBorder="0"
