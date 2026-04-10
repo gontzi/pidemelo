@@ -13,6 +13,7 @@ export const dynamic = 'force-dynamic';
 import { getDictionary } from '@/i18n';
 import ProjectCard from "./ProjectCard";
 import { cn } from "@/lib/utils";
+import DashboardEmptyState from "./DashboardEmptyState";
 
 export default async function Dashboard() {
     const t = await getDictionary();
@@ -105,24 +106,7 @@ export default async function Dashboard() {
                         ))}
                         
                         {userBoards.length === 0 && (
-                            <div className="col-span-full py-24 flex flex-col items-center justify-center text-center bg-zinc-50/50 rounded-[3rem] border border-dashed border-zinc-200">
-                                <div className="w-20 h-20 bg-white rounded-3xl shadow-xl flex items-center justify-center text-4xl mb-8 border border-zinc-100 transform -rotate-6">
-                                    🏜️
-                                </div>
-                                <h3 className="text-2xl font-black tracking-tight text-zinc-900 mb-2">
-                                    {t.dashboard_index.empty_title}
-                                </h3>
-                                <p className="text-zinc-500 font-medium max-w-xs mx-auto mb-8">
-                                    {t.dashboard_index.empty_subtitle}
-                                </p>
-                                <Button 
-                                    variant="outline" 
-                                    className="rounded-full border-zinc-200 font-black text-[10px] uppercase tracking-widest hover:bg-white px-8"
-                                    onClick={() => document.getElementById('name')?.focus()}
-                                >
-                                    {t.dashboard_index.create_first_btn}
-                                </Button>
-                            </div>
+                            <DashboardEmptyState dict={t.dashboard_index} />
                         )}
                     </section>
 
