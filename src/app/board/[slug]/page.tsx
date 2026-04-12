@@ -101,7 +101,6 @@ export default async function PublicBoardPage({ params }: { params: { slug: stri
 
     if (!board) notFound();
 
-    const isBoardPremium = board.user ? (board.user.isPremium || board.user.plan === 'pro' || board.user.plan === 'lifetime') : false;
     const isCurrentUserAdmin = userId === board.userId;
 
     const sortedIdeas = board.ideas.sort((a, b) => b.votes.length - a.votes.length);
@@ -168,7 +167,6 @@ export default async function PublicBoardPage({ params }: { params: { slug: stri
                             dict={t.submit_idea_form}
                             imageDict={t.image_upload}
                             tags={board.tags}
-                            isBoardPremium={isBoardPremium}
                             isCurrentUserAdmin={isCurrentUserAdmin}
                         />
                     </aside>

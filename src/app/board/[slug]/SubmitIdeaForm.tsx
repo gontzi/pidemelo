@@ -19,7 +19,6 @@ export default function SubmitIdeaForm({
     dict,
     imageDict,
     tags,
-    isBoardPremium = false,
     isCurrentUserAdmin = false,
     widgetVersion = 'normal'
 }: {
@@ -31,7 +30,6 @@ export default function SubmitIdeaForm({
     dict: any,
     imageDict: any,
     tags?: Tag[],
-    isBoardPremium?: boolean,
     isCurrentUserAdmin?: boolean,
     widgetVersion?: 'normal' | 'lite'
 }) {
@@ -231,7 +229,6 @@ export default function SubmitIdeaForm({
             {!uploadedImageUrl ? (
                 <ImageUploadDropzone
                     boardId={boardId}
-                    isBoardPremium={isBoardPremium}
                     isCurrentUserAdmin={isCurrentUserAdmin}
                     onUploadSuccess={(url) => setUploadedImageUrl(url)}
                     isDarkMode={isDarkMode}

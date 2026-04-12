@@ -9,12 +9,7 @@ import LanguageSwitcher from "../LanguageSwitcher";
 
 export default function AdminSidebar({ dict }: { dict: Record<string, string> }) {
     const pathname = usePathname();
-    const [isPremium, setIsPremium] = useState(false);
     const { user } = useUser();
-
-    useEffect(() => {
-        if (user?.publicMetadata?.isPremium) setIsPremium(true);
-    }, [user]);
 
     const isActive = (path: string) => {
         if (path === '/dashboard') return pathname === '/dashboard';
@@ -38,19 +33,21 @@ export default function AdminSidebar({ dict }: { dict: Record<string, string> })
                     <Monitor className={`w-5 h-5 ${isActive('/dashboard/widgets') ? 'text-[#FF5C00]' : 'text-zinc-400'}`} />
                     {dict.widgets || "Widgets"}
                 </Link>
-                <Link href="/dashboard/billing" className={`flex items-center gap-3 px-3 py-2.5 rounded-xl font-bold transition-all ${isActive('/dashboard/billing') ? 'bg-orange-50 text-[#FF5C00]' : 'text-zinc-500 hover:text-[#FF5C00] hover:bg-orange-50/50 group'}`}>
-                    {isPremium ? (
-                        <Zap className={`w-5 h-5 ${isActive('/dashboard/billing') ? 'fill-[#FF5C00]' : 'group-hover:animate-pulse'}`} />
-                    ) : (
-                        <Rocket className={`w-5 h-5 ${isActive('/dashboard/billing') ? 'text-[#FF5C00]' : ''}`} />
-                    )}
-                    {isPremium ? (dict.pro || "Pro") : (dict.plans || "Planes")}
-                </Link>
             </nav>
 
-            <div className="mt-auto pt-6 border-t border-zinc-100 flex items-center justify-between px-2">
-                <UserButton appearance={{ elements: { avatarBox: "w-10 h-10 border border-zinc-200 shadow-sm" } }} />
-                <LanguageSwitcher />
+            <div className="mt-auto pt-6 border-t border-zinc-100 flex flex-col gap-4 px-2">
+                <a 
+                    href="https://buymeacoffee.com/gontzi" 
+                    target="_blank" 
+                    rel="noopener noreferrer" 
+                    className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-[#FF5C00] hover:bg-[#E65300] text-white font-bold text-xs rounded-md transition-all hover:scale-105 active:scale-95 shadow-sm"
+                >
+                    ☕ Apoyar a Gontzi
+                </a>
+                <div className="flex items-center justify-between">
+                    <UserButton appearance={{ elements: { avatarBox: "w-10 h-10 border border-zinc-200 shadow-sm" } }} />
+                    <LanguageSwitcher />
+                </div>
             </div>
         </aside>
     );

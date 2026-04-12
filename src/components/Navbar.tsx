@@ -17,14 +17,7 @@ function Rocket({ className }: { className?: string }) {
 export default function Navbar({ dict }: { dict: Record<string, string> }) {
     const pathname = usePathname();
     const [menuOpen, setMenuOpen] = useState(false);
-    // We'll derive isPremium from user public metadata if available,
-    // but keep it simple here; for full support pass it as a prop from a server component wrapper
-    const [isPremium, setIsPremium] = useState(false);
     const { user } = useUser();
-
-    useEffect(() => {
-        if (user?.publicMetadata?.isPremium) setIsPremium(true);
-    }, [user]);
 
     useEffect(() => {
         document.body.style.overflow = menuOpen ? 'hidden' : '';
@@ -47,7 +40,6 @@ export default function Navbar({ dict }: { dict: Record<string, string> }) {
                     {/* Desktop nav links */}
                     <div className="hidden md:flex items-center gap-2 mr-2">
                         <Link href="/#que-es" className="text-sm font-bold text-zinc-600 hover:text-zinc-900 transition-colors px-3 py-2 rounded-xl hover:bg-zinc-50">{dict.what_is}</Link>
-                        <Link href="/#precios" className="text-sm font-bold text-zinc-600 hover:text-zinc-900 transition-colors px-3 py-2 rounded-xl hover:bg-zinc-50">{dict.plans}</Link>
                         <Link href="/#faq" className="text-sm font-bold text-zinc-600 hover:text-zinc-900 transition-colors px-3 py-2 rounded-xl hover:bg-zinc-50">{dict.faq}</Link>
                     </div>
 
@@ -114,9 +106,6 @@ export default function Navbar({ dict }: { dict: Record<string, string> }) {
                             <div className="grid gap-2 text-left">
                                 <Link href="/#que-es" onClick={() => setMenuOpen(false)} className="px-5 py-4 rounded-2xl text-zinc-600 font-bold hover:bg-zinc-50 border border-transparent hover:border-zinc-100 transition-all">
                                     {dict.mobile_what_is}
-                                </Link>
-                                <Link href="/#precios" onClick={() => setMenuOpen(false)} className="px-5 py-4 rounded-2xl text-zinc-600 font-bold hover:bg-zinc-50 border border-transparent hover:border-zinc-100 transition-all">
-                                    {dict.plans}
                                 </Link>
                                 <Link href="/#faq" onClick={() => setMenuOpen(false)} className="px-5 py-4 rounded-2xl text-zinc-600 font-bold hover:bg-zinc-50 border border-transparent hover:border-zinc-100 transition-all">
                                     {dict.mobile_faq}

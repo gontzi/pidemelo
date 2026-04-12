@@ -111,20 +111,12 @@ export async function createTag(boardId: string, name: string, color: string, de
     const { userId } = auth();
     if (!userId) return { error: "Unauthorized" };
 
-    const user = await db.query.users.findFirst({
-        where: eq(users.id, userId)
-    });
-
     const board = await db.query.boards.findFirst({
         where: and(eq(boards.id, boardId), eq(boards.userId, userId)),
         with: { tags: true }
     });
 
     if (!board) return { error: "No permission" };
-
-    if (!user?.isPremium && board.tags.length >= 6) {
-        return { error: "Limit reached. Upgrade to Pro for unlimited tags." };
-    }
 
     await db.insert(tags).values({
         boardId,

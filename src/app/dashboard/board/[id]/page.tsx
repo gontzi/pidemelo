@@ -4,7 +4,6 @@ import { auth } from "@clerk/nextjs/server";
 import { and, eq, desc } from "drizzle-orm";
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import IframeGenerator from "./IframeGenerator";
 import DashboardClient from "./DashboardClient";
 import SettingsModal from "./SettingsModal";
 import { ExternalLink, ArrowLeft, Settings } from "lucide-react";
@@ -30,12 +29,6 @@ export default async function BoardDashboardPage({ params }: { params: { id: str
     });
 
     if (!board) notFound();
-
-    // Consultar estado premium del usuario
-    const user = await db.query.users.findFirst({
-        where: eq(users.id, userId)
-    });
-    const isPremium = user?.isPremium || false;
 
     const formattedIdeas = board.ideas.map(idea => ({
         id: idea.id,
@@ -77,7 +70,6 @@ export default async function BoardDashboardPage({ params }: { params: { id: str
                             currentSlug={board.slug}
                             dict={t.board_details}
                             tags={board.tags}
-                            isPremium={isPremium}
                             notifyNewIdeas={board.notifyNewIdeas}
                             trigger={
                                 <button className="p-2.5 md:p-4 rounded-xl md:rounded-2xl bg-zinc-50 border border-zinc-100 text-zinc-400 hover:text-zinc-900 transition-all active:scale-95 flex-shrink-0">

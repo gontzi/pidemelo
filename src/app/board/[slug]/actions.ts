@@ -44,21 +44,11 @@ export async function submitIdea(boardId: string, slug: string, formData: FormDa
 
         if (!title || !description) return { error: "Faltan campos." };
 
-        // 1. Identificación y Plan
+        // 1. Identificación
         const { userId } = auth();
-        let isPremiumUser = false;
-
-        if (userId) {
-            const userData = await db.query.users.findFirst({
-                where: eq(users.id, userId)
-            });
-            if (userData && (userData.isPremium || userData.plan === 'pro' || userData.plan === 'lifetime')) {
-                isPremiumUser = true;
-            }
-        }
 
         // 2. Lógica de Cooldowns
-        const COOLDOWN_SECONDS = isPremiumUser ? 30 : 180;
+        const COOLDOWN_SECONDS = 30; // 30 segundos para todos (Open Source & Free)
 
         // Usamos ipHash como fingerprint para todos (más estricto y seguro)
         const ipHash = await getIpHash();
@@ -81,13 +71,7 @@ export async function submitIdea(boardId: string, slug: string, formData: FormDa
                 if (elapsedSeconds < COOLDOWN_SECONDS) {
                     const remainingSeconds = COOLDOWN_SECONDS - elapsedSeconds;
 
-                    if (!isPremiumUser && remainingSeconds > 60) {
-                        const mins = Math.floor(remainingSeconds / 60);
-                        const secs = remainingSeconds % 60;
-                        return { error: `Estás enviando ideas muy rápido. Por favor, espera ${mins} minutos y ${secs} segundos.` };
-                    } else {
-                        return { error: `Por favor, espera ${remainingSeconds} segundos antes de enviar otra idea.` };
-                    }
+                    return { error: `Por favor, espera ${remainingSeconds} segundos antes de enviar otra idea.` };
                 }
             }
         }

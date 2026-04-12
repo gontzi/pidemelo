@@ -8,12 +8,7 @@ import LanguageSwitcher from "../LanguageSwitcher";
 
 export default function AdminHeader({ dict }: { dict: Record<string, string> }) {
     const [menuOpen, setMenuOpen] = useState(false);
-    const [isPremium, setIsPremium] = useState(false);
     const { user } = useUser();
-
-    useEffect(() => {
-        if (user?.publicMetadata?.isPremium) setIsPremium(true);
-    }, [user]);
 
     useEffect(() => {
         document.body.style.overflow = menuOpen ? 'hidden' : '';
@@ -50,13 +45,6 @@ export default function AdminHeader({ dict }: { dict: Record<string, string> }) 
                             </Link>
                             <Link href="/dashboard/widgets" onClick={() => setMenuOpen(false)} className="px-5 py-4 rounded-2xl text-zinc-600 font-bold hover:bg-zinc-50 border border-transparent hover:border-zinc-100 flex items-center gap-3 transition-all">
                                 <Monitor className="w-5 h-5 opacity-40" /> {dict.widgets || "Widgets"}
-                            </Link>
-                            <Link href="/dashboard/billing" onClick={() => setMenuOpen(false)} className="px-5 py-4 rounded-2xl text-zinc-600 font-bold hover:bg-zinc-50 border border-transparent hover:border-zinc-100 flex items-center gap-3 transition-all">
-                                {isPremium ? (
-                                    <><Zap className="w-5 h-5 text-orange-500" /> {dict.mobile_subscription || "Tu Suscripción"}</>
-                                ) : (
-                                    <><Rocket className="w-5 h-5 opacity-40" /> {dict.mobile_plans || "Planes y Precios"}</>
-                                )}
                             </Link>
                         </div>
                     </div>

@@ -31,7 +31,6 @@ export default function SettingsModal({
     trigger,
     dict,
     tags,
-    isPremium,
     notifyNewIdeas: initialNotifyState,
     open: externalOpen,
     onOpenChange: setExternalOpen
@@ -42,7 +41,6 @@ export default function SettingsModal({
     dict: Record<string, string>,
     trigger?: React.ReactNode,
     tags?: Tag[],
-    isPremium?: boolean,
     notifyNewIdeas?: boolean,
     open?: boolean,
     onOpenChange?: (open: boolean) => void
@@ -204,8 +202,8 @@ export default function SettingsModal({
                         </form>
 
                         <div className="hidden md:flex flex-col space-y-4 md:border-l md:pl-8 lg:pl-12 border-zinc-100">
-                            {tags !== undefined && isPremium !== undefined ? (
-                                <TagsManager boardId={boardId} tags={tags} isPremium={isPremium} dict={dict} />
+                            {tags !== undefined ? (
+                                <TagsManager boardId={boardId} tags={tags} dict={dict} />
                             ) : (
                                 <div className="flex-1 border-2 border-dashed border-zinc-100 rounded-2xl bg-zinc-50 flex flex-col items-center justify-center p-8 text-center text-zinc-400 gap-3 min-h-[300px]">
                                     <div className="p-3 bg-white rounded-xl shadow-sm border border-zinc-100">

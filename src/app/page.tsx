@@ -5,7 +5,6 @@ import { Button } from "@/components/ui/button";
 import { Suspense } from 'react';
 import { getDictionary, getLocale } from '@/i18n';
 import WidgetSkeleton from '@/components/WidgetSkeleton';
-import PricingWrapper from '@/components/landing/PricingWrapper';
 
 import JsonLd from '@/components/JsonLd';
 
@@ -140,67 +139,6 @@ export default async function Home() {
           </div>
         </section>
 
-        {/* Sección de Precios */}
-        <section id="precios" className="w-full max-w-5xl mx-auto py-16 md:py-32 px-4 sm:px-6">
-          <div className="text-center mb-12 md:mb-20 space-y-6">
-            <h2 className="text-4xl md:text-6xl font-black tracking-tighter text-zinc-900 leading-none">
-              {t.billing_page.free_title_1} <br /> <span className="text-[#FF5C00] italic">{t.billing_page.free_title_2}</span>
-            </h2>
-            <p className="text-zinc-500 text-lg md:text-xl font-medium max-w-xl mx-auto leading-relaxed">
-              {t.billing_page.free_subtitle}
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-12 items-stretch max-w-5xl mx-auto text-left">
-            {/* Tarjeta 1: Free */}
-            <div className="relative flex flex-col p-7 md:p-10 rounded-[2rem] bg-white border border-zinc-200 shadow-xl shadow-zinc-200/20 opacity-80 hover:opacity-100 transition-all">
-              <div className="mb-8">
-                <h3 className="text-xl md:text-2xl font-black tracking-tight mb-2 italic text-zinc-400">{t.billing_page.free_card_title}</h3>
-                <p className="text-zinc-300 text-[10px] font-black uppercase tracking-widest">{t.billing_page.free_card_subtitle}</p>
-              </div>
-
-              <div className="flex items-baseline mb-8">
-                <span className="text-5xl md:text-6xl font-black tracking-tighter text-zinc-300">0€</span>
-                <span className="text-zinc-300 font-bold ml-2 uppercase tracking-widest text-sm">{t.billing_page.free_price_suffix}</span>
-              </div>
-
-              <div className="space-y-4 mb-10 flex-grow">
-                {[
-                  { text: t.billing_page.free_feat_1, limit: true },
-                  { text: t.billing_page.free_feat_2, limit: true },
-                  { text: t.billing_page.free_feat_3, limit: true },
-                  { text: t.billing_page.free_feat_4, limit: true },
-                  { text: t.billing_page.free_feat_5, limit: false },
-                ].map((feat, i) => (
-                  <div key={i} className={`flex items-start gap-3 font-medium ${feat.limit ? 'text-zinc-400' : 'text-zinc-500'}`}>
-                    <span className="text-zinc-200 shrink-0 mt-0.5" aria-hidden="true">✓</span>
-                    <span className="text-sm md:text-base">{feat.text}</span>
-                  </div>
-                ))}
-              </div>
-
-              <SignedOut>
-                <SignInButton mode="modal">
-                  <Button className="h-14 rounded-2xl bg-zinc-100 text-zinc-400 font-black text-xs tracking-widest uppercase w-full">
-                    {t.navbar.start_now}
-                  </Button>
-                </SignInButton>
-              </SignedOut>
-              <SignedIn>
-                <Link href="/dashboard" className="w-full">
-                  <Button className="h-14 rounded-2xl bg-zinc-100 text-zinc-400 font-black text-xs tracking-widest uppercase w-full">
-                    {t.navbar.dashboard}
-                  </Button>
-                </Link>
-              </SignedIn>
-            </div>
-
-            {/* Tarjeta 2: Reusamos el componente de Precios cargado dinámicamente con streaming */}
-            <Suspense fallback={<div className="h-[500px] w-full bg-zinc-100 animate-pulse rounded-[2rem]" />}>
-              <PricingWrapper t={t} />
-            </Suspense>
-          </div>
-        </section>
 
         {/* FAQ */}
         <section id="faq" aria-labelledby="faq-heading" className="max-w-3xl w-full text-left py-12 md:py-20 font-sans">
@@ -222,8 +160,16 @@ export default async function Home() {
         </section>
       </main>
 
-      <footer className="py-8 md:py-10 border-t border-zinc-100">
-        <div className="max-w-5xl mx-auto px-5 flex flex-col md:flex-row items-center justify-between gap-4 text-sm font-bold opacity-50">
+      <footer className="py-8 md:py-12 border-t border-zinc-100 flex flex-col items-center gap-6">
+        <a 
+          href="https://buymeacoffee.com/gontzi" 
+          target="_blank" 
+          rel="noopener noreferrer" 
+          className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-[#FF5C00] hover:bg-[#E65300] text-white font-bold text-sm rounded-md transition-all hover:scale-105 active:scale-95 shadow-md"
+        >
+          ☕ Apoyar el proyecto (Donar)
+        </a>
+        <div className="max-w-5xl mx-auto w-full px-5 flex flex-col md:flex-row items-center justify-between gap-4 text-sm font-bold opacity-50">
           <span>pidemelo<span className="text-[#FF5C00]">.</span>app</span>
           <p className="text-center text-xs">
             {t.landing.footer_made} <a href="https://ka0s.site/me" target="_blank" className="text-[#FF5C00]">Gontzi</a> de <a href="https://tunuevosoftware.com" target="_blank" className="text-[#ffd400]">TuNuevoSoftware</a>

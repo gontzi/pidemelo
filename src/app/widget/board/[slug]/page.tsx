@@ -50,27 +50,6 @@ async function BoardContent({ params, searchParams, t }: any) {
 
     if (!board) notFound();
 
-    const isOwnerPremium = board.user?.isPremium || board.user?.plan === 'pro' || board.user?.plan === 'lifetime';
-
-    if (!isOwnerPremium) {
-        return (
-            <div className="min-h-screen flex flex-col items-center justify-center p-8 text-center bg-zinc-50 border-4 border-dashed border-zinc-200">
-                <div className="w-16 h-16 bg-white rounded-2xl shadow-xl flex items-center justify-center text-3xl mb-4">🔒</div>
-                <h1 className="text-xl font-black text-zinc-900 mb-2 italic">{t.widget_page.disabled_title}</h1>
-                <p className="text-sm text-zinc-500 font-medium max-w-xs mb-6 leading-relaxed">
-                    {t.widget_page.disabled_desc}
-                </p>
-                <a
-                    href="https://pidemelo.app"
-                    target="_blank"
-                    className="text-[10px] font-black uppercase tracking-widest text-[#FF5C00] hover:underline"
-                >
-                    {t.widget_page.go_to}
-                </a>
-            </div>
-        );
-    }
-
     const sortedIdeas = board.ideas.sort((a, b) => b.votes.length - a.votes.length);
 
     return (

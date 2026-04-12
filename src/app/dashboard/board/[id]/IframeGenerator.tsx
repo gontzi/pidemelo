@@ -5,7 +5,7 @@ import { Copy, Check, Code, Lock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 
-export default function IframeGenerator({ slug, isPremium }: { slug: string; isPremium: boolean }) {
+export default function IframeGenerator({ slug }: { slug: string }) {
     const [copied, setCopied] = useState(false);
     const [color, setColor] = useState('#FF5C00');
     const [textColor, setTextColor] = useState('#18181b');
@@ -15,7 +15,6 @@ export default function IframeGenerator({ slug, isPremium }: { slug: string; isP
     const iframeCode = `<iframe src="${origin}/widget/${slug}?color=${encodeURIComponent(color)}&textColor=${encodeURIComponent(textColor)}" width="100%" height="600px" frameborder="0"></iframe>`;
 
     const handleCopy = async () => {
-        if (!isPremium) return;
         try {
             await navigator.clipboard.writeText(iframeCode);
             setCopied(true);
@@ -35,35 +34,13 @@ export default function IframeGenerator({ slug, isPremium }: { slug: string; isP
     ];
 
     return (
-        <section className={`bg-white p-10 md:p-12 rounded-[2.5rem] border border-zinc-200/60 shadow-xl shadow-zinc-200/20 overflow-hidden relative group transition-all ${!isPremium ? 'grayscale-[0.5]' : ''}`}>
+        <section className={`bg-white p-10 md:p-12 rounded-[2.5rem] border border-zinc-200/60 shadow-xl shadow-zinc-200/20 overflow-hidden relative group transition-all`}>
             <div
                 className="absolute top-0 right-0 -mr-16 -mt-16 w-64 h-64 rounded-full blur-3xl transition-all duration-700"
                 style={{ backgroundColor: `${color}10` }}
             />
 
-            {/* Overlay para No-Premium */}
-            {!isPremium && (
-                <div className="absolute inset-0 z-50 flex items-center justify-center bg-white/40 backdrop-blur-[2px]">
-                    <div className="bg-zinc-900 p-8 rounded-[2rem] shadow-2xl text-center space-y-6 max-w-sm animate-in fade-in zoom-in duration-300">
-                        <div className="w-16 h-16 bg-orange-500 rounded-3xl flex items-center justify-center mx-auto text-white shadow-lg shadow-orange-500/30">
-                            <Lock className="w-8 h-8" />
-                        </div>
-                        <div className="space-y-2">
-                            <h4 className="text-xl font-black text-white italic">Función Premium</h4>
-                            <p className="text-zinc-400 text-sm font-medium">
-                                Personaliza el color de tu widget y úsalo en tu web. Exclusivo para suscriptores.
-                            </p>
-                        </div>
-                        <Link href="/dashboard/billing">
-                            <Button className="w-full bg-[#FF5C00] hover:bg-white hover:text-zinc-900 text-white font-black text-xs tracking-widest uppercase h-12 rounded-xl transition-all shadow-lg shadow-orange-500/20">
-                                SUBIR DE NIVEL 🚀
-                            </Button>
-                        </Link>
-                    </div>
-                </div>
-            )}
-
-            <div className={`relative z-10 flex flex-col xl:flex-row gap-12 transition-all ${!isPremium ? 'blur-[2px] pointer-events-none' : ''}`}>
+            <div className={`relative z-10 flex flex-col xl:flex-row gap-12 transition-all`}>
                 <div className="space-y-10 max-w-xl">
                     <div className="space-y-4">
                         <div className="flex items-center gap-3">
@@ -168,9 +145,8 @@ export default function IframeGenerator({ slug, isPremium }: { slug: string; isP
 
                         <Button
                             onClick={handleCopy}
-                            disabled={!isPremium}
                             style={{ backgroundColor: color }}
-                            className={`w-full h-14 rounded-2xl transition-all font-black text-xs tracking-widest uppercase hover:opacity-90 shadow-2xl active:scale-95 text-white shadow-zinc-950/20`}
+                            className={`w-full h-14 rounded-2xl transition-all font-black text-xs tracking-widest uppercase hover:opacity-90 shadow-2xl active:scale-[0.98] text-white shadow-zinc-950/20`}
                         >
                             {copied ? (
                                 <><Check className="w-5 h-5 mr-3" /> ¡COPIADO AL PORTAPAPELES!</>

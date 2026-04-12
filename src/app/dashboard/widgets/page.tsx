@@ -14,10 +14,6 @@ export default async function WidgetsPage() {
     const { userId } = auth();
     if (!userId) redirect("/");
 
-    const user = await db.query.users.findFirst({
-        where: eq(users.id, userId)
-    });
-
     const userBoards = await db.query.boards.findMany({
         where: eq(boards.userId, userId),
         orderBy: (boards, { desc }) => [desc(boards.createdAt)],
@@ -35,7 +31,6 @@ export default async function WidgetsPage() {
 
                 <WidgetsClient
                     boards={userBoards}
-                    isPremium={user?.isPremium || false}
                     dict={t.widgets_client}
                 />
             </div>

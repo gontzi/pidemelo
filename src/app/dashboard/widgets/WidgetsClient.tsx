@@ -15,11 +15,9 @@ type Board = {
 
 export default function WidgetsClient({
     boards,
-    isPremium,
     dict
 }: {
     boards: Board[];
-    isPremium: boolean;
     dict: Record<string, string>;
 }) {
     const [selectedBoardId, setSelectedBoardId] = useState(boards[0]?.id || '');
@@ -47,7 +45,6 @@ export default function WidgetsClient({
         [widgetUrl, widgetType]);
 
     const handleCopy = async () => {
-        if (!isPremium) return;
         try {
             await navigator.clipboard.writeText(iframeCode);
             setCopied(true);
@@ -96,13 +93,6 @@ export default function WidgetsClient({
                     <h2 className="text-3xl font-black tracking-tight text-zinc-900">{dict.studio_title}</h2>
                     <p className="text-zinc-500 font-medium text-sm mt-1">{dict.studio_desc}</p>
                 </div>
-                {!isPremium && (
-                    <Link href="/dashboard/billing">
-                        <Button className="bg-gradient-to-r from-amber-400 to-orange-500 text-white font-black text-[10px] uppercase tracking-[0.2em] h-10 px-6 rounded-full shadow-lg shadow-orange-200 hover:scale-105 active:scale-95 transition-transform">
-                            {dict.upgrade_pro}
-                        </Button>
-                    </Link>
-                )}
             </div>
 
             <div className="flex flex-col lg:grid lg:grid-cols-12 gap-8 items-start w-full">
@@ -326,8 +316,7 @@ export default function WidgetsClient({
                                 </div>
                                 <Button
                                     onClick={handleCopy}
-                                    disabled={!isPremium}
-                                    className={`h-7 px-3 rounded-lg font-bold text-[10px] uppercase tracking-widest gap-1.5 bg-white/10 hover:bg-white/20 text-white border border-white/10 transition-all ${!isPremium ? 'opacity-50 grayscale' : ''}`}
+                                    className="h-7 px-3 rounded-lg font-bold text-[10px] uppercase tracking-widest gap-1.5 bg-white/10 hover:bg-white/20 text-white border border-white/10 transition-all"
                                 >
                                     {copied ? <Check className="w-3 h-3 text-green-400" /> : <Copy className="w-3 h-3" />}
                                     {copied ? dict.copied : dict.copy_code}
@@ -335,12 +324,6 @@ export default function WidgetsClient({
                             </div>
                             <div className="relative p-5 font-mono text-[11px] text-zinc-300 overflow-x-auto whitespace-pre-wrap break-all leading-relaxed max-h-[160px]">
                                 {iframeCode}
-                                {!isPremium && (
-                                    <div className="absolute inset-0 bg-zinc-950/80 backdrop-blur-sm flex flex-col items-center justify-center z-10 transition-all">
-                                        <Lock className="w-6 h-6 text-orange-500 mb-2" />
-                                        <p className="text-[10px] font-black uppercase tracking-[0.2em] text-white">{dict.pro_feature}</p>
-                                    </div>
-                                )}
                             </div>
                         </div>
                     </section>
@@ -375,7 +358,7 @@ export default function WidgetsClient({
                     </div>
 
                     {/* Contenedor del Escaparate */}
-                    <div className="bg-zinc-50/50 rounded-[2.5rem] p-4 sm:p-8 min-h-[600px] md:min-h-[800px] flex items-center justify-center border border-zinc-200 overflow-hidden relative transition-all duration-500 bg-[url('https://res.cloudinary.com/dqrzi8qzi/image/upload/v1734975549/grid_hzp3to.svg')] bg-center bg-zinc-100/50">
+                    <div className="bg-zinc-50/50 rounded-[2.5rem] p-4 sm:p-8 min-h-[600px] md:min-h-[800px] flex items-center justify-center border border-zinc-200 overflow-hidden relative transition-all duration-500 bg-[url('https://res.cloudinary.com/dqrzi8qzi/image/upload/v1734975549/grid_hzp3to.svg')] bg-center">
 
                         {/* Contenedor Dinámico del Iframe */}
                         <div

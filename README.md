@@ -5,9 +5,14 @@
 ![Tailwind CSS](https://img.shields.io/badge/Tailwind%20CSS-06B6D4?style=flat-square&logo=tailwind-css)
 
 ## Introduction
-This is a Next.js project, a web application for managing boards and ideas. The project utilizes TypeScript, React, and Tailwind CSS for styling.
+Pídemelo is a **100% Free, Unlimited, and Open Source** web application for managing boards and collecting feedback/ideas from your users. It embraces "Fintech Minimalism" to deliver a stunning experience.
+The project utilizes Next.js, TypeScript, React, and Tailwind CSS.
 
-## Project Structure
+## ☕ Support the Project (Sponsor)
+This project is maintained completely free of charge. If you find it useful for your business, consider supporting its development:
+
+[![Buy me a coffee](https://img.shields.io/badge/Buy%20me%20a%20coffee-FF5C00?style=for-the-badge&logo=buymeacoffee&logoColor=white)](https://buymeacoffee.com/gontzi)
+
 ## 📂 Project Structure
 ```markdown
 .

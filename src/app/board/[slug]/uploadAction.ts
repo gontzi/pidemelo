@@ -33,13 +33,7 @@ export async function uploadImageAction(formData: FormData) {
             return { error: "Tablero no encontrado." };
         }
 
-        const isOwnerPremium = boardInfo.user.isPremium ||
-            boardInfo.user.plan === 'pro' ||
-            boardInfo.user.plan === 'lifetime';
 
-        if (!isOwnerPremium) {
-            return { error: "Plan gratuito: No se permiten subidas de imágenes en este tablero." };
-        }
 
         // Subida a ImageKit mediante Fetch directo para soportar el Edge Runtime
         const privateKey = process.env.IMAGEKIT_PRIVATE_KEY;

@@ -11,8 +11,8 @@ import {
 
 interface ImageUploadProps {
     boardId: string;
-    isBoardPremium: boolean;
-    isCurrentUserAdmin: boolean;
+    isCurrentUserAdmin?: boolean;
+    widgetVersion?: 'normal' | 'lite';
     onUploadSuccess: (url: string) => void;
     isDarkMode?: boolean;
     dict: {
@@ -28,8 +28,8 @@ interface ImageUploadProps {
 
 export default function ImageUploadDropzone({
     boardId,
-    isBoardPremium,
-    isCurrentUserAdmin,
+    isCurrentUserAdmin = false,
+    widgetVersion = 'normal',
     onUploadSuccess,
     isDarkMode = false,
     dict
@@ -39,49 +39,6 @@ export default function ImageUploadDropzone({
     const [isPopoverOpen, setIsPopoverOpen] = useState(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
 
-    // Si NO es premium, mostramos la zona deshabilitada con un Popover persuasivo
-    if (!isBoardPremium) {
-        return (
-            <div className="w-full mb-4">
-                <Popover open={isPopoverOpen} onOpenChange={setIsPopoverOpen}>
-                    <PopoverTrigger asChild>
-                        <button
-                            type="button"
-                            onMouseEnter={() => setIsPopoverOpen(true)}
-                            onMouseLeave={() => setIsPopoverOpen(false)}
-                            className={`w-full flex items-center justify-center gap-2 rounded-2xl border-2 border-dashed p-4 opacity-50 cursor-not-allowed transition-all outline-none focus-visible:ring-2 focus-visible:ring-zinc-400 focus-visible:ring-offset-2 ${isDarkMode ? 'border-zinc-800 bg-zinc-900/50 hover:bg-zinc-800/50 text-zinc-500' : 'border-zinc-200 bg-zinc-50/50 hover:bg-zinc-100/50 text-zinc-400'}`}
-                        >
-                            <ImagePlus className="w-5 h-5" />
-                            <span className="text-sm font-medium text-left">
-                                {dict.attach_pro}
-                            </span>
-                        </button>
-                    </PopoverTrigger>
-                    <PopoverContent
-                        side="top"
-                        align="center"
-                        className="w-72 p-4 rounded-2xl shadow-xl border-zinc-200 animate-in fade-in zoom-in-95 duration-200 z-[100]"
-                        onMouseEnter={() => setIsPopoverOpen(true)}
-                        onMouseLeave={() => setIsPopoverOpen(false)}
-                    >
-                        <div className="flex flex-col items-center text-center gap-3">
-                            <div className="w-10 h-10 rounded-full bg-orange-100 flex items-center justify-center">
-                                <Lock className="w-5 h-5 text-[#FF5C00]" />
-                            </div>
-                            <div className="space-y-1">
-                                <h4 className="font-bold text-sm text-zinc-900 leading-tight">{dict.pro_title}</h4>
-                                <p className="text-xs text-zinc-500 leading-relaxed font-medium">
-                                    {dict.pro_desc}
-                                </p>
-                            </div>
-                        </div>
-                    </PopoverContent>
-                </Popover>
-            </div>
-        );
-    }
-
-    // Tablero Premium -> Subida funcional
     const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (!file) return;

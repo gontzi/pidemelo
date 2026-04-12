@@ -18,12 +18,10 @@ type Tag = {
 export default function TagsManager({
     boardId,
     tags,
-    isPremium,
     dict
 }: {
     boardId: string;
     tags: Tag[];
-    isPremium: boolean;
     dict: Record<string, string>;
 }) {
     const [name, setName] = useState('');
@@ -33,7 +31,7 @@ export default function TagsManager({
     const [isPending, startTransition] = useTransition();
     const [error, setError] = useState<string | null>(null);
 
-    const isLimitReached = !isPremium && tags.length >= 6;
+
 
     const handleSubmit = () => {
         if (!name.trim()) return;
@@ -87,29 +85,12 @@ export default function TagsManager({
             <div className="space-y-1">
                 <div className="flex items-center gap-2">
                     <h3 className="font-bold text-lg md:text-xl text-zinc-900 tracking-tight">{dict.tags_title || 'Etiquetas / Tags'}</h3>
-                    <span className={`text-[10px] font-black px-2 py-0.5 rounded-full ${isLimitReached ? 'bg-orange-100 text-[#FF5C00]' : 'bg-emerald-100 text-emerald-600'}`}>
-                        {isPremium ? '∞' : `${tags.length}/6`}
+                    <span className="text-[10px] font-black px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-600">
+                        ∞
                     </span>
                 </div>
                 <p className="text-xs md:text-sm font-medium text-zinc-500">{dict.tags_desc || 'Organiza las ideas por categoría o estado utilizando colores y etiquetas.'}</p>
             </div>
-
-            {isLimitReached && (
-                <div className="bg-orange-50/50 border border-orange-100 rounded-2xl p-4 flex gap-4 items-center mb-4">
-                    <div className="w-10 h-10 rounded-full bg-white flex items-center justify-center text-[#FF5C00] shadow-sm flex-shrink-0">
-                        <Lock className="w-5 h-5" />
-                    </div>
-                    <div>
-                        <p className="text-xs md:text-sm text-zinc-800 font-bold leading-tight">{dict.tags_limit_title || 'Has alcanzado el límite gratuito'}</p>
-                        <p className="text-[10px] md:text-xs text-zinc-500 font-medium">{dict.tags_limit_desc || 'Las cuentas gratuitas pueden tener hasta 6 etiquetas por board.'}</p>
-                    </div>
-                    <Link href="/dashboard/billing" className="ml-auto">
-                        <Button size="sm" className="bg-[#FF5C00] hover:bg-[#E65300] text-white font-bold text-[10px] uppercase tracking-widest rounded-full h-8 px-4">
-                            {dict.upgrade || 'Mejorar'}
-                        </Button>
-                    </Link>
-                </div>
-            )}
 
             <div className="flex-1 bg-zinc-50 border border-zinc-100 rounded-[1.5rem] p-4 flex flex-col gap-3 overflow-y-auto max-h-[250px] shadow-inner">
                 {tags.length === 0 ? (
@@ -150,11 +131,7 @@ export default function TagsManager({
             </div>
 
             <div className="relative mt-auto pt-4 border-t border-zinc-100">
-                {isLimitReached && (
-                    <div className="absolute inset-0 z-20 bg-white/40 backdrop-blur-[2px] transition-all duration-500 rounded-xl" />
-                )}
-
-                <div className={`space-y-4 ${isLimitReached ? 'opacity-40 grayscale-[0.5] pointer-events-none' : ''}`}>
+                <div className="space-y-4">
                     <div className="flex flex-col gap-4">
                         <div className="space-y-1.5 flex-1">
                             <Label htmlFor="tag-name" className="text-[10px] uppercase tracking-widest font-bold text-zinc-400 ml-1">{dict.new_tag_name || 'Nombre'}</Label>
@@ -163,7 +140,7 @@ export default function TagsManager({
                                 value={name}
                                 onChange={e => setName(e.target.value)}
                                 placeholder={dict.new_tag_ph || 'Ej: Bug...'}
-                                disabled={isLimitReached || isPending}
+                                disabled={isPending}
                                 className="h-12 rounded-xl shadow-none border-zinc-200 bg-white focus-visible:ring-[#FF5C00] font-medium px-4 text-sm"
                             />
                         </div>
@@ -176,7 +153,7 @@ export default function TagsManager({
                                 onChange={e => setDescription(e.target.value)}
                                 maxLength={100}
                                 placeholder={dict.tag_desc_ph || 'Explicación breve...'}
-                                disabled={isLimitReached || isPending}
+                                disabled={isPending}
                                 className="h-10 rounded-xl shadow-none border-zinc-200 bg-white focus-visible:ring-[#FF5C00] text-xs px-4"
                             />
                         </div>
@@ -188,7 +165,7 @@ export default function TagsManager({
                                     <button
                                         key={preset}
                                         type="button"
-                                        disabled={isLimitReached || isPending}
+                                        disabled={isPending}
                                         onClick={() => setColor(preset)}
                                         className={`w-8 h-8 rounded-lg border-2 transition-all hover:scale-110 active:scale-90 ${color === preset ? 'border-zinc-900 shadow-sm' : 'border-transparent'}`}
                                         style={{ backgroundColor: preset }}
@@ -198,7 +175,7 @@ export default function TagsManager({
                                     type="color"
                                     value={color}
                                     onChange={(e) => setColor(e.target.value)}
-                                    disabled={isLimitReached || isPending}
+                                    disabled={isPending}
                                     className="w-8 h-8 rounded-lg border-2 border-transparent cursor-pointer bg-white overflow-hidden shadow-inner flex-shrink-0 p-0"
                                 />
                             </div>
@@ -222,7 +199,7 @@ export default function TagsManager({
                         <Button
                             type="button"
                             onClick={handleSubmit}
-                            disabled={(!editingId && isLimitReached) || isPending || !name.trim()}
+                            disabled={isPending || !name.trim()}
                             className={`${editingId ? 'w-2/3' : 'w-full'} h-12 rounded-xl bg-zinc-900 text-white hover:bg-zinc-800 font-bold transition-all active:scale-95 flex items-center justify-center gap-2 text-sm shadow-md`}
                         >
                             {!editingId && <Plus className="w-4 h-4" />}

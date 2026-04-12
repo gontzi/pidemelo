@@ -14,12 +14,7 @@ import { UserButton, useUser } from '@clerk/nextjs';
 export default function BottomNav({ dict }: { dict: any }) {
     const pathname = usePathname();
     const [open, setOpen] = useState(false);
-    const [isPremium, setIsPremium] = useState(false);
     const { user } = useUser();
-
-    useEffect(() => {
-        if (user?.publicMetadata?.isPremium) setIsPremium(true);
-    }, [user]);
 
     const isActive = (path: string) => {
         if (path === '/dashboard') return pathname === '/dashboard';
@@ -37,11 +32,7 @@ export default function BottomNav({ dict }: { dict: any }) {
             label: dict.navbar.widgets || 'Widgets', 
             icon: Monitor 
         },
-        { 
-            href: '/dashboard/billing', 
-            label: isPremium ? (dict.navbar.pro || 'Pro') : (dict.navbar.plans || 'Planes'), 
-            icon: Zap 
-        },
+
         { 
             href: '/dashboard/profile', 
             label: 'Perfil', 

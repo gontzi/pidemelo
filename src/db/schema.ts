@@ -6,9 +6,7 @@ export const users = pgTable('users', {
     id: text('id').primaryKey(), // Clerk User ID
     email: text('email'),
     name: text('name'),
-    isPremium: boolean('is_premium').default(false).notNull(),
-    plan: text('plan'), // 'pro' | 'lifetime' | null
-    subscriptionId: text('subscription_id'),
+
     createdAt: timestamp('created_at').defaultNow().notNull(),
     updatedAt: timestamp('updated_at').defaultNow().notNull(),
 });

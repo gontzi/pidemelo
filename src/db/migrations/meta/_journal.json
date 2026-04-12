@@ -15,6 +15,13 @@
       "when": 1775301870868,
       "tag": "0001_funny_shinko_yamashiro",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1776029309765,
+      "tag": "0002_clammy_lockheed",
+      "breakpoints": true
     }
   ]
 }

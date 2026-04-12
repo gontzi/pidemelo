@@ -25,10 +25,9 @@ interface ProjectCardProps {
     };
     dict: Record<string, string>;
     settingsDict: Record<string, string>;
-    isPremium: boolean;
 }
 
-export default function ProjectCard({ board, dict, settingsDict, isPremium }: ProjectCardProps) {
+export default function ProjectCard({ board, dict, settingsDict }: ProjectCardProps) {
     const [copied, setCopied] = useState(false);
     const [settingsOpen, setSettingsOpen] = useState(false);
 
@@ -75,7 +74,7 @@ export default function ProjectCard({ board, dict, settingsDict, isPremium }: Pr
                         </h3>
                         
                         <div className="flex flex-wrap gap-1.5 pt-2">
-                            {board.tags?.slice(0, 3).map(tag => (
+                            {board.tags?.map(tag => (
                                 <span key={tag.id} className="text-[10px] font-bold text-zinc-400 bg-zinc-50 border border-zinc-100/50 px-2 py-0.5 rounded-full flex items-center gap-1.5 uppercase tracking-tight">
                                     <span className="w-1 h-1 rounded-full" style={{ backgroundColor: tag.color }} />
                                     {tag.name}
@@ -131,7 +130,6 @@ export default function ProjectCard({ board, dict, settingsDict, isPremium }: Pr
                                 currentSlug={board.slug}
                                 dict={settingsDict}
                                 tags={board.tags}
-                                isPremium={isPremium}
                                 notifyNewIdeas={board.notifyNewIdeas}
                                 trigger={
                                     <button
@@ -164,7 +162,6 @@ export default function ProjectCard({ board, dict, settingsDict, isPremium }: Pr
                     currentSlug={board.slug}
                     dict={settingsDict}
                     tags={board.tags}
-                    isPremium={isPremium}
                     notifyNewIdeas={board.notifyNewIdeas}
                     trigger={
                         <ContextMenuItem onSelect={(e) => { e.preventDefault(); setSettingsOpen(true); }} className="rounded-xl py-3 px-4 font-bold text-zinc-700 focus:bg-orange-50 focus:text-[#FF5C00]">
