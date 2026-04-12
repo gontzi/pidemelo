@@ -1,7 +1,23 @@
 {
   "name": "pidemelo",
-  "version": "0.1.0",
+  "version": "1.0.0",
+  "description": "100% Free, Unlimited, and Open Source Feedback Management Platform.",
+  "author": "Gontzi (pidemelo.app)",
   "private": true,
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/gontzi/pidemelo"
+  },
+  "keywords": [
+    "feedback",
+    "boards",
+    "open-source",
+    "nextjs",
+    "saas",
+    "voting",
+    "community-feedback"
+  ],
   "scripts": {
     "dev": "next dev",
     "build": "next build",
