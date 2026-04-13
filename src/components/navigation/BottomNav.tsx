@@ -35,7 +35,7 @@ export default function BottomNav({ dict }: { dict: any }) {
 
         { 
             href: '/dashboard/profile', 
-            label: 'Perfil', 
+            label: dict.navbar.profile || 'Perfil', 
             icon: User,
             isProfile: true
         },
@@ -108,7 +108,7 @@ export default function BottomNav({ dict }: { dict: any }) {
                             item.isProfile ? (
                                 <div key="profile" className="flex flex-col items-center gap-1 active:scale-90 transition-all px-1">
                                     <UserButton appearance={{ elements: { avatarBox: "w-6 h-6 border border-zinc-200" } }} />
-                                    <span className="text-[9px] font-black uppercase tracking-tighter text-zinc-400 leading-none">Perfil</span>
+                                    <span className="text-[9px] font-black uppercase tracking-tighter text-zinc-400 leading-none">{dict.navbar.profile || 'Perfil'}</span>
                                 </div>
                             ) : (
                                 <Link

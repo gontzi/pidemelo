@@ -8,14 +8,14 @@ import { revalidatePath } from "next/cache";
 
 export async function updateBoardSettings(boardId: string, newName: string, formDataSlug: string) {
     const { userId } = auth();
-    if (!userId) return { error: "Unauthorized" };
+    if (!userId) return { error: "unauthorized" };
 
-    if (!newName) return { error: "Name cannot be empty" };
-    if (!formDataSlug) return { error: "Slug cannot be empty" };
+    if (!newName) return { error: "name_empty" };
+    if (!formDataSlug) return { error: "slug_empty" };
 
     // Formato: lowercase, sin espacios, solo guiones, alfanumerico
     const newSlug = formDataSlug.toLowerCase().replace(/[^a-z0-9-]/g, '').replace(/-+/g, '-').replace(/^-|-$/g, '');
-    if (!newSlug) return { error: "Invalid slug format" };
+    if (!newSlug) return { error: "invalid_slug" };
 
     // Check unique
     const existing = await db.query.boards.findFirst({
@@ -23,7 +23,7 @@ export async function updateBoardSettings(boardId: string, newName: string, form
     });
 
     if (existing) {
-        return { error: "El slug ya está en uso." };
+        return { error: "slug_taken" };
     }
 
     await db.update(boards)
@@ -36,7 +36,7 @@ export async function updateBoardSettings(boardId: string, newName: string, form
 
 export async function updateBoardNotificationPreference(boardId: string, notify: boolean) {
     const { userId } = auth();
-    if (!userId) return { error: "Unauthorized" };
+    if (!userId) return { error: "unauthorized" };
 
     await db.update(boards)
         .set({ notifyNewIdeas: notify })
@@ -48,7 +48,7 @@ export async function updateBoardNotificationPreference(boardId: string, notify:
 
 export async function updateIdeaStatus(ideaId: string, newStatus: 'en_revision' | 'planeado' | 'en_progreso' | 'completado' | 'descartado' | 'archivado', boardId: string) {
     const { userId } = auth();
-    if (!userId) return { error: "Unauthorized" };
+    if (!userId) return { error: "unauthorized" };
 
     // Verificar propiedad
     const idea = await db.query.ideas.findFirst({
@@ -57,7 +57,7 @@ export async function updateIdeaStatus(ideaId: string, newStatus: 'en_revision' 
     });
 
     if (!idea || idea.board.userId !== userId) {
-        return { error: "No permission" };
+        return { error: "no_permission" };
     }
 
     await db.update(ideas)
@@ -70,7 +70,7 @@ export async function updateIdeaStatus(ideaId: string, newStatus: 'en_revision' 
 
 export async function deleteIdea(ideaId: string, boardId: string) {
     const { userId } = auth();
-    if (!userId) return { error: "Unauthorized" };
+    if (!userId) return { error: "unauthorized" };
 
     // Verificar propiedad
     const idea = await db.query.ideas.findFirst({
@@ -79,7 +79,7 @@ export async function deleteIdea(ideaId: string, boardId: string) {
     });
 
     if (!idea || idea.board.userId !== userId) {
-        return { error: "No permission" };
+        return { error: "no_permission" };
     }
 
     // Eliminar votos. El cascade ya lo hace si está configurado en Postgres, pero con Serverless a veces es mejor asegurarlo.
@@ -92,13 +92,13 @@ export async function deleteIdea(ideaId: string, boardId: string) {
 
 export async function deleteBoard(boardId: string) {
     const { userId } = auth();
-    if (!userId) return { error: "Unauthorized" };
+    if (!userId) return { error: "unauthorized" };
 
     const board = await db.query.boards.findFirst({
         where: and(eq(boards.id, boardId), eq(boards.userId, userId))
     });
 
-    if (!board) return { error: "No permission" };
+    if (!board) return { error: "no_permission" };
 
     // Automatic cascade delete on Postgres
     await db.delete(boards).where(and(eq(boards.id, boardId), eq(boards.userId, userId)));
@@ -109,14 +109,14 @@ export async function deleteBoard(boardId: string) {
 
 export async function createTag(boardId: string, name: string, color: string, description?: string | null) {
     const { userId } = auth();
-    if (!userId) return { error: "Unauthorized" };
+    if (!userId) return { error: "unauthorized" };
 
     const board = await db.query.boards.findFirst({
         where: and(eq(boards.id, boardId), eq(boards.userId, userId)),
         with: { tags: true }
     });
 
-    if (!board) return { error: "No permission" };
+    if (!board) return { error: "no_permission" };
 
     await db.insert(tags).values({
         boardId,
@@ -131,13 +131,13 @@ export async function createTag(boardId: string, name: string, color: string, de
 
 export async function updateTag(tagId: string, boardId: string, name: string, color: string, description?: string | null) {
     const { userId } = auth();
-    if (!userId) return { error: "Unauthorized" };
+    if (!userId) return { error: "unauthorized" };
 
     const board = await db.query.boards.findFirst({
         where: and(eq(boards.id, boardId), eq(boards.userId, userId))
     });
 
-    if (!board) return { error: "No permission" };
+    if (!board) return { error: "no_permission" };
 
     await db.update(tags)
         .set({ name, color, description })
@@ -149,13 +149,13 @@ export async function updateTag(tagId: string, boardId: string, name: string, co
 
 export async function deleteTag(tagId: string, boardId: string) {
     const { userId } = auth();
-    if (!userId) return { error: "Unauthorized" };
+    if (!userId) return { error: "unauthorized" };
 
     const board = await db.query.boards.findFirst({
         where: and(eq(boards.id, boardId), eq(boards.userId, userId))
     });
 
-    if (!board) return { error: "No permission" };
+    if (!board) return { error: "no_permission" };
 
     await db.delete(tags).where(and(eq(tags.id, tagId), eq(tags.boardId, boardId)));
 

@@ -167,7 +167,7 @@ export default async function Home() {
           rel="noopener noreferrer" 
           className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-[#FF5C00] hover:bg-[#E65300] text-white font-bold text-sm rounded-md transition-all hover:scale-105 active:scale-95 shadow-md"
         >
-          ☕ Apoyar el proyecto (Donar)
+          ☕ {t.common.support_project}
         </a>
         <div className="max-w-5xl mx-auto w-full px-5 flex flex-col md:flex-row items-center justify-between gap-4 text-sm font-bold opacity-50">
           <span>pidemelo<span className="text-[#FF5C00]">.</span>app</span>

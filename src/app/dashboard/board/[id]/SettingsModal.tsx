@@ -142,15 +142,15 @@ export default function SettingsModal({
                                         className="h-12 md:h-14 rounded-none rounded-r-2xl shadow-none border-zinc-200 bg-[#FAFAFA] focus-visible:ring-[#FF5C00] font-medium text-sm md:text-base"
                                     />
                                 </div>
-                                {error && <p className="text-[10px] md:text-sm text-red-500 font-medium mt-2">{error}</p>}
+                                {error && <p className="text-[10px] md:text-sm text-red-500 font-medium mt-2">{(dict as any).errors?.[error] || error}</p>}
                             </div>
 
                             {/* Notificaciones */}
                             <div className="pt-4 border-t border-zinc-100">
                                 <div className="flex items-center justify-between p-4 bg-zinc-50 rounded-2xl border border-zinc-200/50">
                                     <div className="space-y-0.5">
-                                        <Label className="text-sm font-bold text-zinc-900 leading-none">Notificaciones por correo</Label>
-                                        <p className="text-[10px] md:text-xs text-zinc-500 font-medium">Recibe un email cada vez que alguien publique una nueva idea en este tablero.</p>
+                                        <Label className="text-sm font-bold text-zinc-900 leading-none">{dict.notify_email}</Label>
+                                        <p className="text-[10px] md:text-xs text-zinc-500 font-medium">{dict.notify_desc}</p>
                                     </div>
                                     <Switch
                                         checked={notify}
@@ -209,7 +209,7 @@ export default function SettingsModal({
                                     <div className="p-3 bg-white rounded-xl shadow-sm border border-zinc-100">
                                         <Settings className="w-6 h-6 text-zinc-300" />
                                     </div>
-                                    <span className="text-xs font-bold uppercase tracking-widest">En construcción</span>
+                                    <span className="text-xs font-bold uppercase tracking-widest">{dict.under_construction}</span>
                                 </div>
                             )}
                         </div>

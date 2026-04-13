@@ -107,10 +107,10 @@ export default function SubmitIdeaForm({
                                 <Check className="w-8 h-8 text-white stroke-[3] animate-in zoom-in duration-500 delay-150" />
                             </div>
                             <h3 className="font-[family-name:var(--font-jakarta)] text-2xl md:text-3xl font-extrabold tracking-tight mb-2 text-white drop-shadow-sm w-full text-balance">
-                                {dict.success_title || '¡Idea recibida!'}
+                                {dict.success_title}
                             </h3>
                             <p className="text-sm md:text-base font-medium text-white/90 max-w-[260px] mx-auto leading-relaxed text-balance">
-                                {dict.success_desc || 'Ya está guardada. Ojalá llegue muy lejos.'}
+                                {dict.success_desc}
                             </p>
                         </div>
                     ) : (
@@ -119,7 +119,7 @@ export default function SubmitIdeaForm({
                                 <X className="w-8 h-8 text-red-600 stroke-[3]" />
                             </div>
                             <h3 className={`font-[family-name:var(--font-jakarta)] text-2xl font-extrabold tracking-tight mb-2 text-balance ${isDarkMode ? 'text-zinc-50' : 'text-zinc-900'}`}>
-                                Ups, algo falló
+                                {dict.error_submit_title}
                             </h3>
                             <p className="text-sm font-medium opacity-80 max-w-[260px] mx-auto text-balance" style={{ color: isDarkMode ? '#a1a1aa' : '#52525b' }}>
                                 {error}
@@ -237,7 +237,7 @@ export default function SubmitIdeaForm({
             ) : (
                 <div className="relative inline-block mt-2">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src={uploadedImageUrl} alt="Imagen subida" className="h-24 w-24 object-cover rounded-xl border-2 border-zinc-200 shadow-sm" />
+                    <img src={uploadedImageUrl} alt={dict.image_uploaded_alt} className="h-24 w-24 object-cover rounded-xl border-2 border-zinc-200 shadow-sm" />
                     <button
                         type="button"
                         onClick={() => setUploadedImageUrl(null)}

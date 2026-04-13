@@ -37,7 +37,9 @@ export default {
     "common": {
         "save": "Save",
         "cancel": "Cancel",
-        "donation_text": "This project is free and Open Source. If it helps you, consider buying us a coffee to keep it alive."
+        "donation_text": "This project is free and Open Source. If it helps you, consider buying us a coffee to keep it alive.",
+        "support_project": "Support the project (Donate)",
+        "support_gontzi": "Support Gontzi"
     },
     "navbar": {
         "what_is": "What is it?",
@@ -51,7 +53,9 @@ export default {
         "mobile_faq": "🤔 FAQ",
         "mobile_try_free": "TRY FOR FREE 🚀",
         "mobile_dashboard": "Dashboard 🏠",
-        "mobile_donation": "Donate / Support"
+        "mobile_donation": "Donate / Support",
+        "profile": "Profile",
+        "support_gontzi": "Support Gontzi"
     },
     "dashboard_index": {
         "admin": "Administration",
@@ -94,7 +98,17 @@ export default {
         "delete_confirm_desc": "This action is irreversible. All votes and accumulated ideas will be lost. Are you sure you want to proceed?",
         "deleting": "Deleting...",
         "yes_delete": "Yes, permanently delete 🗑️",
-        "changed_my_mind": "I changed my mind"
+        "changed_my_mind": "I changed my mind",
+        "notify_email": "Email Notifications",
+        "notify_desc": "Get an email every time someone posts a new idea on this board.",
+        "under_construction": "Under construction",
+        "tags_title": "Tags / Categories",
+        "tags_desc": "Organize ideas by category or status using colors and labels. Unlimited.",
+        "new_tag_name": "Name",
+        "new_tag_ph": "Ex: Bug...",
+        "color": "Color",
+        "add_tag": "Add Tag",
+        "no_tags": "No tags yet"
     },
     "board_client": {
         "col_pending": "🤔 Under Review",
@@ -109,7 +123,23 @@ export default {
         "vote": "VOTE",
         "votes": "VOTES",
         "idea_description": "Description",
-        "close": "Close"
+        "close": "Close",
+        "tab_active": "🚀 Active",
+        "tab_discarded": "💨 Discarded",
+        "tab_archived": "🗃️ Archived",
+        "move_to": "Move to...",
+        "actions_title": "Status Actions",
+        "status_revision": "Review",
+        "status_planned": "Planned",
+        "status_progress": "Progress",
+        "status_done": "Done",
+        "status_discard": "Discard",
+        "status_archive": "Archive",
+        "status_restore": "Restore",
+        "empty_section": "Nothing in this section",
+        "discarded_desc": "Out of priority",
+        "archived_desc": "In the archive",
+        "empty": "Empty"
     },
     "widgets_page": {
         "title": "Widgets",
@@ -144,7 +174,13 @@ export default {
         "english": "English",
         "widget_version": "Widget Version",
         "version_normal": "Normal",
-        "version_lite": "Lite / Mini"
+        "version_lite": "Lite / Mini",
+        "pro_badge": "Pro Customization",
+        "custom_title": "Your widget, your colors",
+        "custom_desc": "Choose the color that best fits your brand. Buttons and widget details will adapt magically.",
+        "embed_hint": "Embed this code on your website",
+        "copy_full": "COPY HTML CODE",
+        "copied_full": "COPIED TO CLIPBOARD!"
     },
     "public_board_page": {
         "tag": "🚀 Suggestions & Roadmap",
@@ -166,7 +202,8 @@ export default {
         "tag_discarded": "Discarded",
         "tag_done": "Done",
         "empty_title": "We couldn't find anything.",
-        "empty_desc": "Try with other filters or be the first to propose it."
+        "empty_desc": "Try with other filters or be the first to propose it.",
+        "powered_by": "Powered by"
     },
     "submit_idea_form": {
         "title_placeholder": "Ex. Add a button that gives me free coffee...",
@@ -174,20 +211,14 @@ export default {
         "select_tag": "Select tag (optional)",
         "no_tag": "No tag",
         "error_fallback": "Something went wrong",
+        "error_submit_title": "Oops, something failed",
         "submitting": "SUBMITTING...",
-        "submit_btn": "DROP MY IDEA 🚀"
+        "submit_btn": "DROP MY IDEA 🚀",
+        "success_title": "Idea received!",
+        "success_desc": "It's already saved. Hope it goes far.",
+        "image_uploaded_alt": "Uploaded image"
     },
-    "tags_manager": {
-        "tags_title": "Tags / Categories",
-        "tags_desc": "Organize ideas by category or status using colors and labels. Unlimited.",
-        "new_tag_name": "Name",
-        "new_tag_ph": "Ex: Bug...",
-        "color": "Color",
-        "add_tag": "Add Tag",
-        "no_tags": "No tags yet",
-        "save": "Save",
-        "cancel": "Cancel"
-    },
+
     "image_upload": {
         "attach": "Attach image or screenshot (max 1MB)",
         "uploading": "Uploading image...",
@@ -204,5 +235,15 @@ export default {
         "desc": "There is nothing here. No ideas, no votes, not even that coffee you desperately need right now.",
         "back": "Back to civilization",
         "quote": "\"If you want different results, do not go to routes that don't exist\" — Probably Einstein."
+    },
+
+    "errors": {
+        "unauthorized": "Unauthorized",
+        "no_permission": "No permission",
+        "invalid_slug": "Invalid URL format",
+        "slug_taken": "The URL is already in use.",
+        "name_empty": "Name cannot be empty",
+        "slug_empty": "URL cannot be empty",
+        "generic": "Something went wrong"
     }
 }

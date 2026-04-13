@@ -84,18 +84,18 @@ export default function TagsManager({
         <div className="flex flex-col h-full space-y-6">
             <div className="space-y-1">
                 <div className="flex items-center gap-2">
-                    <h3 className="font-bold text-lg md:text-xl text-zinc-900 tracking-tight">{dict.tags_title || 'Etiquetas / Tags'}</h3>
+                    <h3 className="font-bold text-lg md:text-xl text-zinc-900 tracking-tight">{dict.tags_title}</h3>
                     <span className="text-[10px] font-black px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-600">
                         ∞
                     </span>
                 </div>
-                <p className="text-xs md:text-sm font-medium text-zinc-500">{dict.tags_desc || 'Organiza las ideas por categoría o estado utilizando colores y etiquetas.'}</p>
+                <p className="text-xs md:text-sm font-medium text-zinc-500">{dict.tags_desc}</p>
             </div>
 
             <div className="flex-1 bg-zinc-50 border border-zinc-100 rounded-[1.5rem] p-4 flex flex-col gap-3 overflow-y-auto max-h-[250px] shadow-inner">
                 {tags.length === 0 ? (
                     <div className="flex-1 flex flex-col items-center justify-center text-center text-zinc-400 gap-2 min-h-[100px]">
-                        <span className="text-xs font-bold uppercase tracking-widest">{dict.no_tags || 'Aún no hay etiquetas'}</span>
+                        <span className="text-xs font-bold uppercase tracking-widest">{dict.no_tags}</span>
                     </div>
                 ) : (
                     tags.map(tag => (
@@ -134,12 +134,12 @@ export default function TagsManager({
                 <div className="space-y-4">
                     <div className="flex flex-col gap-4">
                         <div className="space-y-1.5 flex-1">
-                            <Label htmlFor="tag-name" className="text-[10px] uppercase tracking-widest font-bold text-zinc-400 ml-1">{dict.new_tag_name || 'Nombre'}</Label>
+                            <Label htmlFor="tag-name" className="text-[10px] uppercase tracking-widest font-bold text-zinc-400 ml-1">{dict.new_tag_name}</Label>
                             <Input
                                 id="tag-name"
                                 value={name}
                                 onChange={e => setName(e.target.value)}
-                                placeholder={dict.new_tag_ph || 'Ej: Bug...'}
+                                placeholder={dict.new_tag_ph}
                                 disabled={isPending}
                                 className="h-12 rounded-xl shadow-none border-zinc-200 bg-white focus-visible:ring-[#FF5C00] font-medium px-4 text-sm"
                             />
@@ -152,14 +152,14 @@ export default function TagsManager({
                                 value={description}
                                 onChange={e => setDescription(e.target.value)}
                                 maxLength={100}
-                                placeholder={dict.tag_desc_ph || 'Explicación breve...'}
+                                placeholder={dict.tag_desc_ph}
                                 disabled={isPending}
                                 className="h-10 rounded-xl shadow-none border-zinc-200 bg-white focus-visible:ring-[#FF5C00] text-xs px-4"
                             />
                         </div>
 
                         <div className="space-y-2">
-                            <Label className="text-[10px] uppercase tracking-widest font-bold text-zinc-400 ml-1">{dict.color || 'Color'}</Label>
+                            <Label className="text-[10px] uppercase tracking-widest font-bold text-zinc-400 ml-1">{dict.color}</Label>
                             <div className="flex flex-wrap gap-2">
                                 {colorPresets.map((preset) => (
                                     <button
@@ -182,7 +182,7 @@ export default function TagsManager({
                         </div>
                     </div>
 
-                    {error && <p className="text-[10px] text-red-500 font-medium">{error}</p>}
+                    {error && <p className="text-[10px] text-red-500 font-medium">{(dict as any).errors?.[error] || error}</p>}
 
                     <div className="flex gap-2">
                         {editingId && (
@@ -193,7 +193,7 @@ export default function TagsManager({
                                 variant="outline"
                                 className="w-1/3 h-12 rounded-xl text-zinc-600 font-medium transition-all active:scale-95 text-xs shadow-sm bg-white"
                             >
-                                {dict.cancel || 'Cancelar'}
+                                {dict.cancel}
                             </Button>
                         )}
                         <Button
@@ -203,7 +203,7 @@ export default function TagsManager({
                             className={`${editingId ? 'w-2/3' : 'w-full'} h-12 rounded-xl bg-zinc-900 text-white hover:bg-zinc-800 font-bold transition-all active:scale-95 flex items-center justify-center gap-2 text-sm shadow-md`}
                         >
                             {!editingId && <Plus className="w-4 h-4" />}
-                            {editingId ? (dict.save || 'Guardar') : (dict.add_tag || 'Añadir Etiqueta')}
+                            {editingId ? dict.save : dict.add_tag}
                         </Button>
                     </div>
                 </div>

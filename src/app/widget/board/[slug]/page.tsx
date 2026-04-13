@@ -78,7 +78,7 @@ async function BoardContent({ params, searchParams, t }: any) {
                     target="_blank"
                     className="inline-flex items-center gap-1.5 text-[10px] uppercase tracking-[0.2em] font-black text-zinc-300 hover:text-zinc-400 transition-all group"
                 >
-                    <span>Powered by</span>
+                    <span>{t.public_board_client.powered_by || 'Powered by'}</span>
                     <span className="font-jakarta font-extrabold lowercase tracking-tighter text-[13px] flex items-center">
                         <span className="group-hover:text-[#FF5C00] transition-colors text-zinc-400">pidemelo</span>
                         <span className="text-[#FF5C00]">.</span>

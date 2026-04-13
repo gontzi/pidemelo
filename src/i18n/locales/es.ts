@@ -37,7 +37,9 @@ export default {
     "common": {
         "save": "Guardar",
         "cancel": "Cancelar",
-        "donation_text": "Este proyecto es gratuito y Open Source. Si te ayuda, considera invitarnos a un café para que siga vivo."
+        "donation_text": "Este proyecto es gratuito y Open Source. Si te ayuda, considera invitarnos a un café para que siga vivo.",
+        "support_project": "Apoyar el proyecto (Donar)",
+        "support_gontzi": "Apoyar a Gontzi"
     },
     "navbar": {
         "what_is": "¿Qué es?",
@@ -51,7 +53,9 @@ export default {
         "mobile_faq": "🤔 Dudas frecuentes",
         "mobile_try_free": "PROBAR GRATIS 🚀",
         "mobile_dashboard": "Panel de Control 🏠",
-        "mobile_donation": "Donar / Support"
+        "mobile_donation": "Donar / Support",
+        "profile": "Perfil",
+        "support_gontzi": "Apoyar a Gontzi"
     },
     "dashboard_index": {
         "admin": "Administración",
@@ -94,7 +98,17 @@ export default {
         "delete_confirm_desc": "Esta acción es irreversible. Se borrarán todos los votos e ideas acumuladas. ¿Seguro que quieres seguir?",
         "deleting": "Borrando...",
         "yes_delete": "Sí, borrar definitivamente 🗑️",
-        "changed_my_mind": "Me lo he pensado mejor"
+        "changed_my_mind": "Me lo he pensado mejor",
+        "notify_email": "Notificaciones por correo",
+        "notify_desc": "Recibe un email cada vez que alguien publique una nueva idea en este tablero.",
+        "under_construction": "En construcción",
+        "tags_title": "Etiquetas / Tags",
+        "tags_desc": "Organiza las ideas por categoría o estado utilizando colores y etiquetas. Ilimitadas.",
+        "new_tag_name": "Nombre",
+        "new_tag_ph": "Ej: Bug...",
+        "color": "Color",
+        "add_tag": "Añadir Etiqueta",
+        "no_tags": "Aún no hay etiquetas"
     },
     "board_client": {
         "col_pending": "🤔 En Revisión",
@@ -109,7 +123,23 @@ export default {
         "vote": "VOTO",
         "votes": "VOTOS",
         "idea_description": "Descripción",
-        "close": "Cerrar"
+        "close": "Cerrar",
+        "tab_active": "🚀 Activas",
+        "tab_discarded": "💨 Descartadas",
+        "tab_archived": "🗃️ Archivadas",
+        "move_to": "Mover a...",
+        "actions_title": "Acciones de Estado",
+        "status_revision": "Revisión",
+        "status_planned": "Planeado",
+        "status_progress": "Progreso",
+        "status_done": "Completado",
+        "status_discard": "Descartar",
+        "status_archive": "Archivar",
+        "status_restore": "Restaurar",
+        "empty_section": "Nada en esta sección",
+        "discarded_desc": "Fuera de prioridad",
+        "archived_desc": "En el archivo",
+        "empty": "Vacío"
     },
     "widgets_page": {
         "title": "Widgets",
@@ -144,7 +174,13 @@ export default {
         "english": "Inglés",
         "widget_version": "Versión del Widget",
         "version_normal": "Normal",
-        "version_lite": "Lite / Mini"
+        "version_lite": "Lite / Mini",
+        "pro_badge": "Personalización Pro",
+        "custom_title": "Tu widget, tus colores",
+        "custom_desc": "Elige el color que mejor le siente a tu marca. Los botones y detalles del widget se adaptarán mágicamente.",
+        "embed_hint": "Incrusta este código en tu web",
+        "copy_full": "COPIAR CÓDIGO HTML",
+        "copied_full": "¡COPIADO AL PORTAPAPELES!"
     },
     "public_board_page": {
         "tag": "🚀 Sugerencias y Roadmap",
@@ -166,7 +202,8 @@ export default {
         "tag_discarded": "Descartado",
         "tag_done": "Completado",
         "empty_title": "No hemos encontrado nada.",
-        "empty_desc": "Prueba con otros filtros o sé el primero en proponerlo."
+        "empty_desc": "Prueba con otros filtros o sé el primero en proponerlo.",
+        "powered_by": "Con la tecnología de"
     },
     "submit_idea_form": {
         "title_placeholder": "Ej. Poner un botón que me dé café gratis...",
@@ -174,20 +211,14 @@ export default {
         "select_tag": "Seleccionar etiqueta (opcional)",
         "no_tag": "Sin etiqueta",
         "error_fallback": "Algo salió mal",
+        "error_submit_title": "Ups, algo falló",
         "submitting": "ENVIANDO...",
-        "submit_btn": "SOLTAR MI IDEA 🚀"
+        "submit_btn": "SOLTAR MI IDEA 🚀",
+        "success_title": "¡Idea recibida!",
+        "success_desc": "Ya está guardada. Ojalá llegue muy lejos.",
+        "image_uploaded_alt": "Imagen subida"
     },
-    "tags_manager": {
-        "tags_title": "Etiquetas / Tags",
-        "tags_desc": "Organiza las ideas por categoría o estado utilizando colores y etiquetas. Ilimitadas.",
-        "new_tag_name": "Nombre",
-        "new_tag_ph": "Ej: Bug...",
-        "color": "Color",
-        "add_tag": "Añadir Etiqueta",
-        "no_tags": "Aún no hay etiquetas",
-        "save": "Guardar",
-        "cancel": "Cancelar"
-    },
+
     "image_upload": {
         "attach": "Adjuntar imagen o captura (máx 1MB)",
         "uploading": "Subiendo imagen...",
@@ -204,5 +235,15 @@ export default {
         "desc": "Aquí no hay nada. Ni ideas, ni votos, ni ese café que tanto necesitas ahora mismo.",
         "back": "Volver a la civilización",
         "quote": "\"Si buscas resultados distintos, no entres en rutas que no existen\" — Probablemente Einstein."
+    },
+
+    "errors": {
+        "unauthorized": "No autorizado",
+        "no_permission": "Sin permisos",
+        "invalid_slug": "Formato de URL no válido",
+        "slug_taken": "La URL ya está en uso.",
+        "name_empty": "El nombre no puede estar vacío",
+        "slug_empty": "La URL no puede estar vacía",
+        "generic": "Algo salió mal"
     }
 }

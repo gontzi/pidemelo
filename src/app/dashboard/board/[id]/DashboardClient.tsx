@@ -115,23 +115,23 @@ export default function DashboardClient({ initialIdeas, boardId, dict }: { initi
                 </div>
             </ContextMenuTrigger>
             <ContextMenuContent className="w-64 rounded-2xl p-2 shadow-2xl border-none bg-white/95 backdrop-blur-xl">
-                <div className="px-4 py-2 text-[10px] font-black text-zinc-400 uppercase tracking-widest leading-none mb-1">Mover a...</div>
+                <div className="px-4 py-2 text-[10px] font-black text-zinc-400 uppercase tracking-widest leading-none mb-1">{dict.move_to}</div>
                 {['en_revision', 'planeado', 'en_progreso', 'completado'].map((st) => (
                     idea.status !== st && (
                         <ContextMenuItem key={st} onClick={(e) => updateStatus(idea.id, st as any, e)} className="rounded-xl py-3 px-4 font-bold text-zinc-700 focus:bg-orange-50 focus:text-[#FF5C00] active:scale-95 transition-transform">
-                            {st === 'en_revision' ? '🤔 REVISIÓN' : st === 'planeado' ? '🏗️ PLANEADO' : st === 'en_progreso' ? '⚙️ PROGRESO' : '✅ COMPLETADO'}
+                            {st === 'en_revision' ? dict.col_pending?.toUpperCase() : st === 'planeado' ? dict.col_planned?.toUpperCase() : st === 'en_progreso' ? dict.col_in_progress?.toUpperCase() : dict.col_done?.toUpperCase()}
                         </ContextMenuItem>
                     )
                 ))}
 
                 {idea.status !== 'descartado' && (
                     <ContextMenuItem onClick={(e) => updateStatus(idea.id, 'descartado', e)} className="rounded-xl py-3 px-4 font-bold text-zinc-700 focus:bg-orange-50 focus:text-[#FF5C00] active:scale-95 transition-transform">
-                        ❌ {dict.filter_discarded || 'Descartar'}
+                        ❌ {dict.status_discard}
                     </ContextMenuItem>
                 )}
                 {idea.status !== 'archivado' && (
                     <ContextMenuItem onClick={(e) => updateStatus(idea.id, 'archivado', e)} className="rounded-xl py-3 px-4 font-bold text-purple-600 focus:bg-purple-50 active:scale-95 transition-transform">
-                        🗃️ Archivar
+                        🗃️ {dict.status_archive}
                     </ContextMenuItem>
                 )}
                 <ContextMenuSeparator className="bg-zinc-100 my-1" />
@@ -219,7 +219,7 @@ export default function DashboardClient({ initialIdeas, boardId, dict }: { initi
                                             {selectedIdea?.status?.replace('_', ' ').toUpperCase()}
                                         </span>
                                     </div>
-                                    <h2 className="text-2xl md:text-5xl font-black tracking-tighter text-zinc-900 leading-normal pt-2 break-all [word-break:break-word] [hyphens:auto]">
+                                    <h2 className="text-2xl md:text-5xl font-black tracking-tighter text-zinc-900 leading-normal pt-2 [word-break:break-word] [hyphens:auto]">
                                         {selectedIdea?.title}
                                     </h2>
                                 </div>
@@ -235,15 +235,15 @@ export default function DashboardClient({ initialIdeas, boardId, dict }: { initi
 
                                 <div className="space-y-3 pt-6 border-t border-zinc-100">
                                     <p className="text-[10px] md:text-xs font-black uppercase tracking-[0.2em] text-zinc-400 flex items-center gap-2">
-                                        <span className="w-8 h-px bg-zinc-200" /> Acciones de Estado
+                                        <span className="w-8 h-px bg-zinc-200" /> {dict.actions_title || 'Acciones de Estado'}
                                     </p>
                                     <div className="flex flex-wrap gap-2">
-                                        <Button size="sm" variant="outline" onClick={() => updateStatus(selectedIdea!.id, 'en_revision')} className="rounded-full font-bold text-xs uppercase tracking-widest">Revisión</Button>
-                                        <Button size="sm" variant="outline" onClick={() => updateStatus(selectedIdea!.id, 'planeado')} className="rounded-full font-bold text-xs uppercase tracking-widest">Planeado</Button>
-                                        <Button size="sm" variant="outline" onClick={() => updateStatus(selectedIdea!.id, 'en_progreso')} className="rounded-full font-bold text-xs uppercase tracking-widest">Progreso</Button>
-                                        <Button size="sm" variant="outline" onClick={() => updateStatus(selectedIdea!.id, 'completado')} className="rounded-full font-bold text-xs uppercase tracking-widest">Completado</Button>
-                                        <Button size="sm" variant="outline" onClick={() => updateStatus(selectedIdea!.id, 'descartado')} className="rounded-full font-bold text-xs text-red-500 border-red-200 hover:bg-red-50 uppercase tracking-widest">Descartar</Button>
-                                        <Button size="sm" variant="outline" onClick={() => updateStatus(selectedIdea!.id, 'archivado')} className="rounded-full font-bold text-xs text-purple-600 border-purple-200 hover:bg-purple-50 uppercase tracking-widest">Archivar</Button>
+                                        <Button size="sm" variant="outline" onClick={() => updateStatus(selectedIdea!.id, 'en_revision')} className="rounded-full font-bold text-xs uppercase tracking-widest">{dict.status_revision || 'Revisión'}</Button>
+                                        <Button size="sm" variant="outline" onClick={() => updateStatus(selectedIdea!.id, 'planeado')} className="rounded-full font-bold text-xs uppercase tracking-widest">{dict.status_planned || 'Planeado'}</Button>
+                                        <Button size="sm" variant="outline" onClick={() => updateStatus(selectedIdea!.id, 'en_progreso')} className="rounded-full font-bold text-xs uppercase tracking-widest">{dict.status_progress || 'Progreso'}</Button>
+                                        <Button size="sm" variant="outline" onClick={() => updateStatus(selectedIdea!.id, 'completado')} className="rounded-full font-bold text-xs uppercase tracking-widest">{dict.status_done || 'Completado'}</Button>
+                                        <Button size="sm" variant="outline" onClick={() => updateStatus(selectedIdea!.id, 'descartado')} className="rounded-full font-bold text-xs text-red-500 border-red-200 hover:bg-red-50 uppercase tracking-widest">{dict.status_discard || 'Descartar'}</Button>
+                                        <Button size="sm" variant="outline" onClick={() => updateStatus(selectedIdea!.id, 'archivado')} className="rounded-full font-bold text-xs text-purple-600 border-purple-200 hover:bg-purple-50 uppercase tracking-widest">{dict.status_archive || 'Archivar'}</Button>
                                     </div>
                                 </div>
                             </div>
@@ -273,7 +273,7 @@ export default function DashboardClient({ initialIdeas, boardId, dict }: { initi
                                 : "text-zinc-400 hover:text-zinc-600"
                         )}
                     >
-                        🚀 {dict.filter_all?.split(' ')[0] || 'Activas'}
+                        {dict.tab_active}
                     </button>
                     <button
                         onClick={() => setViewTab('descartadas')}
@@ -284,7 +284,7 @@ export default function DashboardClient({ initialIdeas, boardId, dict }: { initi
                                 : "text-zinc-400 hover:text-zinc-600"
                         )}
                     >
-                        💨 {dict.filter_discarded || 'Descartadas'}
+                        {dict.tab_discarded}
                     </button>
                     <button
                         onClick={() => setViewTab('archivadas')}
@@ -295,7 +295,7 @@ export default function DashboardClient({ initialIdeas, boardId, dict }: { initi
                                 : "text-zinc-400 hover:text-zinc-600"
                         )}
                     >
-                        🗃️ Archivadas
+                        {dict.tab_archived}
                     </button>
                 </div>
             </div>
@@ -380,7 +380,7 @@ export default function DashboardClient({ initialIdeas, boardId, dict }: { initi
                             {ideas.filter(i => i.status === (viewTab === 'descartadas' ? 'descartado' : 'archivado')).length === 0 && (
                                 <div className="py-24 flex flex-col items-center justify-center text-zinc-400 opacity-60">
                                     <span className="text-4xl mb-4">{viewTab === 'descartadas' ? '💨' : '🗃️'}</span>
-                                    <p className="font-bold text-xs tracking-widest uppercase">Nada en esta sección</p>
+                                    <p className="font-bold text-xs tracking-widest uppercase">{dict.empty_section || 'Nada en esta sección'}</p>
                                 </div>
                             )}
                         </div>
@@ -494,7 +494,7 @@ export default function DashboardClient({ initialIdeas, boardId, dict }: { initi
                                             <h4 onClick={() => setSelectedIdea(idea)} className="font-black text-lg text-zinc-900 uppercase tracking-tighter cursor-pointer hover:underline truncate">{idea.title}</h4>
                                             <p className="text-[10px] text-zinc-400 font-bold uppercase tracking-widest mt-1 italic flex items-center gap-2">
                                                 <span className="w-4 h-px bg-zinc-200" />
-                                                {viewTab === 'descartadas' ? 'Fuera de prioridad' : 'En el archivo'}
+                                                {viewTab === 'descartadas' ? (dict.discarded_desc || 'Fuera de prioridad') : (dict.archived_desc || 'En el archivo')}
                                             </p>
                                         </div>
                                     </div>
@@ -505,7 +505,7 @@ export default function DashboardClient({ initialIdeas, boardId, dict }: { initi
                                             onClick={() => updateStatus(idea.id, 'en_revision')}
                                             className="rounded-full font-black text-[10px] tracking-[0.2em] uppercase h-10 px-6 border-zinc-200 hover:bg-orange-50 hover:text-[#FF5C00] hover:border-[#FF5C00]/30 transition-all active:scale-95 flex items-center gap-2"
                                         >
-                                            <Reply className="w-3 h-3" /> Restaurar
+                                            <Reply className="w-3 h-3" /> {dict.status_restore || 'Restaurar'}
                                         </Button>
 
                                         {viewTab === 'descartadas' && (
@@ -515,7 +515,7 @@ export default function DashboardClient({ initialIdeas, boardId, dict }: { initi
                                                 onClick={() => updateStatus(idea.id, 'archivado')}
                                                 className="rounded-full font-black text-[10px] tracking-[0.2em] uppercase h-10 px-6 text-purple-600 hover:bg-purple-50 transition-all active:scale-95 flex items-center gap-2"
                                             >
-                                                <Archive className="w-3 h-3" /> Archivar
+                                                <Archive className="w-3 h-3" /> {dict.status_archive || 'Archivar'}
                                             </Button>
                                         )}
 
@@ -533,7 +533,7 @@ export default function DashboardClient({ initialIdeas, boardId, dict }: { initi
                             {ideas.filter(i => i.status === (viewTab === 'descartadas' ? 'descartado' : 'archivado')).length === 0 && (
                                 <div className="py-32 flex flex-col items-center justify-center text-zinc-400 border-2 border-dashed border-zinc-200 rounded-[3rem] opacity-40">
                                     <span className="text-4xl mb-4">{viewTab === 'descartadas' ? '💨' : '🗃️'}</span>
-                                    <p className="font-black text-xs tracking-widest uppercase">Vacío</p>
+                                    <p className="font-black text-xs tracking-widest uppercase">{dict.empty || 'Vacío'}</p>
                                 </div>
                             )}
                         </div>

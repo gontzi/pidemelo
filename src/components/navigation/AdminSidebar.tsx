@@ -42,7 +42,7 @@ export default function AdminSidebar({ dict }: { dict: Record<string, string> })
                     rel="noopener noreferrer" 
                     className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-[#FF5C00] hover:bg-[#E65300] text-white font-bold text-xs rounded-md transition-all hover:scale-105 active:scale-95 shadow-sm"
                 >
-                    ☕ Apoyar a Gontzi
+                    ☕ {dict.support_gontzi}
                 </a>
                 <div className="flex items-center justify-between">
                     <UserButton appearance={{ elements: { avatarBox: "w-10 h-10 border border-zinc-200 shadow-sm" } }} />
