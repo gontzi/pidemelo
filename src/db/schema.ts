@@ -1,4 +1,4 @@
-import { pgTable, text, timestamp, uuid, pgEnum, boolean } from "drizzle-orm/pg-core";
+import { pgTable, text, timestamp, uuid, pgEnum, boolean, index, uniqueIndex } from "drizzle-orm/pg-core";
 
 export const statusEnum = pgEnum('status', ['en_revision', 'planeado', 'en_progreso', 'completado', 'descartado', 'archivado']);
 
@@ -18,7 +18,9 @@ export const boards = pgTable('boards', {
     slug: text('slug').notNull().unique(),
     notifyNewIdeas: boolean('notify_new_ideas').default(true).notNull(),
     createdAt: timestamp('created_at').defaultNow().notNull(),
-});
+}, (table) => [
+    index('boards_user_id_idx').on(table.userId),
+]);
 
 export const tags = pgTable('tags', {
     id: uuid('id').primaryKey().defaultRandom(),
@@ -27,7 +29,9 @@ export const tags = pgTable('tags', {
     color: text('color').default('#FF5C00').notNull(),
     description: text('description'),
     createdAt: timestamp('created_at').defaultNow().notNull(),
-});
+}, (table) => [
+    index('tags_board_id_idx').on(table.boardId),
+]);
 
 export const ideas = pgTable('ideas', {
     id: uuid('id').primaryKey().defaultRandom(),
@@ -39,14 +43,20 @@ export const ideas = pgTable('ideas', {
     authorFingerprint: text('author_fingerprint').default('').notNull(),
     imageUrl: text('image_url'),
     createdAt: timestamp('created_at').defaultNow().notNull(),
-});
+}, (table) => [
+    index('ideas_board_id_idx').on(table.boardId),
+    index('ideas_tag_id_idx').on(table.tagId),
+]);
 
 export const votes = pgTable('votes', {
     id: uuid('id').primaryKey().defaultRandom(),
     ideaId: uuid('idea_id').references(() => ideas.id, { onDelete: 'cascade' }).notNull(),
     anonymousFingerprint: text('anonymous_fingerprint').notNull(), // Hash de IP o Cookie para votos anónimos
     createdAt: timestamp('created_at').defaultNow().notNull(),
-});
+}, (table) => [
+    index('votes_idea_id_idx').on(table.ideaId),
+    uniqueIndex('votes_idea_fingerprint_unique').on(table.ideaId, table.anonymousFingerprint),
+]);
 
 import { relations } from 'drizzle-orm';
 

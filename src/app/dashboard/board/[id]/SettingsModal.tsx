@@ -111,7 +111,7 @@ export default function SettingsModal({
                         </button>
                     )}
                 </DialogTrigger>
-                <DialogContent className="w-[90vw] md:max-w-3xl lg:max-w-5xl rounded-[2rem] border-zinc-200 p-6 md:p-10">
+                <DialogContent className="w-[90vw] md:max-w-3xl lg:max-w-5xl rounded-[2rem] border-zinc-200 p-6 md:p-10 max-h-[90vh] overflow-y-auto overflow-x-hidden">
                     <DialogHeader>
                         <DialogTitle className="font-heading text-xl md:text-3xl font-bold tracking-tight">{dict.board_settings}</DialogTitle>
                     </DialogHeader>
@@ -201,7 +201,7 @@ export default function SettingsModal({
                             </div>
                         </form>
 
-                        <div className="hidden md:flex flex-col space-y-4 md:border-l md:pl-8 lg:pl-12 border-zinc-100">
+                        <div className="flex flex-col space-y-4 pt-6 border-t border-zinc-100 md:border-t-0 md:border-l md:pt-0 md:pl-8 lg:pl-12">
                             {tags !== undefined ? (
                                 <TagsManager boardId={boardId} tags={tags} dict={dict} />
                             ) : (

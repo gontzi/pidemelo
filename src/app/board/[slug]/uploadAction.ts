@@ -7,6 +7,24 @@ import { eq } from "drizzle-orm";
 const MAX_FILE_SIZE = 1 * 1024 * 1024; // 1 MB
 const ALLOWED_MIME_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/jpg'];
 
+// Detecta el tipo real de imagen leyendo su firma binaria (magic bytes),
+// en lugar de confiar en el MIME declarado por el cliente (falsificable).
+async function detectImageMime(file: File): Promise<string | null> {
+    const bytes = new Uint8Array(await file.slice(0, 12).arrayBuffer());
+
+    // JPEG: FF D8 FF
+    if (bytes[0] === 0xff && bytes[1] === 0xd8 && bytes[2] === 0xff) return 'image/jpeg';
+    // PNG: 89 50 4E 47
+    if (bytes[0] === 0x89 && bytes[1] === 0x50 && bytes[2] === 0x4e && bytes[3] === 0x47) return 'image/png';
+    // WEBP: "RIFF" .... "WEBP"
+    if (
+        bytes[0] === 0x52 && bytes[1] === 0x49 && bytes[2] === 0x46 && bytes[3] === 0x46 &&
+        bytes[8] === 0x57 && bytes[9] === 0x45 && bytes[10] === 0x42 && bytes[11] === 0x50
+    ) return 'image/webp';
+
+    return null;
+}
+
 export async function uploadImageAction(formData: FormData) {
     const file = formData.get('file') as File | null;
     const boardId = formData.get('boardId') as string | null;
@@ -19,7 +37,8 @@ export async function uploadImageAction(formData: FormData) {
         return { error: "La imagen supera el límite de 1MB." };
     }
 
-    if (!ALLOWED_MIME_TYPES.includes(file.type)) {
+    const detectedType = await detectImageMime(file);
+    if (!detectedType || !ALLOWED_MIME_TYPES.includes(detectedType)) {
         return { error: "Formato no permitido. Solo se aceptan JPG, PNG y WEBP." };
     }
 

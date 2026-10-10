@@ -1,38 +1,52 @@
 'use server'
 
 import { db } from "@/db";
-import { ideas, votes, boards, users } from "@/db/schema";
+import { ideas, votes, boards } from "@/db/schema";
 import { and, eq, desc } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { cookies, headers } from "next/headers";
 import { v4 as uuidv4 } from 'uuid';
 import { Resend } from 'resend';
-import { auth } from '@clerk/nextjs/server';
 
-function getFingerprint() {
-    const cookieStore = cookies();
-    let fingerprint = cookieStore.get('voter-id')?.value;
+// IP de confianza: priorizamos la cabecera de Cloudflare y, como respaldo,
+// el último valor de X-Forwarded-For (el más cercano a nuestro proxy).
+function getClientIp(): string {
+    const cfIp = headers().get('cf-connecting-ip');
+    if (cfIp) return cfIp.trim();
 
-    if (!fingerprint) {
-        fingerprint = uuidv4();
-        // Nota: En Server Actions de Next.js, cookies().set() funciona directamente
-        cookies().set('voter-id', fingerprint, { maxAge: 60 * 60 * 24 * 365 });
+    const forwardedFor = headers().get('x-forwarded-for');
+    if (forwardedFor) {
+        const parts = forwardedFor.split(',').map(p => p.trim()).filter(Boolean);
+        if (parts.length > 0) return parts[parts.length - 1];
     }
 
-    return fingerprint;
+    return 'unknown';
 }
 
-// 🌐 Versión compatible con Edge Runtime (Web Crypto API)
-async function getIpHash() {
-    const fallback = 'unknown';
-    const forwardedFor = headers().get('x-forwarded-for') || fallback;
-    const ip = forwardedFor.split(',')[0].trim();
-
-    // Usamos la API nativa de Edge
-    const msgUint8 = new TextEncoder().encode(ip);
+// 🌐 Hash compatible con Edge Runtime (Web Crypto API)
+async function sha256(value: string): Promise<string> {
+    const msgUint8 = new TextEncoder().encode(value);
     const hashBuffer = await crypto.subtle.digest('SHA-256', msgUint8);
     const hashArray = Array.from(new Uint8Array(hashBuffer));
     return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
+async function getIpHash() {
+    return sha256(getClientIp());
+}
+
+// Identidad de voto = cookie de dispositivo + IP. Dificulta el voto múltiple
+// sin depender únicamente de una cookie borrable.
+async function getVoterFingerprint(): Promise<string> {
+    const cookieStore = cookies();
+    let cookieId = cookieStore.get('voter-id')?.value;
+
+    if (!cookieId) {
+        cookieId = uuidv4();
+        cookies().set('voter-id', cookieId, { maxAge: 60 * 60 * 24 * 365 });
+    }
+
+    return sha256(`${cookieId}|${getClientIp()}`);
 }
 
 export async function submitIdea(boardId: string, slug: string, formData: FormData) {
@@ -44,22 +58,19 @@ export async function submitIdea(boardId: string, slug: string, formData: FormDa
 
         if (!title || !description) return { error: "Faltan campos." };
 
-        // 1. Identificación
-        const { userId } = auth();
-
-        // 2. Lógica de Cooldowns
+        // 1. Lógica de Cooldowns
         const COOLDOWN_SECONDS = 30; // 30 segundos para todos (Open Source & Free)
 
         // Usamos ipHash como fingerprint para todos (más estricto y seguro)
         const ipHash = await getIpHash();
 
-        // 3. Validación en Drizzle
+        // 2. Validación en Drizzle (el cooldown se limita a este tablón)
         const recentIdea = await db.query.ideas.findFirst({
-            where: eq(ideas.authorFingerprint, ipHash),
+            where: and(eq(ideas.boardId, boardId), eq(ideas.authorFingerprint, ipHash)),
             orderBy: [desc(ideas.createdAt)]
         });
 
-        // 4. Cálculo de Tiempo y Error UI
+        // 3. Cálculo de Tiempo y Error UI
         if (recentIdea && recentIdea.createdAt) {
             const pastMs = recentIdea.createdAt instanceof Date
                 ? recentIdea.createdAt.getTime()
@@ -196,14 +207,11 @@ export async function submitIdea(boardId: string, slug: string, formData: FormDa
 }
 
 export async function upvoteIdea(ideaId: string, slug: string) {
-    const fingerprint = getFingerprint();
+    const fingerprint = await getVoterFingerprint();
 
-    const existingVote = await db.query.votes.findFirst({
-        where: and(eq(votes.ideaId, ideaId), eq(votes.anonymousFingerprint, fingerprint))
-    });
+    await db.insert(votes)
+        .values({ ideaId, anonymousFingerprint: fingerprint })
+        .onConflictDoNothing();
 
-    if (!existingVote) {
-        await db.insert(votes).values({ ideaId, anonymousFingerprint: fingerprint });
-        revalidatePath(`/board/${slug}`);
-    }
+    revalidatePath(`/board/${slug}`);
 }

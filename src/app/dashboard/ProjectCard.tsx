@@ -10,7 +10,6 @@ import {
     ContextMenuContent,
     ContextMenuItem,
     ContextMenuTrigger,
-    ContextMenuSeparator,
 } from "@/components/ui/context-menu";
 import { cn } from "@/lib/utils";
 
@@ -169,10 +168,6 @@ export default function ProjectCard({ board, dict, settingsDict }: ProjectCardPr
                         </ContextMenuItem>
                     }
                 />
-                <ContextMenuSeparator className="bg-zinc-100 my-1" />
-                <ContextMenuItem onSelect={(e) => { e.preventDefault(); setSettingsOpen(true); }} className="rounded-xl py-3 px-4 font-bold text-red-500 focus:bg-red-50 focus:text-red-600">
-                    <ExternalLink className="w-4 h-4 mr-3 opacity-60" /> {settingsDict.delete_board}
-                </ContextMenuItem>
             </ContextMenuContent>
         </ContextMenu>
     );
