@@ -2,7 +2,6 @@ import type { Metadata } from 'next';
 import { SignedIn, SignedOut, SignInButton } from "@clerk/nextjs";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Suspense } from 'react';
 import { getDictionary, getLocale } from '@/i18n';
 import WidgetSkeleton from '@/components/WidgetSkeleton';
 

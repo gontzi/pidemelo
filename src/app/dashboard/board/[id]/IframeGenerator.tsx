@@ -1,9 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import { Copy, Check, Code, Lock } from 'lucide-react';
+import { Copy, Check, Code } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import Link from 'next/link';
 
 export default function IframeGenerator({ slug }: { slug: string }) {
     const [copied, setCopied] = useState(false);
@@ -129,16 +128,16 @@ export default function IframeGenerator({ slug }: { slug: string }) {
                             <span className="text-pink-400">iframe</span>
                             <br />
                             <span className="text-zinc-400 ml-6 truncate"> src=</span>
-                            <span className="text-green-400">"{origin}/widget/{slug}?color=<span className="bg-zinc-800 px-1 rounded text-white">{encodeURIComponent(color)}</span>&textColor=<span className="bg-zinc-800 px-1 rounded text-white">{encodeURIComponent(textColor)}</span>"</span>
+                            <span className="text-green-400">{'"'}{origin}/widget/{slug}?color=<span className="bg-zinc-800 px-1 rounded text-white">{encodeURIComponent(color)}</span>&textColor=<span className="bg-zinc-800 px-1 rounded text-white">{encodeURIComponent(textColor)}</span>{'"'}</span>
                             <br />
                             <span className="text-zinc-400 ml-6"> width=</span>
-                            <span className="text-green-400">"100%"</span>
+                            <span className="text-green-400">{'"'}100%{'"'}</span>
                             <br />
                             <span className="text-zinc-400 ml-6"> height=</span>
-                            <span className="text-green-400">"600px"</span>
+                            <span className="text-green-400">{'"'}600px{'"'}</span>
                             <br />
                             <span className="text-zinc-400 ml-6"> frameborder=</span>
-                            <span className="text-green-400">"0"</span>
+                            <span className="text-green-400">{'"'}0{'"'}</span>
                             <br />
                             <span className="text-indigo-400">{'/>'}</span>
                         </div>

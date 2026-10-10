@@ -1,4 +1,4 @@
-export default {
+const es = {
     "seo": {
         "title": "Pídemelo — Tablón de sugerencias para creadores y SaaS",
         "description": "Recoge el feedback de tu comunidad, gestiona sugerencias y publica tu roadmap público sin complicaciones. La herramienta de feedback definitiva.",
@@ -221,14 +221,21 @@ export default {
         "success_title": "¡Idea recibida!",
         "success_desc": "Ya está guardada. Ojalá llegue muy lejos.",
         "image_uploaded_alt": "Imagen subida",
-        "close": "Cerrar"
+        "close": "Cerrar",
+        "err_missing_fields": "Por favor, rellena todos los campos.",
+        "err_cooldown": "Por favor, espera {s} segundos antes de enviar otra idea.",
+        "err_generic": "Algo salió mal. Inténtalo de nuevo."
     },
 
     "image_upload": {
         "attach": "Adjuntar imagen o captura (máx 1MB)",
         "uploading": "Subiendo imagen...",
         "error_size": "La imagen pesa más de 1MB.",
-        "error_connection": "Fallo en la conexión al servidor."
+        "error_connection": "Fallo en la conexión al servidor.",
+        "error_missing": "Faltan datos requeridos.",
+        "error_format": "Formato no permitido. Solo se aceptan JPG, PNG y WEBP.",
+        "error_board": "Tablero no encontrado.",
+        "error_upload": "Hubo un error inesperado al procesar la imagen."
     },
     "widget_page": {
         "go_to": "ir a pidemelo.app 🚀",
@@ -252,3 +259,5 @@ export default {
         "generic": "Algo salió mal"
     }
 }
+
+export default es;

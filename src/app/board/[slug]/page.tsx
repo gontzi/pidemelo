@@ -75,7 +75,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
                 images: ['/og-image.png'],
             },
         }
-    } catch (error) {
+    } catch {
         return {
             title: 'Pídemelo',
             robots: { index: false }

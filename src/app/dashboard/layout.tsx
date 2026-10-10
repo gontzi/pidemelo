@@ -1,8 +1,7 @@
-import { auth, currentUser } from "@clerk/nextjs/server";
+import { currentUser } from "@clerk/nextjs/server";
 import { db } from "@/db";
 import { users } from "@/db/schema";
 import AdminSidebar from "@/components/navigation/AdminSidebar";
-import AdminHeader from "@/components/navigation/AdminHeader";
 import BottomNav from "@/components/navigation/BottomNav";
 import { getDictionary } from "@/i18n";
 
@@ -47,11 +46,6 @@ export default async function DashboardLayout({
 
             {/* Main Content Wrapper */}
             <div className="flex-1 flex flex-col lg:pl-64 pb-nav lg:pb-0">
-                {/* Mobile Header (Hidden as we use BottomNav, but keeping if needed for something else, though the request says hide it) */}
-                <div className="lg:hidden">
-                    {/* <AdminHeader dict={t.navbar} /> */}
-                </div>
-
                 <main className="flex-1">
                     {children}
                 </main>

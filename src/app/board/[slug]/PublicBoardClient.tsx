@@ -19,7 +19,6 @@ export default function PublicBoardClient({
     initialIdeas,
     boardSlug,
     accentColor = "#FF5C00",
-    textColor = "#18181b",
     isDarkMode = false,
     widgetVersion = 'normal',
     dict

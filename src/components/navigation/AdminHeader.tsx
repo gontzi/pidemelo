@@ -2,13 +2,12 @@
 
 import Link from "next/link";
 import { useState, useEffect } from "react";
-import { SignedIn, SignedOut, SignInButton, UserButton, useUser } from "@clerk/nextjs";
-import { Menu, X, Monitor, Zap, Rocket } from "lucide-react";
+import { UserButton } from "@clerk/nextjs";
+import { Menu, X, Monitor } from "lucide-react";
 import LanguageSwitcher from "../LanguageSwitcher";
 
 export default function AdminHeader({ dict }: { dict: Record<string, string> }) {
     const [menuOpen, setMenuOpen] = useState(false);
-    const { user } = useUser();
 
     useEffect(() => {
         document.body.style.overflow = menuOpen ? 'hidden' : '';

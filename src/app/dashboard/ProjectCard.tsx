@@ -3,7 +3,6 @@
 import { useState } from 'react';
 import { ExternalLink, Copy, Check, Settings, ArrowRight, Share2 } from 'lucide-react';
 import Link from 'next/link';
-import { Button } from "@/components/ui/button";
 import SettingsModal from './board/[id]/SettingsModal';
 import {
     ContextMenu,
@@ -11,7 +10,6 @@ import {
     ContextMenuItem,
     ContextMenuTrigger,
 } from "@/components/ui/context-menu";
-import { cn } from "@/lib/utils";
 
 interface ProjectCardProps {
     board: {

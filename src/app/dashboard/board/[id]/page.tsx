@@ -1,5 +1,5 @@
 import { db } from "@/db";
-import { boards, ideas, users } from "@/db/schema";
+import { boards, ideas } from "@/db/schema";
 import { auth } from "@clerk/nextjs/server";
 import { and, eq, desc } from "drizzle-orm";
 import { notFound } from "next/navigation";

@@ -1,11 +1,10 @@
 'use server'
 
 import { db } from "@/db";
-import { boards, users } from "@/db/schema";
+import { boards } from "@/db/schema";
 import { auth } from "@clerk/nextjs/server";
 import { revalidatePath } from "next/cache";
-import { eq, count } from "drizzle-orm";
-import { redirect } from "next/navigation";
+import { eq } from "drizzle-orm";
 
 function slugify(text: string) {
     return text.toLowerCase().replace(/[^\w\s-]/g, '').replace(/[\s_-]+/g, '-').replace(/^-+|-+$/g, '');

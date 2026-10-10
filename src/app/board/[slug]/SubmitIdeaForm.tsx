@@ -5,10 +5,24 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { submitIdea } from './actions';
 import { ChevronDown, X, Check } from 'lucide-react';
-import ImageUploadDropzone from '@/components/ImageUploadDropzone';
+import ImageUploadDropzone, { type ImageUploadDict } from '@/components/ImageUploadDropzone';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 type Tag = { id: string, name: string, color: string, description?: string | null };
+
+type SubmitError = { error?: string; seconds?: number };
+
+function resolveError(res: SubmitError, dict: Record<string, string>): string {
+    switch (res.error) {
+        case 'missing_fields':
+            return dict.err_missing_fields || dict.error_fallback;
+        case 'cooldown':
+            return (dict.err_cooldown || dict.error_fallback).replace('{s}', String(res.seconds ?? ''));
+        case 'generic':
+        default:
+            return dict.err_generic || dict.error_fallback;
+    }
+}
 
 export default function SubmitIdeaForm({
     boardId,
@@ -19,16 +33,15 @@ export default function SubmitIdeaForm({
     dict,
     imageDict,
     tags,
-    isCurrentUserAdmin = false,
-    widgetVersion = 'normal'
+    isCurrentUserAdmin = false
 }: {
     boardId: string,
     boardSlug: string,
     accentColor?: string,
     textColor?: string,
     isDarkMode?: boolean,
-    dict: any,
-    imageDict: any,
+    dict: Record<string, string>,
+    imageDict: ImageUploadDict,
     tags?: Tag[],
     isCurrentUserAdmin?: boolean,
     widgetVersion?: 'normal' | 'lite'
@@ -65,7 +78,7 @@ export default function SubmitIdeaForm({
         try {
             const res = await submitIdea(boardId, boardSlug, formData);
             if (res && res.error) {
-                setError(res.error);
+                setError(resolveError(res, dict));
                 setShowError(true);
                 setTimeout(() => setShowError(false), 3000);
             } else {

@@ -18,7 +18,6 @@ export default async function WidgetPage({
     searchParams: { color?: string, textColor?: string, darkMode?: string, lang?: string, version?: string }
 }) {
     const lang = (searchParams.lang === 'en' || searchParams.lang === 'es') ? searchParams.lang : 'es';
-    const widgetVersion = searchParams.version === 'lite' ? 'lite' : 'normal';
     const t = await getDictionary(lang);
 
     return (
@@ -30,7 +29,11 @@ export default async function WidgetPage({
     );
 }
 
-async function FormContent({ params, searchParams, t }: any) {
+async function FormContent({ params, searchParams, t }: {
+    params: { slug: string };
+    searchParams: { color?: string; textColor?: string; darkMode?: string; lang?: string; version?: string };
+    t: Awaited<ReturnType<typeof getDictionary>>;
+}) {
     const accentColor = searchParams.color ? decodeURIComponent(searchParams.color) : "#FF5C00";
     const textColor = searchParams.textColor ? decodeURIComponent(searchParams.textColor) : "#18181b";
     const isDarkMode = searchParams.darkMode === 'true';

@@ -4,9 +4,8 @@ import { useState, useTransition } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Trash2, Plus, Lock, Pencil } from 'lucide-react';
+import { Trash2, Plus, Pencil } from 'lucide-react';
 import { createTag, deleteTag, updateTag } from './actions';
-import Link from 'next/link';
 
 type Tag = {
     id: string;
@@ -182,7 +181,7 @@ export default function TagsManager({
                         </div>
                     </div>
 
-                    {error && <p className="text-[10px] text-red-500 font-medium">{(dict as any).errors?.[error] || error}</p>}
+                    {error && <p className="text-[10px] text-red-500 font-medium">{(dict as { errors?: Record<string, string> }).errors?.[error] || error}</p>}
 
                     <div className="flex gap-2">
                         {editingId && (

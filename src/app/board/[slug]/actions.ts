@@ -49,6 +49,22 @@ async function getVoterFingerprint(): Promise<string> {
     return sha256(`${cookieId}|${getClientIp()}`);
 }
 
+// Escapa texto controlado por el usuario antes de inyectarlo en el HTML del email
+// (evita inyección de HTML/phishing en las notificaciones).
+function escapeHtml(value: string): string {
+    return value
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+}
+
+// Evita la inyección de cabeceras en el asunto del email (saltos de línea)
+function sanitizeHeader(value: string): string {
+    return value.replace(/[\r\n]+/g, ' ').slice(0, 120);
+}
+
 export async function submitIdea(boardId: string, slug: string, formData: FormData) {
     try {
         const title = formData.get('title') as string;
@@ -56,7 +72,7 @@ export async function submitIdea(boardId: string, slug: string, formData: FormDa
         const tagId = formData.get('tagId') as string | null;
         const imageUrl = formData.get('imageUrl') as string | null;
 
-        if (!title || !description) return { error: "Faltan campos." };
+        if (!title || !description) return { error: 'missing_fields' };
 
         // 1. Lógica de Cooldowns
         const COOLDOWN_SECONDS = 30; // 30 segundos para todos (Open Source & Free)
@@ -82,7 +98,7 @@ export async function submitIdea(boardId: string, slug: string, formData: FormDa
                 if (elapsedSeconds < COOLDOWN_SECONDS) {
                     const remainingSeconds = COOLDOWN_SECONDS - elapsedSeconds;
 
-                    return { error: `Por favor, espera ${remainingSeconds} segundos antes de enviar otra idea.` };
+                    return { error: 'cooldown', seconds: remainingSeconds };
                 }
             }
         }
@@ -116,7 +132,7 @@ export async function submitIdea(boardId: string, slug: string, formData: FormDa
                 let html = '';
 
                 if (locale === 'es') {
-                    subject = `🔔 Te están dando la chapa en: ${boardName}`;
+                    subject = `🔔 Te están dando la chapa en: ${sanitizeHeader(boardName)}`;
                     html = `
                     <style>
                         .logo-link { transition: color 0.15s ease-in-out; }
@@ -129,14 +145,14 @@ export async function submitIdea(boardId: string, slug: string, formData: FormDa
                                     <span style="font-weight: 900; font-size: 24px; letter-spacing: -1px;">pidemelo<span style="color: #FF5C00;">.</span>app</span>
                                 </a>
                             </div>
-                            <h2 style="font-size: 20px; font-weight: 800; margin: 0 0 16px 0; line-height: 1.2;">Alguien te está dando la chapa en <b>${boardName}</b></h2>
+                            <h2 style="font-size: 20px; font-weight: 800; margin: 0 0 16px 0; line-height: 1.2;">Alguien te está dando la chapa en <b>${escapeHtml(boardName)}</b></h2>
                             <p style="font-size: 15px; color: #52525b; margin: 0 0 24px 0; line-height: 1.5;">Acaban de dejarte una nueva sugerencia en tu tablón. O igual es una idea brillante, quién sabe.</p>
                             
                             <div style="background-color: #fff7ed; border-left: 4px solid #FF5C00; padding: 16px; border-radius: 8px; margin-bottom: 32px;">
                                 <p style="font-size: 12px; text-transform: uppercase; letter-spacing: 1px; color: #FF5C00; font-weight: 800; margin: 0 0 8px 0;">TÍTULO:</p>
-                                <p style="font-size: 16px; font-weight: 700; margin: 0 0 16px 0; color: #18181b;">${title}</p>
+                                <p style="font-size: 16px; font-weight: 700; margin: 0 0 16px 0; color: #18181b;">${escapeHtml(title)}</p>
                                 <p style="font-size: 12px; text-transform: uppercase; letter-spacing: 1px; color: #FF5C00; font-weight: 800; margin: 0 0 8px 0;">DESCRIPCIÓN:</p>
-                                <p style="font-size: 14px; margin: 0; color: #3f3f46; white-space: pre-wrap; font-style: italic;">"${description}"</p>
+                                <p style="font-size: 14px; margin: 0; color: #3f3f46; white-space: pre-wrap; font-style: italic;">"${escapeHtml(description)}"</p>
                             </div>
 
                             <a href="https://pidemelo.app/dashboard/board/${boardId}" style="display: block; background-color: #FF5C00; color: #ffffff; font-weight: 900; text-decoration: none; padding: 16px 24px; border-radius: 9999px; font-size: 12px; text-transform: uppercase; letter-spacing: 2px; text-align: center;">Entrar al panel y gestionar</a>
@@ -146,7 +162,7 @@ export async function submitIdea(boardId: string, slug: string, formData: FormDa
                         <p style="font-size: 12px; color: #a1a1aa; text-align: center; margin-top: 24px; font-weight: bold;">Un saludo desde Pídemelo 👋</p>
                     </div>`;
                 } else {
-                    subject = `🔔 Someone is requesting stuff on: ${boardName}`;
+                    subject = `🔔 Someone is requesting stuff on: ${sanitizeHeader(boardName)}`;
                     html = `
                     <style>
                         .logo-link { transition: color 0.15s ease-in-out; }
@@ -159,14 +175,14 @@ export async function submitIdea(boardId: string, slug: string, formData: FormDa
                                     <span style="font-weight: 900; font-size: 24px; letter-spacing: -1px;">pidemelo<span style="color: #FF5C00;">.</span>app</span>
                                 </a>
                             </div>
-                            <h2 style="font-size: 20px; font-weight: 800; margin: 0 0 16px 0; line-height: 1.2;">Someone is requesting stuff on <b>${boardName}</b></h2>
+                            <h2 style="font-size: 20px; font-weight: 800; margin: 0 0 16px 0; line-height: 1.2;">Someone is requesting stuff on <b>${escapeHtml(boardName)}</b></h2>
                             <p style="font-size: 15px; color: #52525b; margin: 0 0 24px 0; line-height: 1.5;">Someone just dropped a new request on your board. Or maybe it's a genius idea, who knows.</p>
                             
                             <div style="background-color: #fff7ed; border-left: 4px solid #FF5C00; padding: 16px; border-radius: 8px; margin-bottom: 32px;">
                                 <p style="font-size: 12px; text-transform: uppercase; letter-spacing: 1px; color: #FF5C00; font-weight: 800; margin: 0 0 8px 0;">TITLE:</p>
-                                <p style="font-size: 16px; font-weight: 700; margin: 0 0 16px 0; color: #18181b;">${title}</p>
+                                <p style="font-size: 16px; font-weight: 700; margin: 0 0 16px 0; color: #18181b;">${escapeHtml(title)}</p>
                                 <p style="font-size: 12px; text-transform: uppercase; letter-spacing: 1px; color: #FF5C00; font-weight: 800; margin: 0 0 8px 0;">DESCRIPTION:</p>
-                                <p style="font-size: 14px; margin: 0; color: #3f3f46; white-space: pre-wrap; font-style: italic;">"${description}"</p>
+                                <p style="font-size: 14px; margin: 0; color: #3f3f46; white-space: pre-wrap; font-style: italic;">"${escapeHtml(description)}"</p>
                             </div>
 
                             <a href="https://pidemelo.app/dashboard/board/${boardId}" style="display: block; background-color: #FF5C00; color: #ffffff; font-weight: 900; text-decoration: none; padding: 16px 24px; border-radius: 9999px; font-size: 12px; text-transform: uppercase; letter-spacing: 2px; text-align: center;">Open dashboard to review</a>
@@ -201,8 +217,8 @@ export async function submitIdea(boardId: string, slug: string, formData: FormDa
         const errorMsg = e instanceof Error ? e.message : String(e);
         console.log("Error seguro capturado en submitIdea:", errorMsg);
 
-        // Devolvemos el error real para verlo en UI en vez de la caída del runtime (útil para debugear Edge)
-        return { error: `Error inesperado: ${errorMsg}` };
+        // Devolvemos un código de error genérico (sin filtrar detalles internos al cliente)
+        return { error: 'generic' };
     }
 }
 

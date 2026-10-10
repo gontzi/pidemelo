@@ -2,14 +2,12 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Monitor, LayoutDashboard, Zap, Rocket } from "lucide-react";
-import { UserButton, useUser } from "@clerk/nextjs";
-import { useState, useEffect } from "react";
+import { Monitor, LayoutDashboard } from "lucide-react";
+import { UserButton } from "@clerk/nextjs";
 import LanguageSwitcher from "../LanguageSwitcher";
 
 export default function AdminSidebar({ dict }: { dict: Record<string, string> }) {
     const pathname = usePathname();
-    const { user } = useUser();
 
     const isActive = (path: string) => {
         if (path === '/dashboard') return pathname === '/dashboard';

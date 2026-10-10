@@ -1,13 +1,19 @@
 'use client';
 
 import { useState, useRef } from 'react';
-import { ImagePlus, Loader2, Lock } from 'lucide-react';
+import { ImagePlus, Loader2 } from 'lucide-react';
 import { uploadImageAction } from '@/app/board/[slug]/uploadAction';
-import {
-    Popover,
-    PopoverContent,
-    PopoverTrigger,
-} from "@/components/ui/popover";
+
+export type ImageUploadDict = {
+    attach: string;
+    uploading: string;
+    error_size: string;
+    error_connection: string;
+    error_missing: string;
+    error_format: string;
+    error_board: string;
+    error_upload: string;
+};
 
 interface ImageUploadProps {
     boardId: string;
@@ -15,28 +21,33 @@ interface ImageUploadProps {
     widgetVersion?: 'normal' | 'lite';
     onUploadSuccess: (url: string) => void;
     isDarkMode?: boolean;
-    dict: {
-        attach: string;
-        attach_pro: string;
-        uploading: string;
-        error_size: string;
-        error_connection: string;
-        pro_title: string;
-        pro_desc: string;
-    };
+    dict: ImageUploadDict;
+}
+
+function resolveUploadError(code: string, dict: ImageUploadDict): string {
+    switch (code) {
+        case 'too_large':
+            return dict.error_size;
+        case 'bad_format':
+            return dict.error_format;
+        case 'board_not_found':
+            return dict.error_board;
+        case 'missing_data':
+            return dict.error_missing;
+        case 'upload_failed':
+        default:
+            return dict.error_upload;
+    }
 }
 
 export default function ImageUploadDropzone({
     boardId,
-    isCurrentUserAdmin = false,
-    widgetVersion = 'normal',
     onUploadSuccess,
     isDarkMode = false,
     dict
 }: ImageUploadProps) {
     const [isUploading, setIsUploading] = useState(false);
     const [error, setError] = useState<string | null>(null);
-    const [isPopoverOpen, setIsPopoverOpen] = useState(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
 
     const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -59,11 +70,11 @@ export default function ImageUploadDropzone({
             const result = await uploadImageAction(formData);
 
             if (result.error) {
-                setError(result.error);
+                setError(resolveUploadError(result.error, dict));
             } else if (result.url) {
                 onUploadSuccess(result.url);
             }
-        } catch (err) {
+        } catch {
             setError(dict.error_connection);
         } finally {
             setIsUploading(false);

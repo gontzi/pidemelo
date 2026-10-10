@@ -30,16 +30,16 @@ export async function uploadImageAction(formData: FormData) {
     const boardId = formData.get('boardId') as string | null;
 
     if (!file || !boardId) {
-        return { error: "Faltan datos requeridos." };
+        return { error: 'missing_data' };
     }
 
     if (file.size > MAX_FILE_SIZE) {
-        return { error: "La imagen supera el límite de 1MB." };
+        return { error: 'too_large' };
     }
 
     const detectedType = await detectImageMime(file);
     if (!detectedType || !ALLOWED_MIME_TYPES.includes(detectedType)) {
-        return { error: "Formato no permitido. Solo se aceptan JPG, PNG y WEBP." };
+        return { error: 'bad_format' };
     }
 
     try {
@@ -49,7 +49,7 @@ export async function uploadImageAction(formData: FormData) {
         });
 
         if (!boardInfo || !boardInfo.user) {
-            return { error: "Tablero no encontrado." };
+            return { error: 'board_not_found' };
         }
 
 
@@ -88,6 +88,6 @@ export async function uploadImageAction(formData: FormData) {
     } catch (error) {
         const errorMsg = error instanceof Error ? error.message : String(error);
         console.error("Error al subir imagen:", errorMsg);
-        return { error: "Hubo un error inesperado al procesar la imagen." };
+        return { error: 'upload_failed' };
     }
 }

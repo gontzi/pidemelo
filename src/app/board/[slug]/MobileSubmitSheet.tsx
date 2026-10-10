@@ -10,6 +10,7 @@ import {
     DialogClose,
 } from '@/components/ui/dialog';
 import SubmitIdeaForm from './SubmitIdeaForm';
+import type { ImageUploadDict } from '@/components/ImageUploadDropzone';
 
 type Tag = { id: string; name: string; color: string; description?: string | null };
 
@@ -29,7 +30,7 @@ export default function MobileSubmitSheet({
     formTitle: string;
     formDesc: string;
     dict: Record<string, string>;
-    imageDict: Record<string, string>;
+    imageDict: ImageUploadDict;
     tags?: Tag[];
     isCurrentUserAdmin?: boolean;
     fabLabel: string;

@@ -2,7 +2,7 @@
 
 import { DragDropContext, Droppable, Draggable, DropResult } from '@hello-pangea/dnd';
 import { updateIdeaStatus, deleteIdea } from './actions';
-import { Trash2, GripVertical, AlertTriangle, X, ChevronUp, Archive, MoreVertical, ArchiveX, Reply } from 'lucide-react';
+import { Trash2, GripVertical, AlertTriangle, ChevronUp, Archive, Reply } from 'lucide-react';
 import { useTransition, useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { cn } from "@/lib/utils";
@@ -118,7 +118,7 @@ export default function DashboardClient({ initialIdeas, boardId, dict }: { initi
                 <div className="px-4 py-2 text-[10px] font-black text-zinc-400 uppercase tracking-widest leading-none mb-1">{dict.move_to}</div>
                 {['en_revision', 'planeado', 'en_progreso', 'completado'].map((st) => (
                     idea.status !== st && (
-                        <ContextMenuItem key={st} onClick={(e) => updateStatus(idea.id, st as any, e)} className="rounded-xl py-3 px-4 font-bold text-zinc-700 focus:bg-orange-50 focus:text-[#FF5C00] active:scale-95 transition-transform">
+                        <ContextMenuItem key={st} onClick={(e) => updateStatus(idea.id, st as Idea['status'], e)} className="rounded-xl py-3 px-4 font-bold text-zinc-700 focus:bg-orange-50 focus:text-[#FF5C00] active:scale-95 transition-transform">
                             {st === 'en_revision' ? dict.col_pending?.toUpperCase() : st === 'planeado' ? dict.col_planned?.toUpperCase() : st === 'en_progreso' ? dict.col_in_progress?.toUpperCase() : dict.col_done?.toUpperCase()}
                         </ContextMenuItem>
                     )

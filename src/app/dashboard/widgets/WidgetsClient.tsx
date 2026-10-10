@@ -1,9 +1,8 @@
 'use client';
 
 import { useState, useMemo } from 'react';
-import { Copy, Check, Code, Lock, Monitor, Smartphone, Layout, Palette, Sun, Moon } from 'lucide-react';
+import { Copy, Check, Code, Monitor, Smartphone, Layout, Sun, Moon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import Link from 'next/link';
 import WidgetSkeleton from '@/components/WidgetSkeleton';
 
@@ -362,7 +361,7 @@ export default function WidgetsClient({
 
                         {/* Contenedor Dinámico del Iframe */}
                         <div
-                            className={`relative bg-white transition-all duration-500 ease-[cubic-bezier(0.23,1,0.32,1)] will-change-transform flex flex-col max-w-full ${viewMode === 'mobile'
+                            className={`relative bg-white transition-all duration-500 ease-out will-change-transform flex flex-col max-w-full ${viewMode === 'mobile'
                                 ? 'w-full max-w-[320px] sm:max-w-[375px] h-[568px] sm:h-[667px] border-[8px] sm:border-[12px] border-zinc-900 rounded-[2.5rem] sm:rounded-[3rem] shadow-2xl ring-1 ring-black/5 flex-shrink-0'
                                 : 'w-full max-w-4xl h-[500px] md:h-[700px] border border-zinc-200 rounded-[1.5rem] sm:rounded-[2rem] shadow-xl'
                                 }`}

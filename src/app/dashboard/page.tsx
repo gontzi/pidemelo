@@ -1,10 +1,9 @@
 import { db } from "@/db";
-import { boards, users } from "@/db/schema";
+import { boards } from "@/db/schema";
 import { auth } from "@clerk/nextjs/server";
 import { eq } from "drizzle-orm";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import Link from "next/link";
 import { createBoard } from "./actions";
 
 export const runtime = 'edge';
@@ -12,7 +11,6 @@ export const dynamic = 'force-dynamic';
 
 import { getDictionary } from '@/i18n';
 import ProjectCard from "./ProjectCard";
-import { cn } from "@/lib/utils";
 import DashboardEmptyState from "./DashboardEmptyState";
 export default async function Dashboard() {
     const t = await getDictionary();
@@ -82,7 +80,7 @@ export default async function Dashboard() {
 
                     <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-8">
                         {userBoards.map(board => (
-                            <ProjectCard key={board.id} board={board as any} dict={t.project_card} settingsDict={t.board_details} />
+                            <ProjectCard key={board.id} board={board} dict={t.project_card} settingsDict={t.board_details} />
                         ))}
                         
                         {userBoards.length === 0 && (

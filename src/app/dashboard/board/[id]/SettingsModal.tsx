@@ -142,7 +142,7 @@ export default function SettingsModal({
                                         className="h-12 md:h-14 rounded-none rounded-r-2xl shadow-none border-zinc-200 bg-[#FAFAFA] focus-visible:ring-[#FF5C00] font-medium text-sm md:text-base"
                                     />
                                 </div>
-                                {error && <p className="text-[10px] md:text-sm text-red-500 font-medium mt-2">{(dict as any).errors?.[error] || error}</p>}
+                                {error && <p className="text-[10px] md:text-sm text-red-500 font-medium mt-2">{(dict as { errors?: Record<string, string> }).errors?.[error] || error}</p>}
                             </div>
 
                             {/* Notificaciones */}

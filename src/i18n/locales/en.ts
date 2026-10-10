@@ -1,4 +1,4 @@
-export default {
+const en = {
     "seo": {
         "title": "Pídemelo — Feedback and suggestion board for creators and SaaS",
         "description": "Collect feedback from your community, manage suggestions, and publish your public roadmap effortlessly. The ultimate feedback tool.",
@@ -221,14 +221,21 @@ export default {
         "success_title": "Idea received!",
         "success_desc": "It's already saved. Hope it goes far.",
         "image_uploaded_alt": "Uploaded image",
-        "close": "Close"
+        "close": "Close",
+        "err_missing_fields": "Please fill in all fields.",
+        "err_cooldown": "Please wait {s} seconds before submitting another idea.",
+        "err_generic": "Something went wrong. Please try again."
     },
 
     "image_upload": {
         "attach": "Attach image or screenshot (max 1MB)",
         "uploading": "Uploading image...",
         "error_size": "Image is over 1MB.",
-        "error_connection": "Server connection failed."
+        "error_connection": "Server connection failed.",
+        "error_missing": "Missing required data.",
+        "error_format": "Format not allowed. Only JPG, PNG and WEBP are accepted.",
+        "error_board": "Board not found.",
+        "error_upload": "There was an unexpected error processing the image."
     },
     "widget_page": {
         "go_to": "go to pidemelo.app 🚀",
@@ -252,3 +259,5 @@ export default {
         "generic": "Something went wrong"
     }
 }
+
+export default en;
