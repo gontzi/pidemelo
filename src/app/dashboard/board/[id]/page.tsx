@@ -1,7 +1,7 @@
 import { db } from "@/db";
-import { boards, ideas } from "@/db/schema";
+import { boards, ideas, votes } from "@/db/schema";
 import { auth } from "@clerk/nextjs/server";
-import { and, eq, desc } from "drizzle-orm";
+import { and, eq, desc, count, inArray } from "drizzle-orm";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import DashboardClient from "./DashboardClient";
@@ -22,7 +22,7 @@ export default async function BoardDashboardPage({ params }: { params: { id: str
         with: {
             tags: true,
             ideas: {
-                with: { votes: true, tag: true },
+                with: { tag: true },
                 orderBy: [desc(ideas.createdAt)]
             }
         }
@@ -30,13 +30,23 @@ export default async function BoardDashboardPage({ params }: { params: { id: str
 
     if (!board) notFound();
 
+    // Conteo de votos agregado en SQL (evita cargar todas las filas de votos)
+    const ideaIds = board.ideas.map(i => i.id);
+    const voteRows = ideaIds.length > 0
+        ? await db.select({ ideaId: votes.ideaId, count: count() })
+            .from(votes)
+            .where(inArray(votes.ideaId, ideaIds))
+            .groupBy(votes.ideaId)
+        : [];
+    const voteCountMap = new Map(voteRows.map(r => [r.ideaId, r.count]));
+
     const formattedIdeas = board.ideas.map(idea => ({
         id: idea.id,
         title: idea.title,
         description: idea.description,
         status: idea.status,
         imageUrl: idea.imageUrl,
-        votesCount: idea.votes.length,
+        votesCount: voteCountMap.get(idea.id) ?? 0,
         tag: idea.tag ? {
             id: idea.tag.id,
             name: idea.tag.name,

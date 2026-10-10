@@ -11,7 +11,7 @@ type Idea = {
     description: string;
     imageUrl?: string | null;
     status: 'en_revision' | 'planeado' | 'en_progreso' | 'completado' | 'descartado';
-    votes: { id: string }[];
+    votesCount: number;
     tag: { id: string; name: string; color: string; } | null;
 };
 
@@ -135,7 +135,7 @@ export default function PublicBoardClient({
                         <form action={upvoteIdea.bind(null, idea.id, boardSlug)} className="shrink-0 text-[#FF5C00]">
                             <button
                                 type="submit"
-                                aria-label={`${dict.vote} (${idea.votes.length})`}
+                                aria-label={`${dict.vote} (${idea.votesCount})`}
                                 style={{
                                     '--hover-bg': `${accentColor}15`,
                                     '--hover-border': accentColor,
@@ -145,7 +145,7 @@ export default function PublicBoardClient({
                                 className={`flex flex-col items-center justify-center w-14 md:w-16 h-[4.5rem] md:h-20 border ${isDarkMode ? 'border-zinc-800 hover:bg-[var(--hover-bg)]' : 'border-zinc-200 hover:bg-[var(--hover-bg)]'} rounded-xl md:rounded-2xl hover:border-[var(--hover-border)] hover:text-[var(--hover-text)] transition-colors active:scale-95 group/btn shadow-sm`}
                             >
                                 <span className="text-zinc-400 font-black mb-0.5 md:mb-1 text-[10px] md:text-sm group-hover/btn:text-[var(--hover-text)]" aria-hidden="true">▲</span>
-                                <span className={`font-black text-lg md:text-xl leading-none group-hover/btn:text-[var(--hover-text)] ${isDarkMode ? 'text-zinc-100' : 'text-zinc-900'}`}>{idea.votes.length}</span>
+                                <span className={`font-black text-lg md:text-xl leading-none group-hover/btn:text-[var(--hover-text)] ${isDarkMode ? 'text-zinc-100' : 'text-zinc-900'}`}>{idea.votesCount}</span>
                             </button>
                         </form>
 

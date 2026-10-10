@@ -1,6 +1,6 @@
 import { db } from "@/db";
-import { boards, ideas } from "@/db/schema";
-import { eq, desc } from "drizzle-orm";
+import { boards } from "@/db/schema";
+import { eq } from "drizzle-orm";
 import { notFound } from "next/navigation";
 import SubmitIdeaForm from "../../../board/[slug]/SubmitIdeaForm";
 import { getDictionary } from "@/i18n";
@@ -43,11 +43,7 @@ async function FormContent({ params, searchParams, t }: {
         where: eq(boards.slug, params.slug),
         with: {
             tags: true,
-            user: true,
-            ideas: {
-                with: { votes: true, tag: true },
-                orderBy: [desc(ideas.createdAt)]
-            }
+            user: true
         }
     });
 

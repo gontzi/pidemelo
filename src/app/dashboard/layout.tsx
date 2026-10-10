@@ -1,6 +1,3 @@
-import { currentUser } from "@clerk/nextjs/server";
-import { db } from "@/db";
-import { users } from "@/db/schema";
 import AdminSidebar from "@/components/navigation/AdminSidebar";
 import BottomNav from "@/components/navigation/BottomNav";
 import { getDictionary } from "@/i18n";
@@ -10,31 +7,6 @@ export default async function DashboardLayout({
 }: {
     children: React.ReactNode;
 }) {
-    const user = await currentUser();
-
-    if (user) {
-        try {
-            const email = user.emailAddresses[0]?.emailAddress;
-            const name = `${user.firstName || ""} ${user.lastName || ""}`.trim() || user.username || "";
-
-            await db.insert(users).values({
-                id: user.id,
-                email,
-                name,
-                updatedAt: new Date(),
-            }).onConflictDoUpdate({
-                target: users.id,
-                set: {
-                    email,
-                    name,
-                    updatedAt: new Date(),
-                }
-            });
-        } catch (error) {
-            console.error("Error syncing user to database:", error);
-        }
-    }
-
     const t = await getDictionary();
 
     return (

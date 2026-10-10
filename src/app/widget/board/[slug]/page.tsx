@@ -1,6 +1,6 @@
 import { db } from "@/db";
-import { boards, ideas } from "@/db/schema";
-import { eq, desc, ne } from "drizzle-orm";
+import { boards, ideas, votes } from "@/db/schema";
+import { eq, desc, ne, count, inArray } from "drizzle-orm";
 import { notFound } from "next/navigation";
 import PublicBoardClient from "../../../board/[slug]/PublicBoardClient";
 import { getDictionary } from "@/i18n";
@@ -45,7 +45,7 @@ async function BoardContent({ params, searchParams, t }: {
             user: true,
             ideas: {
                 where: ne(ideas.status, 'archivado'),
-                with: { votes: true, tag: true },
+                with: { tag: true },
                 orderBy: [desc(ideas.createdAt)]
             }
         }
@@ -53,7 +53,16 @@ async function BoardContent({ params, searchParams, t }: {
 
     if (!board) notFound();
 
-    const sortedIdeas = board.ideas.sort((a, b) => b.votes.length - a.votes.length);
+    const ideaIds = board.ideas.map(i => i.id);
+    const voteRows = ideaIds.length > 0
+        ? await db.select({ ideaId: votes.ideaId, count: count() })
+            .from(votes)
+            .where(inArray(votes.ideaId, ideaIds))
+            .groupBy(votes.ideaId)
+        : [];
+    const voteCountMap = new Map(voteRows.map(r => [r.ideaId, r.count]));
+
+    const sortedIdeas = board.ideas.sort((a, b) => (voteCountMap.get(b.id) ?? 0) - (voteCountMap.get(a.id) ?? 0));
 
     return (
         <div className={`min-h-screen flex flex-col p-4 ${isDarkMode ? 'bg-zinc-950 text-zinc-50' : 'bg-white text-zinc-900'}`}>
@@ -64,7 +73,8 @@ async function BoardContent({ params, searchParams, t }: {
                         status: i.status as 'en_revision' | 'planeado' | 'en_progreso' | 'completado' | 'descartado',
                         title: i.title ?? '',
                         description: i.description ?? '',
-                        imageUrl: i.imageUrl
+                        imageUrl: i.imageUrl,
+                        votesCount: voteCountMap.get(i.id) ?? 0
                     }))}
                     boardSlug={board.slug}
                     accentColor={accentColor}

@@ -1,8 +1,8 @@
 'use server'
 
 import { db } from "@/db";
-import { boards } from "@/db/schema";
-import { auth } from "@clerk/nextjs/server";
+import { boards, users } from "@/db/schema";
+import { auth, currentUser } from "@clerk/nextjs/server";
 import { revalidatePath } from "next/cache";
 import { eq } from "drizzle-orm";
 
@@ -10,25 +10,55 @@ function slugify(text: string) {
     return text.toLowerCase().replace(/[^\w\s-]/g, '').replace(/[\s_-]+/g, '-').replace(/^-+|-+$/g, '');
 }
 
+function randomSuffix() {
+    return Math.random().toString(36).substring(2, 8);
+}
+
 export async function createBoard(formData: FormData) {
     const { userId } = auth();
     if (!userId) throw new Error("Unauthorized");
 
-
     const name = formData.get('name') as string;
-    if (!name) return;
+    if (!name || !name.trim()) return;
 
-    const baseSlug = slugify(name);
+    // Aseguramos que la fila del usuario existe (FK de boards.user_id).
+    // Antes lo hacía el layout del dashboard en cada render; ahora solo al crear un tablero.
+    let email: string | undefined;
+    let displayName: string | undefined;
+    try {
+        const user = await currentUser();
+        email = user?.emailAddresses[0]?.emailAddress;
+        displayName = `${user?.firstName || ""} ${user?.lastName || ""}`.trim() || user?.username || "";
+    } catch (e) {
+        console.log("No se pudo obtener datos del usuario en createBoard:", e instanceof Error ? e.message : String(e));
+    }
+
+    await db.insert(users).values({
+        id: userId,
+        email,
+        name: displayName,
+        updatedAt: new Date(),
+    }).onConflictDoUpdate({
+        target: users.id,
+        set: {
+            email,
+            name: displayName,
+            updatedAt: new Date(),
+        }
+    });
+
+    // Slug seguro: si el nombre no genera uno válido, usamos uno con sufijo aleatorio
+    const baseSlug = slugify(name) || `board-${randomSuffix()}`;
 
     // Comprobar si el slug limpio ya existe en la BBDD
     let slug = baseSlug;
     const existing = await db.query.boards.findFirst({ where: eq(boards.slug, baseSlug) });
-    if (existing) {
+    if (existing || slug.length < 2) {
         // Solo añadimos sufijo aleatorio si hay colisión
-        let candidate = `${baseSlug}-${Math.random().toString(36).substring(2, 6)}`;
+        let candidate = `${baseSlug}-${randomSuffix()}`;
         // Aseguramos que el candidato con sufijo también sea único
         while (await db.query.boards.findFirst({ where: eq(boards.slug, candidate) })) {
-            candidate = `${baseSlug}-${Math.random().toString(36).substring(2, 6)}`;
+            candidate = `${baseSlug}-${randomSuffix()}`;
         }
         slug = candidate;
     }
