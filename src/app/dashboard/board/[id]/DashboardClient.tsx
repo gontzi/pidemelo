@@ -320,12 +320,12 @@ export default function DashboardClient({ initialIdeas, boardId, dict }: { initi
                     </div>
                 )}
 
-                <div className="flex-1 overflow-y-auto overflow-x-hidden p-4 pb-32 max-w-full">
+                <div className="flex-1 overflow-y-auto overflow-x-hidden p-4 pb-28 max-w-full">
                     {viewTab === 'activas' ? (
                         <DragDropContext onDragEnd={onDragEnd}>
                             <div className="space-y-10">
                                 {columnsConfig.map((col) => (
-                                    <div key={col.id} id={`mobile-col-${col.id}`} className="space-y-4">
+                                    <div key={col.id} id={`mobile-col-${col.id}`} className="space-y-4 scroll-mt-28">
                                         <div className="flex items-center justify-between px-1">
                                             <div className="flex items-center gap-2">
                                                 <h3 className="text-[10px] font-black tracking-widest text-zinc-400 uppercase">

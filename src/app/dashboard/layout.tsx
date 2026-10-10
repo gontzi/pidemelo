@@ -46,7 +46,7 @@ export default async function DashboardLayout({
             </div>
 
             {/* Main Content Wrapper */}
-            <div className="flex-1 flex flex-col lg:pl-64 pb-32 lg:pb-0">
+            <div className="flex-1 flex flex-col lg:pl-64 pb-nav lg:pb-0">
                 {/* Mobile Header (Hidden as we use BottomNav, but keeping if needed for something else, though the request says hide it) */}
                 <div className="lg:hidden">
                     {/* <AdminHeader dict={t.navbar} /> */}

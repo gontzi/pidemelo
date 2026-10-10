@@ -49,7 +49,7 @@ export default function ProjectCard({ board, dict, settingsDict }: ProjectCardPr
     return (
         <ContextMenu>
             <ContextMenuTrigger asChild>
-                <div className="group relative bg-white border border-zinc-200/60 rounded-[2rem] p-6 transition-all duration-300 hover:shadow-[0_20px_50px_rgba(0,0,0,0.04)] hover:border-zinc-300/60 flex flex-col min-h-[340px]">
+                <div className="group relative bg-white border border-zinc-200/60 rounded-[2rem] p-5 md:p-6 transition-all duration-300 hover:shadow-[0_20px_50px_rgba(0,0,0,0.04)] hover:border-zinc-300/60 flex flex-col min-h-[260px] md:min-h-[340px]">
                     
                     {/* Top Section: Badges & Count */}
                     <div className="flex items-center justify-between mb-8">
@@ -68,7 +68,7 @@ export default function ProjectCard({ board, dict, settingsDict }: ProjectCardPr
 
                     {/* Content Section */}
                     <div className="flex-1 space-y-4">
-                        <h3 className="text-3xl font-black tracking-tight text-zinc-900 leading-[1.1] group-hover:text-black transition-colors">
+                        <h3 className="text-2xl md:text-3xl font-black tracking-tight text-zinc-900 leading-[1.1] group-hover:text-black transition-colors break-words">
                             {board.name}
                         </h3>
                         
@@ -100,7 +100,8 @@ export default function ProjectCard({ board, dict, settingsDict }: ProjectCardPr
                                 <button
                                     onClick={handleCopy}
                                     title={dict.copy_link}
-                                    className="p-2.5 rounded-xl text-zinc-400 hover:text-[#FF5C00] hover:bg-orange-50 transition-all active:scale-95 border border-transparent hover:border-orange-100"
+                                    aria-label={dict.copy_link}
+                                    className="flex items-center justify-center h-11 w-11 rounded-xl text-zinc-400 hover:text-[#FF5C00] hover:bg-orange-50 transition-all active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-300"
                                 >
                                     {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
                                 </button>
@@ -108,7 +109,8 @@ export default function ProjectCard({ board, dict, settingsDict }: ProjectCardPr
                                     href={`/board/${board.slug}`}
                                     target="_blank"
                                     title={dict.view_public}
-                                    className="p-2.5 rounded-xl text-zinc-400 hover:text-blue-500 hover:bg-blue-50 transition-all active:scale-95 border border-transparent hover:border-blue-100"
+                                    aria-label={dict.view_public}
+                                    className="flex items-center justify-center h-11 w-11 rounded-xl text-zinc-400 hover:text-blue-500 hover:bg-blue-50 transition-all active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-300"
                                 >
                                     <ExternalLink className="w-4 h-4" />
                                 </Link>

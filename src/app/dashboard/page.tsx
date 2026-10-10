@@ -35,12 +35,12 @@ export default async function Dashboard() {
 
 
     return (
-        <div className="min-h-screen bg-[#FAFAFA] px-6 py-10 md:px-10 lg:py-16">
+        <div className="min-h-screen bg-[#FAFAFA] px-4 py-6 md:px-10 lg:py-16">
             <div className="max-w-6xl mx-auto">
                 
                 {/* Unified Header Section */}
-                <header className="flex flex-col md:flex-row md:items-end justify-between gap-8 mb-16">
-                    <div className="space-y-4">
+                <header className="flex flex-col md:flex-row md:items-end justify-between gap-6 md:gap-8 mb-8 md:mb-16">
+                    <div className="space-y-3 md:space-y-4">
                         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-orange-50 border border-orange-100/50">
                             <span className="relative flex h-2 w-2">
                                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-orange-400 opacity-75"></span>
@@ -50,10 +50,10 @@ export default async function Dashboard() {
                                 {t.dashboard_index.unlimited_projects}
                             </span>
                         </div>
-                        <h1 className="text-5xl md:text-6xl font-black tracking-tight text-zinc-900 leading-[0.9]">
+                        <h1 className="text-4xl md:text-6xl font-black tracking-tight text-zinc-900 leading-[0.95] md:leading-[0.9]">
                             {t.dashboard_index.my_boards}
                         </h1>
-                        <p className="text-zinc-500 font-medium text-lg max-w-md">
+                        <p className="text-zinc-500 font-medium text-base md:text-lg max-w-md">
                             {t.dashboard_index.my_boards_subtitle}
                         </p>
                     </div>
@@ -80,7 +80,7 @@ export default async function Dashboard() {
                 </header>
 
 
-                    <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-8">
                         {userBoards.map(board => (
                             <ProjectCard key={board.id} board={board as any} dict={t.project_card} settingsDict={t.board_details} />
                         ))}

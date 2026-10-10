@@ -136,15 +136,16 @@ export default function PublicBoardClient({
                         <form action={upvoteIdea.bind(null, idea.id, boardSlug)} className="shrink-0 text-[#FF5C00]">
                             <button
                                 type="submit"
+                                aria-label={`${dict.vote} (${idea.votes.length})`}
                                 style={{
                                     '--hover-bg': `${accentColor}15`,
                                     '--hover-border': accentColor,
                                     '--hover-text': accentColor,
                                     backgroundColor: isDarkMode ? '#18181b' : '#FAFAFA'
                                 } as React.CSSProperties}
-                                className={`flex flex-col items-center justify-center w-14 md:w-16 h-18 md:h-20 border ${isDarkMode ? 'border-zinc-800 hover:bg-[var(--hover-bg)]' : 'border-zinc-200 hover:bg-[var(--hover-bg)]'} rounded-xl md:rounded-2xl hover:border-[var(--hover-border)] hover:text-[var(--hover-text)] transition-colors active:scale-95 group/btn shadow-sm`}
+                                className={`flex flex-col items-center justify-center w-14 md:w-16 h-[4.5rem] md:h-20 border ${isDarkMode ? 'border-zinc-800 hover:bg-[var(--hover-bg)]' : 'border-zinc-200 hover:bg-[var(--hover-bg)]'} rounded-xl md:rounded-2xl hover:border-[var(--hover-border)] hover:text-[var(--hover-text)] transition-colors active:scale-95 group/btn shadow-sm`}
                             >
-                                <span className="text-zinc-400 font-black mb-0.5 md:mb-1 text-[10px] md:text-sm group-hover/btn:text-[var(--hover-text)]">▲</span>
+                                <span className="text-zinc-400 font-black mb-0.5 md:mb-1 text-[10px] md:text-sm group-hover/btn:text-[var(--hover-text)]" aria-hidden="true">▲</span>
                                 <span className={`font-black text-lg md:text-xl leading-none group-hover/btn:text-[var(--hover-text)] ${isDarkMode ? 'text-zinc-100' : 'text-zinc-900'}`}>{idea.votes.length}</span>
                             </button>
                         </form>

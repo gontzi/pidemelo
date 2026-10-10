@@ -55,7 +55,10 @@ export default {
         "mobile_dashboard": "Dashboard 🏠",
         "mobile_donation": "Donate / Support",
         "profile": "Profile",
-        "support_gontzi": "Support Gontzi"
+        "support_gontzi": "Support Gontzi",
+        "nav_menu": "Main navigation",
+        "open_menu": "Open menu",
+        "close_menu": "Close menu"
     },
     "dashboard_index": {
         "admin": "Administration",
@@ -186,7 +189,8 @@ export default {
         "tag": "🚀 Suggestions & Roadmap",
         "description": "Pitch us your ideas or vote on the proposals from other users.",
         "form_title": "Let it all out 💡",
-        "form_desc": "We promise to read it, but whether we listen to you is another story."
+        "form_desc": "We promise to read it, but whether we listen to you is another story.",
+        "submit_fab": "Submit an idea"
     },
     "public_board_client": {
         "showing": "Showing",
@@ -216,7 +220,8 @@ export default {
         "submit_btn": "DROP MY IDEA 🚀",
         "success_title": "Idea received!",
         "success_desc": "It's already saved. Hope it goes far.",
-        "image_uploaded_alt": "Uploaded image"
+        "image_uploaded_alt": "Uploaded image",
+        "close": "Close"
     },
 
     "image_upload": {

@@ -5,6 +5,7 @@ import { eq, desc, ne } from "drizzle-orm";
 import { notFound } from "next/navigation";
 import PublicBoardClient from "./PublicBoardClient";
 import SubmitIdeaForm from "./SubmitIdeaForm";
+import MobileSubmitSheet from "./MobileSubmitSheet";
 import { getDictionary } from "@/i18n";
 import { auth } from "@clerk/nextjs/server";
 
@@ -123,16 +124,16 @@ export default async function PublicBoardPage({ params }: { params: { slug: stri
     };
 
     return (
-        <div className="min-h-screen pb-16 md:pb-24">
+        <div className="min-h-screen pb-nav lg:pb-24">
             <JsonLd schema={collectionSchema} />
 
             {/* Header */}
-            <header className="bg-white border-b border-zinc-200 py-10 md:py-16 mb-6 md:mb-10 shadow-sm">
-                <div className="max-w-3xl mx-auto px-5 text-center space-y-4">
-                    <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#FF5C00]/10 text-[#FF5C00] text-xs md:text-sm font-bold border border-[#FF5C00]/20 mb-2">
+            <header className="bg-white border-b border-zinc-200 py-8 md:py-16 mb-6 md:mb-10 shadow-sm">
+                <div className="max-w-3xl mx-auto px-5 text-center space-y-3 md:space-y-4">
+                    <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#FF5C00]/10 text-[#FF5C00] text-xs md:text-sm font-bold border border-[#FF5C00]/20 mb-1 md:mb-2">
                         {t.public_board_page.tag}
                     </div>
-                    <h1 className="font-heading text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight text-zinc-900">
+                    <h1 className="font-heading text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight text-zinc-900 break-words">
                         {board.name}
                     </h1>
                     <p className="text-base md:text-xl text-zinc-500 max-w-xl mx-auto font-medium">
@@ -144,7 +145,7 @@ export default async function PublicBoardPage({ params }: { params: { slug: stri
             <main className="max-w-5xl mx-auto px-4 md:px-6">
                 <div className="flex flex-col lg:grid lg:grid-cols-[1fr_340px] gap-6 lg:gap-10 items-start">
 
-                    {/* Left Col: Feed */}
+                    {/* Contenido principal: feed de ideas */}
                     <PublicBoardClient
                         initialIdeas={sortedIdeas.map(i => ({
                             ...i,
@@ -157,9 +158,9 @@ export default async function PublicBoardPage({ params }: { params: { slug: stri
                         dict={t.public_board_client}
                     />
 
-                    {/* Right Col / Mobile Bottom: Formulario */}
-                    <aside className="lg:sticky lg:top-20 bg-white border border-zinc-200 p-6 md:p-8 rounded-2xl md:rounded-3xl shadow-lg shadow-zinc-200/40 w-full order-first lg:order-last">
-                        <h2 className="font-heading text-lg md:text-xl font-bold tracking-tight mb-1">{t.public_board_page.form_title}</h2>
+                    {/* Formulario en línea (solo escritorio). En móvil se abre como hoja inferior */}
+                    <aside className="hidden lg:block lg:sticky lg:top-20 bg-white border border-zinc-200 p-8 rounded-3xl shadow-lg shadow-zinc-200/40 w-full">
+                        <h2 className="font-heading text-xl font-bold tracking-tight mb-1">{t.public_board_page.form_title}</h2>
                         <p className="text-zinc-500 font-medium text-sm mb-5">{t.public_board_page.form_desc}</p>
                         <SubmitIdeaForm
                             boardId={board.id}
@@ -173,6 +174,18 @@ export default async function PublicBoardPage({ params }: { params: { slug: stri
 
                 </div>
             </main>
+
+            <MobileSubmitSheet
+                boardId={board.id}
+                boardSlug={board.slug}
+                formTitle={t.public_board_page.form_title}
+                formDesc={t.public_board_page.form_desc}
+                dict={t.submit_idea_form}
+                imageDict={t.image_upload}
+                tags={board.tags}
+                isCurrentUserAdmin={isCurrentUserAdmin}
+                fabLabel={t.public_board_page.submit_fab}
+            />
 
         </div>
     );

@@ -1,9 +1,8 @@
-import type { Metadata } from 'next'
+import type { Metadata, Viewport } from 'next'
 import { Outfit, Instrument_Sans } from 'next/font/google'
 import { ClerkProvider } from '@clerk/nextjs'
 import './globals.css'
 import { getDictionary, getLocale } from '@/i18n'
-import ClientWrapper from '@/components/ClientWrapper'
 import Navbar from '@/components/Navbar'
 
 const outfit = Outfit({
@@ -17,6 +16,14 @@ const instrument = Instrument_Sans({
   variable: '--font-instrument',
   display: 'swap',
 })
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 5,
+  viewportFit: 'cover',
+  themeColor: '#FFFFFF',
+}
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://pidemelo.app'),

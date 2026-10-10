@@ -55,7 +55,10 @@ export default {
         "mobile_dashboard": "Panel de Control 🏠",
         "mobile_donation": "Donar / Support",
         "profile": "Perfil",
-        "support_gontzi": "Apoyar a Gontzi"
+        "support_gontzi": "Apoyar a Gontzi",
+        "nav_menu": "Navegación principal",
+        "open_menu": "Abrir menú",
+        "close_menu": "Cerrar menú"
     },
     "dashboard_index": {
         "admin": "Administración",
@@ -186,7 +189,8 @@ export default {
         "tag": "🚀 Sugerencias y Roadmap",
         "description": "Danos la chapa con tus ideas o vota las propuestas de otros usuarios.",
         "form_title": "Suéltalo todo 💡",
-        "form_desc": "Prometemos leerlo, otra cosa es que te hagamos caso."
+        "form_desc": "Prometemos leerlo, otra cosa es que te hagamos caso.",
+        "submit_fab": "Enviar una idea"
     },
     "public_board_client": {
         "showing": "Mostradas",
@@ -216,7 +220,8 @@ export default {
         "submit_btn": "SOLTAR MI IDEA 🚀",
         "success_title": "¡Idea recibida!",
         "success_desc": "Ya está guardada. Ojalá llegue muy lejos.",
-        "image_uploaded_alt": "Imagen subida"
+        "image_uploaded_alt": "Imagen subida",
+        "close": "Cerrar"
     },
 
     "image_upload": {

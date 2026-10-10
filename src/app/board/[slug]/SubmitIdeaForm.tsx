@@ -134,6 +134,8 @@ export default function SubmitIdeaForm({
                     placeholder={dict.title_placeholder}
                     required
                     maxLength={100}
+                    autoComplete="off"
+                    enterKeyHint="next"
                     style={{ '--tw-ring-color': accentColor, color: isDarkMode ? '#f4f4f5' : '#18181b' } as React.CSSProperties}
                     className={`h-12 md:h-14 shadow-none ${isDarkMode ? 'border-zinc-800 bg-zinc-900 placeholder:text-zinc-600 focus-visible:bg-zinc-800' : 'border-zinc-200 bg-[#FAFAFA] focus-visible:bg-white'} rounded-2xl focus-visible:ring-1 font-medium px-4 text-base transition-colors`}
                 />

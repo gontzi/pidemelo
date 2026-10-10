@@ -1,23 +1,16 @@
 'use client';
 
-import { SignedIn, SignedOut, SignInButton, UserButton, useUser } from "@clerk/nextjs";
+import { SignedIn, SignedOut, SignInButton, UserButton } from "@clerk/nextjs";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { useState, useEffect } from "react";
 import { usePathname } from 'next/navigation';
-import { Menu, X, Monitor, Zap } from "lucide-react";
+import { Menu, X } from "lucide-react";
 import LanguageSwitcher from "./LanguageSwitcher";
-
-function Rocket({ className }: { className?: string }) {
-    return (
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z" /><path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z" /><path d="M9 12H4s.5-1 1-4c2 0 3.27 1.02 4 2z" /><path d="M12 15v5s1 .5 4 1c0-2-1.02-3.27-2-4z" /></svg>
-    )
-}
 
 export default function Navbar({ dict }: { dict: Record<string, string> }) {
     const pathname = usePathname();
     const [menuOpen, setMenuOpen] = useState(false);
-    const { user } = useUser();
 
     useEffect(() => {
         document.body.style.overflow = menuOpen ? 'hidden' : '';
@@ -28,7 +21,7 @@ export default function Navbar({ dict }: { dict: Record<string, string> }) {
 
     return (
         <>
-            <nav className="sticky top-0 z-50 w-full bg-white/90 backdrop-blur-md border-b border-zinc-200/50">
+            <nav className="sticky top-0 z-50 w-full bg-white/90 backdrop-blur-md border-b border-zinc-200/50 pt-safe">
                 <div className="max-w-5xl mx-auto px-5 h-16 flex items-center justify-between">
                     {/* Logo */}
                     <Link href="/" onClick={() => setMenuOpen(false)} className="font-jakarta font-extrabold text-xl tracking-tighter hover:scale-105 transition-all flex items-center active:scale-95 group">

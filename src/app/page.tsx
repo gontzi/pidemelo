@@ -91,7 +91,7 @@ export default async function Home() {
         </div>
 
         {/* Sección de Beneficios */}
-        <section id="que-es" aria-labelledby="beneficios-heading" className="mt-24 md:mt-48 max-w-5xl w-full text-left pb-16 md:pb-32">
+        <section id="que-es" aria-labelledby="beneficios-heading" className="mt-16 md:mt-48 max-w-5xl w-full text-left pb-16 md:pb-32">
           <h2 id="beneficios-heading" className="sr-only">{t.landing.features_sr}</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5">
             <div className="p-6 md:p-8 bg-white border border-zinc-200 rounded-[2rem] space-y-4 hover:shadow-xl transition-shadow">
@@ -133,7 +133,7 @@ export default async function Home() {
               frameBorder="0"
               loading="lazy"
               title="Feedback Board Widget"
-              className="rounded-[1.5rem] md:rounded-[2.2rem] w-full block relative z-10"
+              className="rounded-[1.5rem] md:rounded-[2.2rem] w-full block relative z-10 h-[70dvh] min-h-[560px] md:h-[820px]"
               style={{ overflow: 'hidden' }}
             ></iframe>
           </div>
