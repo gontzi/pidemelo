@@ -7,6 +7,7 @@ import { revalidatePath } from "next/cache";
 import { cookies, headers } from "next/headers";
 import { v4 as uuidv4 } from 'uuid';
 import { Resend } from 'resend';
+import { escapeHtml, sanitizeHeader, sha256 } from "@/lib/feedback";
 
 // IP de confianza: priorizamos la cabecera de Cloudflare y, como respaldo,
 // el último valor de X-Forwarded-For (el más cercano a nuestro proxy).
@@ -21,14 +22,6 @@ function getClientIp(): string {
     }
 
     return 'unknown';
-}
-
-// 🌐 Hash compatible con Edge Runtime (Web Crypto API)
-async function sha256(value: string): Promise<string> {
-    const msgUint8 = new TextEncoder().encode(value);
-    const hashBuffer = await crypto.subtle.digest('SHA-256', msgUint8);
-    const hashArray = Array.from(new Uint8Array(hashBuffer));
-    return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
 }
 
 async function getIpHash() {
@@ -47,22 +40,6 @@ async function getVoterFingerprint(): Promise<string> {
     }
 
     return sha256(`${cookieId}|${getClientIp()}`);
-}
-
-// Escapa texto controlado por el usuario antes de inyectarlo en el HTML del email
-// (evita inyección de HTML/phishing en las notificaciones).
-function escapeHtml(value: string): string {
-    return value
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;')
-        .replace(/'/g, '&#39;');
-}
-
-// Evita la inyección de cabeceras en el asunto del email (saltos de línea)
-function sanitizeHeader(value: string): string {
-    return value.replace(/[\r\n]+/g, ' ').slice(0, 120);
 }
 
 export async function submitIdea(boardId: string, slug: string, formData: FormData) {

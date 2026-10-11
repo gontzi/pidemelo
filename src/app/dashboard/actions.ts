@@ -5,14 +5,7 @@ import { boards, users } from "@/db/schema";
 import { auth, currentUser } from "@clerk/nextjs/server";
 import { revalidatePath } from "next/cache";
 import { eq } from "drizzle-orm";
-
-function slugify(text: string) {
-    return text.toLowerCase().replace(/[^\w\s-]/g, '').replace(/[\s_-]+/g, '-').replace(/^-+|-+$/g, '');
-}
-
-function randomSuffix() {
-    return Math.random().toString(36).substring(2, 8);
-}
+import { slugify, randomSuffix } from "@/lib/feedback";
 
 export async function createBoard(formData: FormData) {
     const { userId } = auth();

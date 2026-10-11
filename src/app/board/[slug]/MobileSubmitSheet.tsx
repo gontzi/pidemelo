@@ -10,7 +10,7 @@ import {
     DialogClose,
 } from '@/components/ui/dialog';
 import SubmitIdeaForm from './SubmitIdeaForm';
-import type { ImageUploadDict } from '@/components/ImageUploadDropzone';
+import type { ImageUploadDict } from '@/lib/feedback';
 
 type Tag = { id: string; name: string; color: string; description?: string | null };
 

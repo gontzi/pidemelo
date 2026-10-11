@@ -5,24 +5,11 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { submitIdea } from './actions';
 import { ChevronDown, X, Check } from 'lucide-react';
-import ImageUploadDropzone, { type ImageUploadDict } from '@/components/ImageUploadDropzone';
+import ImageUploadDropzone from '@/components/ImageUploadDropzone';
+import { resolveError, type ImageUploadDict } from '@/lib/feedback';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 type Tag = { id: string, name: string, color: string, description?: string | null };
-
-type SubmitError = { error?: string; seconds?: number };
-
-function resolveError(res: SubmitError, dict: Record<string, string>): string {
-    switch (res.error) {
-        case 'missing_fields':
-            return dict.err_missing_fields || dict.error_fallback;
-        case 'cooldown':
-            return (dict.err_cooldown || dict.error_fallback).replace('{s}', String(res.seconds ?? ''));
-        case 'generic':
-        default:
-            return dict.err_generic || dict.error_fallback;
-    }
-}
 
 export default function SubmitIdeaForm({
     boardId,

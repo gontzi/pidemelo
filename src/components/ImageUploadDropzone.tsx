@@ -3,17 +3,7 @@
 import { useState, useRef } from 'react';
 import { ImagePlus, Loader2 } from 'lucide-react';
 import { uploadImageAction } from '@/app/board/[slug]/uploadAction';
-
-export type ImageUploadDict = {
-    attach: string;
-    uploading: string;
-    error_size: string;
-    error_connection: string;
-    error_missing: string;
-    error_format: string;
-    error_board: string;
-    error_upload: string;
-};
+import { resolveUploadError, type ImageUploadDict } from '@/lib/feedback';
 
 interface ImageUploadProps {
     boardId: string;
@@ -22,22 +12,6 @@ interface ImageUploadProps {
     onUploadSuccess: (url: string) => void;
     isDarkMode?: boolean;
     dict: ImageUploadDict;
-}
-
-function resolveUploadError(code: string, dict: ImageUploadDict): string {
-    switch (code) {
-        case 'too_large':
-            return dict.error_size;
-        case 'bad_format':
-            return dict.error_format;
-        case 'board_not_found':
-            return dict.error_board;
-        case 'missing_data':
-            return dict.error_missing;
-        case 'upload_failed':
-        default:
-            return dict.error_upload;
-    }
 }
 
 export default function ImageUploadDropzone({
