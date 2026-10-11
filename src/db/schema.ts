@@ -42,6 +42,8 @@ export const ideas = pgTable('ideas', {
     status: statusEnum('status').default('en_revision').notNull(),
     authorFingerprint: text('author_fingerprint').default('').notNull(),
     imageUrl: text('image_url'),
+    adminResponse: text('admin_response'),
+    adminResponseAt: timestamp('admin_response_at'),
     createdAt: timestamp('created_at').defaultNow().notNull(),
 }, (table) => [
     index('ideas_board_id_idx').on(table.boardId),

@@ -1,10 +1,11 @@
 'use client';
 
 import { DragDropContext, Droppable, Draggable, DropResult } from '@hello-pangea/dnd';
-import { updateIdeaStatus, deleteIdea } from './actions';
+import { updateIdeaStatus, deleteIdea, setAdminResponse } from './actions';
 import { Trash2, GripVertical, AlertTriangle, ChevronUp, Archive, Reply } from 'lucide-react';
 import { useTransition, useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
+import { Textarea } from '@/components/ui/textarea';
 import { cn } from "@/lib/utils";
 import ImageLightbox from '@/components/ImageLightbox';
 import {
@@ -30,6 +31,7 @@ type Idea = {
     status: 'en_revision' | 'planeado' | 'en_progreso' | 'completado' | 'descartado' | 'archivado';
     votesCount: number;
     tag: { id: string; name: string; color: string; } | null;
+    adminResponse?: string | null;
 };
 
 export default function DashboardClient({ initialIdeas, boardId, dict }: { initialIdeas: Idea[], boardId: string, dict: Record<string, string> }) {
@@ -45,10 +47,35 @@ export default function DashboardClient({ initialIdeas, boardId, dict }: { initi
     const [ideaToDelete, setIdeaToDelete] = useState<string | null>(null);
     const [selectedIdea, setSelectedIdea] = useState<Idea | null>(null);
     const [viewTab, setViewTab] = useState<'activas' | 'descartadas' | 'archivadas'>('activas');
+    const [responseDraft, setResponseDraft] = useState('');
+    const [responsePending, startResponseTransition] = useTransition();
+    const [responseSaved, setResponseSaved] = useState(false);
 
     useEffect(() => {
         setIdeas(initialIdeas);
     }, [initialIdeas]);
+
+    // Al abrir una idea, precargamos su respuesta oficial en el editor
+    useEffect(() => {
+        if (selectedIdea) {
+            setResponseDraft(selectedIdea.adminResponse ?? '');
+            setResponseSaved(false);
+        }
+    }, [selectedIdea]);
+
+    const handleSaveResponse = () => {
+        if (!selectedIdea) return;
+        startResponseTransition(async () => {
+            const res = await setAdminResponse(selectedIdea.id, boardId, responseDraft);
+            if (!res?.error) {
+                setIdeas(prev => prev.map(i => i.id === selectedIdea.id
+                    ? { ...i, adminResponse: responseDraft.trim() || null }
+                    : i));
+                setResponseSaved(true);
+                setTimeout(() => setResponseSaved(false), 2000);
+            }
+        });
+    };
 
     const onDragEnd = (result: DropResult) => {
         if (!result.destination) return;
@@ -100,6 +127,11 @@ export default function DashboardClient({ initialIdeas, boardId, dict }: { initi
                                 <span className="inline-flex items-center gap-1 text-[8px] font-black uppercase tracking-widest border border-zinc-100 px-2 py-0.5 rounded-full">
                                     <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: idea.tag.color }} />
                                     {idea.tag.name}
+                                </span>
+                            )}
+                            {idea.adminResponse && (
+                                <span className="inline-flex items-center gap-1 text-[8px] font-black uppercase tracking-widest border border-orange-200 bg-orange-50 text-[#FF5C00] px-2 py-0.5 rounded-full">
+                                    {dict.has_response}
                                 </span>
                             )}
                         </div>
@@ -244,6 +276,33 @@ export default function DashboardClient({ initialIdeas, boardId, dict }: { initi
                                         <Button size="sm" variant="outline" onClick={() => updateStatus(selectedIdea!.id, 'completado')} className="rounded-full font-bold text-xs uppercase tracking-widest">{dict.status_done || 'Completado'}</Button>
                                         <Button size="sm" variant="outline" onClick={() => updateStatus(selectedIdea!.id, 'descartado')} className="rounded-full font-bold text-xs text-red-500 border-red-200 hover:bg-red-50 uppercase tracking-widest">{dict.status_discard || 'Descartar'}</Button>
                                         <Button size="sm" variant="outline" onClick={() => updateStatus(selectedIdea!.id, 'archivado')} className="rounded-full font-bold text-xs text-purple-600 border-purple-200 hover:bg-purple-50 uppercase tracking-widest">{dict.status_archive || 'Archivar'}</Button>
+                                    </div>
+                                </div>
+
+                                {/* Respuesta oficial del administrador */}
+                                <div className="space-y-3 pt-6 border-t border-zinc-100">
+                                    <p className="text-[10px] md:text-xs font-black uppercase tracking-[0.2em] text-zinc-400 flex items-center gap-2">
+                                        <span className="w-8 h-px bg-zinc-200" /> {dict.response_label}
+                                    </p>
+                                    <Textarea
+                                        value={responseDraft}
+                                        onChange={(e) => setResponseDraft(e.target.value)}
+                                        placeholder={dict.response_placeholder}
+                                        maxLength={800}
+                                        rows={4}
+                                        className="border-zinc-200 bg-white focus-visible:ring-[#FF5C00] font-medium text-sm leading-relaxed"
+                                    />
+                                    <div className="flex items-center gap-3">
+                                        <Button
+                                            onClick={handleSaveResponse}
+                                            disabled={responsePending}
+                                            className="h-11 px-6 rounded-full bg-[#FF5C00] text-white hover:bg-[#E65300] font-black text-[11px] tracking-widest uppercase shadow-lg shadow-orange-500/20 transition-all active:scale-95"
+                                        >
+                                            {responsePending ? dict.saving : dict.save_response}
+                                        </Button>
+                                        {responseSaved && (
+                                            <span className="text-sm font-bold text-emerald-600">{dict.response_saved}</span>
+                                        )}
                                     </div>
                                 </div>
                             </div>
@@ -454,10 +513,15 @@ export default function DashboardClient({ initialIdeas, boardId, dict }: { initi
                                                                         </div>
                                                                     )}
 
-                                                                    <div className="flex items-center justify-between">
+                                                                    <div className="flex flex-wrap items-center gap-2">
                                                                         <span className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-[#FF5C00] bg-orange-50 border border-orange-100 px-4 py-2 rounded-full shadow-sm flex-shrink-0">
                                                                             <span className="text-sm">▲</span> {idea.votesCount} {idea.votesCount === 1 ? dict.vote : dict.votes}
                                                                         </span>
+                                                                        {idea.adminResponse && (
+                                                                            <span className="text-[10px] font-black uppercase tracking-widest text-[#FF5C00] bg-orange-50 border border-orange-200 px-3 py-2 rounded-full shadow-sm">
+                                                                                {dict.has_response}
+                                                                            </span>
+                                                                        )}
                                                                         {idea.tag && (
                                                                             <span
                                                                                 className="flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest border border-zinc-100 px-3 py-2 rounded-full shadow-sm max-w-[120px] truncate"

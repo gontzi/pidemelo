@@ -162,3 +162,32 @@ export async function deleteTag(tagId: string, boardId: string) {
     revalidatePath(`/dashboard/board/${boardId}`);
     return { success: true };
 }
+
+export async function setAdminResponse(ideaId: string, boardId: string, response: string) {
+    const { userId } = auth();
+    if (!userId) return { error: "unauthorized" };
+
+    // Verificar propiedad (igual patrón que updateIdeaStatus)
+    const idea = await db.query.ideas.findFirst({
+        where: eq(ideas.id, ideaId),
+        with: { board: true }
+    });
+
+    if (!idea || idea.board.userId !== userId) {
+        return { error: "no_permission" };
+    }
+
+    const trimmed = response.trim();
+
+    await db.update(ideas)
+        .set({
+            adminResponse: trimmed || null,
+            adminResponseAt: trimmed ? new Date() : null,
+        })
+        .where(eq(ideas.id, ideaId));
+
+    revalidatePath(`/dashboard/board/${boardId}`);
+    revalidatePath(`/board/${idea.board.slug}`);
+    revalidatePath(`/board/${idea.board.slug}/roadmap`);
+    return { success: true };
+}

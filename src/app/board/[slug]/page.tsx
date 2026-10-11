@@ -3,6 +3,7 @@ import { db } from "@/db";
 import { boards, ideas, votes } from "@/db/schema";
 import { eq, desc, ne, count, inArray } from "drizzle-orm";
 import { notFound } from "next/navigation";
+import Link from "next/link";
 import PublicBoardClient from "./PublicBoardClient";
 import SubmitIdeaForm from "./SubmitIdeaForm";
 import MobileSubmitSheet from "./MobileSubmitSheet";
@@ -149,6 +150,14 @@ export default async function PublicBoardPage({ params }: { params: { slug: stri
                     <p className="text-base md:text-xl text-zinc-500 max-w-xl mx-auto font-medium">
                         {t.public_board_page.description}
                     </p>
+                    <div className="pt-2">
+                        <Link
+                            href={`/board/${board.slug}/roadmap`}
+                            className="inline-flex items-center px-5 h-10 rounded-full border border-zinc-200 bg-white text-zinc-700 text-[11px] font-black uppercase tracking-widest transition-colors hover:border-[#FF5C00]/60 hover:text-[#FF5C00] active:scale-95"
+                        >
+                            {t.public_board_page.roadmap_btn}
+                        </Link>
+                    </div>
                 </div>
             </header>
 

@@ -47,6 +47,7 @@ export default async function BoardDashboardPage({ params }: { params: { id: str
         status: idea.status,
         imageUrl: idea.imageUrl,
         votesCount: voteCountMap.get(idea.id) ?? 0,
+        adminResponse: idea.adminResponse ?? null,
         tag: idea.tag ? {
             id: idea.tag.id,
             name: idea.tag.name,

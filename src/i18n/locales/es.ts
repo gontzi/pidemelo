@@ -142,7 +142,13 @@ const es = {
         "empty_section": "Nada en esta sección",
         "discarded_desc": "Fuera de prioridad",
         "archived_desc": "En el archivo",
-        "empty": "Vacío"
+        "empty": "Vacío",
+        "response_label": "Respuesta oficial",
+        "response_placeholder": "Comparte una actualización oficial con la comunidad…",
+        "save_response": "Guardar respuesta",
+        "response_saved": "Guardada",
+        "saving": "Guardando…",
+        "has_response": "✓ Respondida"
     },
     "widgets_page": {
         "title": "Widgets",
@@ -190,7 +196,8 @@ const es = {
         "description": "Danos la chapa con tus ideas o vota las propuestas de otros usuarios.",
         "form_title": "Suéltalo todo 💡",
         "form_desc": "Prometemos leerlo, otra cosa es que te hagamos caso.",
-        "submit_fab": "Enviar una idea"
+        "submit_fab": "Enviar una idea",
+        "roadmap_btn": "Roadmap"
     },
     "public_board_client": {
         "showing": "Mostradas",
@@ -207,7 +214,8 @@ const es = {
         "tag_done": "Completado",
         "empty_title": "No hemos encontrado nada.",
         "empty_desc": "Prueba con otros filtros o sé el primero en proponerlo.",
-        "powered_by": "Con la tecnología de"
+        "powered_by": "Con la tecnología de",
+        "admin_response": "Respuesta oficial"
     },
     "submit_idea_form": {
         "title_placeholder": "Ej. Poner un botón que me dé café gratis...",
@@ -247,6 +255,18 @@ const es = {
         "desc": "Aquí no hay nada. Ni ideas, ni votos, ni ese café que tanto necesitas ahora mismo.",
         "back": "Volver a la civilización",
         "quote": "\"Si buscas resultados distintos, no entres en rutas que no existen\" — Probablemente Einstein."
+    },
+
+    "roadmap": {
+        "title": "Roadmap",
+        "subtitle": "Lo que tenemos planeado y en construcción",
+        "back": "Volver al tablón",
+        "empty": "Aún no hay nada aquí",
+        "col_planned": "Planeado",
+        "col_in_progress": "En Progreso",
+        "col_done": "Completado",
+        "votes": "votos",
+        "response_label": "Respuesta oficial"
     },
 
     "errors": {

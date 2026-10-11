@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from 'react';
 import { upvoteIdea } from './actions';
 import { Search, ChevronDown } from 'lucide-react';
 import ImageLightbox from '@/components/ImageLightbox';
+import AdminResponseBlock from '@/components/AdminResponseBlock';
 
 type Idea = {
     id: string;
@@ -13,6 +14,7 @@ type Idea = {
     status: 'en_revision' | 'planeado' | 'en_progreso' | 'completado' | 'descartado';
     votesCount: number;
     tag: { id: string; name: string; color: string; } | null;
+    adminResponse?: string | null;
 };
 
 export default function PublicBoardClient({
@@ -185,6 +187,10 @@ export default function PublicBoardClient({
                                     className="mt-4 rounded-xl border border-zinc-100 shadow-sm"
                                 />
                             )}
+                            <AdminResponseBlock
+                                response={idea.adminResponse ?? ''}
+                                label={dict.admin_response}
+                            />
                         </div>
                     </div>
                 ))}

@@ -142,7 +142,13 @@ const en = {
         "empty_section": "Nothing in this section",
         "discarded_desc": "Out of priority",
         "archived_desc": "In the archive",
-        "empty": "Empty"
+        "empty": "Empty",
+        "response_label": "Official reply",
+        "response_placeholder": "Share an official update with the community…",
+        "save_response": "Save reply",
+        "response_saved": "Saved",
+        "saving": "Saving…",
+        "has_response": "✓ Replied"
     },
     "widgets_page": {
         "title": "Widgets",
@@ -190,7 +196,8 @@ const en = {
         "description": "Pitch us your ideas or vote on the proposals from other users.",
         "form_title": "Let it all out 💡",
         "form_desc": "We promise to read it, but whether we listen to you is another story.",
-        "submit_fab": "Submit an idea"
+        "submit_fab": "Submit an idea",
+        "roadmap_btn": "Roadmap"
     },
     "public_board_client": {
         "showing": "Showing",
@@ -207,7 +214,8 @@ const en = {
         "tag_done": "Done",
         "empty_title": "We couldn't find anything.",
         "empty_desc": "Try with other filters or be the first to propose it.",
-        "powered_by": "Powered by"
+        "powered_by": "Powered by",
+        "admin_response": "Official reply"
     },
     "submit_idea_form": {
         "title_placeholder": "Ex. Add a button that gives me free coffee...",
@@ -247,6 +255,18 @@ const en = {
         "desc": "There is nothing here. No ideas, no votes, not even that coffee you desperately need right now.",
         "back": "Back to civilization",
         "quote": "\"If you want different results, do not go to routes that don't exist\" — Probably Einstein."
+    },
+
+    "roadmap": {
+        "title": "Roadmap",
+        "subtitle": "What we're planning and building",
+        "back": "Back to board",
+        "empty": "Nothing here yet",
+        "col_planned": "Planned",
+        "col_in_progress": "In Progress",
+        "col_done": "Done",
+        "votes": "votes",
+        "response_label": "Official reply"
     },
 
     "errors": {
