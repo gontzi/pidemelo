@@ -92,6 +92,9 @@ export const metadata: Metadata = {
       'max-snippet': -1,
     },
   },
+  icons: {
+    icon: ['/favicon.ico', '/icon.svg'],
+  },
 }
 
 export default async function RootLayout({
