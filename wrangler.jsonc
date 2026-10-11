@@ -1,0 +1,33 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "pidemelo",
+  "main": ".open-next/worker.js",
+  "compatibility_date": "2026-09-02",
+  "compatibility_flags": [
+    // Proporciona los módulos de Node (incluido node:async_hooks / AsyncLocalStorage)
+    // que Next.js usa internamente. Requisito de @opennextjs/cloudflare.
+    // https://developers.cloudflare.com/workers/configuration/compatibility-flags/#nodejs-compatibility-flag
+    "nodejs_compat",
+    // Bloquea fetch hacia IPs privadas (SSRF). Solo salimos a servicios públicos
+    // (Clerk, Neon, ImageKit, Resend).
+    "global_fetch_strictly_public"
+  ],
+  "assets": {
+    "directory": ".open-next/assets",
+    "binding": "ASSETS"
+  },
+  "services": [
+    {
+      "binding": "WORKER_SELF_REFERENCE",
+      // Debe coincidir con el "name" de arriba.
+      "service": "pidemelo"
+    }
+  ],
+  "observability": {
+    "enabled": true
+  }
+  // Nota: los secretos (CLERK_SECRET_KEY, DATABASE_URL, IMAGEKIT_PRIVATE_KEY,
+  // RESEND_API_KEY, NEXT_PUBLIC_*) NO se declaran aquí. Se configuran en el
+  // dashboard de Cloudflare o con `wrangler secret put <NOMBRE>`, y en local
+  // mediante `.dev.vars` (gitignored).
+}

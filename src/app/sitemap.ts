@@ -4,7 +4,6 @@ import { db } from '@/db'
 const BASE_URL = 'https://pidemelo.app'
 
 export const dynamic = 'force-dynamic'
-export const runtime = 'edge'
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     // Rutas estáticas principales

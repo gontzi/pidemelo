@@ -7,7 +7,6 @@ import { getDictionary } from "@/i18n";
 import { Suspense } from "react";
 import WidgetSkeleton from "@/components/WidgetSkeleton";
 
-export const runtime = 'edge';
 export const dynamic = 'force-dynamic';
 
 export default async function WidgetBoardPage({

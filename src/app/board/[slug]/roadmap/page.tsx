@@ -6,7 +6,6 @@ import { notFound } from "next/navigation";
 import RoadmapClient from "../RoadmapClient";
 import { getDictionary } from "@/i18n";
 
-export const runtime = 'edge';
 export const dynamic = 'force-dynamic';
 
 type Props = { params: { slug: string } }

@@ -37,17 +37,18 @@ Built with the most modern and scalable technologies:
 
 -   **Framework:** [Next.js 14](https://nextjs.org/) (App Router & Server Actions)
 -   **Database:** PostgreSQL with [Neon](https://neon.tech/) (Serverless)
--   **ORM:** [Drizzle ORM](https://orm.drizzle.team/) (Edge compatible)
+-   **ORM:** [Drizzle ORM](https://orm.drizzle.team/) (Neon HTTP driver, sin WebSockets)
 -   **Auth:** [Clerk](https://clerk.com/)
 -   **Styling:** [Tailwind CSS](https://tailwindcss.com/)
 -   **Icons:** [Lucide React](https://lucide.dev/)
 -   **Email:** [Resend](https://resend.com/)
 -   **Storage:** [ImageKit](https://imagekit.io/)
+-   **Deploy:** [Cloudflare Workers](https://workers.cloudflare.com/) con [@opennextjs/cloudflare](https://opennext.js.org/cloudflare)
 
 ## 🏁 Getting Started
 
 ### 1. Requirements
-- Node.js 18+
+- Node.js 20+ y [pnpm 10](https://pnpm.io/) (`corepack enable` o `npm i -g pnpm`)
 - A Neon PostgreSQL instance
 - A Clerk account
 - A Resend API key
@@ -57,7 +58,7 @@ Built with the most modern and scalable technologies:
 ```bash
 git clone https://github.com/gontzi/pidemelo.git
 cd pidemelo
-npm install
+pnpm install
 ```
 
 ### 3. Environment Setup
@@ -74,8 +75,55 @@ npx drizzle-kit push
 
 ### 5. Run it
 ```bash
-npm run dev
+pnpm dev
 ```
+
+## ☁️ Build & Deploy (Cloudflare Workers)
+
+La app se ejecuta como un **Cloudflare Worker** mediante el adaptador oficial
+[`@opennextjs/cloudflare`](https://opennext.js.org/cloudflare), con el runtime
+**Node** de Next.js habilitado por el flag `nodejs_compat`
+(ver `wrangler.jsonc`). Este adaptador sustituye a `@cloudflare/next-on-pages`,
+que está deprecado y no puede empaquetar Next.js 14.2 (usa `AsyncLocalStorage`
+vía `node:async_hooks`, incompatible con su bundler Edge-only).
+
+### Comandos
+
+| Comando | Qué hace |
+| --- | --- |
+| `pnpm build` | Build estándar de Next.js (`.next`) |
+| `pnpm preview` | Build OpenNext + sirve el Worker en local (`http://127.0.0.1:8787`) en el runtime real de Workers |
+| `pnpm deploy` | Build OpenNext + despliega el Worker a Cloudflare |
+
+> ⚠️ **`preview` y `deploy` deben ejecutarse en Linux o macOS.** El propio adaptador
+> advierte de que Windows no está soportado: el artefacto embebe rutas Windows en
+> `required-server-files.json` y el Worker falla con
+> `Dynamic require of "/.next/server/middleware-manifest.json"`.
+> En Windows usa [WSL](https://learn.microsoft.com/windows/wsl/) o deja que
+> Cloudflare construya desde el repositorio (Workers Builds).
+
+### Variables de entorno en producción
+
+Los mismos nombres que en `.env.example` se configuran en el dashboard de
+Cloudflare (Workers → *pidemelo* → Settings → Variables) o con
+`wrangler secret put <NOMBRE>` para los secretos. **No** se versionan en
+`wrangler.jsonc`.
+
+En local, `pnpm preview` las lee de `.dev.vars`:
+
+```bash
+cp .dev.vars.example .dev.vars   # y rellena los valores (o cp .env .dev.vars)
+```
+
+### Pasos manuales en Cloudflare (una sola vez)
+
+1. Crear el Worker `pidemelo` (o renombrar el `name` de `wrangler.jsonc`).
+2. Activar el plan adecuado: el bundle pesa ~1.6 MiB gzip (límite Free: 3 MiB).
+3. Configurar las variables/secretos del apartado anterior.
+4. Conectar el repositorio con [Workers Builds](https://developers.cloudflare.com/workers/ci-cd/)
+   (Build command: `pnpm build`, Deploy command: `pnpm deploy`) **o** desplegar
+   a mano con `pnpm deploy` desde un runner Linux/macOS.
+5. Añadir el dominio `pidemelo.app` al Worker y ajustar DNS.
 
 ## ☕ Support & Sponsorship
 

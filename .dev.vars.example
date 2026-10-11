@@ -1,0 +1,35 @@
+# Variables de entorno locales para `pnpm preview` (runtime de Cloudflare Workers).
+# Wrangler lee `.dev.vars` en local. Este archivo NO se versiona.
+#
+# Uso:
+#   cp .env .dev.vars      (si ya tienes un .env local con los valores)
+# o bien copia este archivo y rellena los valores:
+#   cp .dev.vars.example .dev.vars
+#
+# En producción los mismos valores se configuran en el dashboard de Cloudflare
+# o con `wrangler secret put <NOMBRE>`.
+
+# Obligatoria para que OpenNext cargue los archivos .env en local
+NEXTJS_ENV=development
+
+# CLERK (Autenticación)
+NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=
+CLERK_SECRET_KEY=
+NEXT_PUBLIC_CLERK_SIGN_IN_URL=
+NEXT_PUBLIC_CLERK_SIGN_UP_URL=
+NEXT_PUBLIC_CLERK_AFTER_SIGN_IN_URL=
+NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL=
+
+# NEON (Base de datos)
+DATABASE_URL=
+
+# IMAGEKIT (Subida de imágenes de ideas)
+IMAGEKIT_PUBLIC_KEY=
+IMAGEKIT_PRIVATE_KEY=
+IMAGEKIT_URL_ENDPOINT=
+
+# RESEND (Email transaccional de nuevas ideas)
+RESEND_API_KEY=
+
+# SEO (Google Search Console, opcional)
+NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION=

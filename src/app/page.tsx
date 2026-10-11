@@ -7,7 +7,6 @@ import WidgetSkeleton from '@/components/WidgetSkeleton';
 
 import JsonLd from '@/components/JsonLd';
 
-export const runtime = 'edge';
 export const dynamic = 'force-dynamic';
 
 export async function generateMetadata(): Promise<Metadata> {

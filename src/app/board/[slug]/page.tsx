@@ -12,7 +12,6 @@ import { auth } from "@clerk/nextjs/server";
 
 import JsonLd from "@/components/JsonLd";
 
-export const runtime = 'edge';
 export const dynamic = 'force-dynamic';
 
 type Props = { params: { slug: string } }

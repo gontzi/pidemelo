@@ -1,7 +1,6 @@
 import { UserProfile } from "@clerk/nextjs";
 import { getDictionary } from "@/i18n";
 
-export const runtime = 'edge';
 export const dynamic = 'force-dynamic';
 
 export default async function ProfilePage() {

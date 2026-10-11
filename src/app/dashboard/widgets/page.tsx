@@ -6,7 +6,6 @@ import { redirect } from "next/navigation";
 import WidgetsClient from "./WidgetsClient";
 import { getDictionary } from "@/i18n";
 
-export const runtime = 'edge';
 export const dynamic = 'force-dynamic';
 
 export default async function WidgetsPage() {

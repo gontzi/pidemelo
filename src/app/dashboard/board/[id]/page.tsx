@@ -9,7 +9,6 @@ import SettingsModal from "./SettingsModal";
 import { ExternalLink, ArrowLeft, Settings } from "lucide-react";
 import { getDictionary } from "@/i18n";
 
-export const runtime = 'edge';
 export const dynamic = 'force-dynamic';
 
 export default async function BoardDashboardPage({ params }: { params: { id: string } }) {

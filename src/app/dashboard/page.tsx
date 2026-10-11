@@ -6,7 +6,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { createBoard } from "./actions";
 
-export const runtime = 'edge';
 export const dynamic = 'force-dynamic';
 
 import { getDictionary } from '@/i18n';
