@@ -102,6 +102,13 @@ vía `node:async_hooks`, incompatible con su bundler Edge-only).
 > En Windows usa [WSL](https://learn.microsoft.com/windows/wsl/) o deja que
 > Cloudflare construya desde el repositorio (Workers Builds).
 
+### Validación en CI
+
+El workflow de GitHub Actions `.github/workflows/build.yml` reproduce el pipeline
+completo en Linux con versiones fijadas (Node 20, pnpm 10.34.6):
+`pnpm install --frozen-lockfile` → typecheck → lint → tests → build OpenNext →
+`wrangler deploy --dry-run` (tamaño del bundle) → verificación de artefactos.
+
 ### Variables de entorno en producción
 
 Los mismos nombres que en `.env.example` se configuran en el dashboard de

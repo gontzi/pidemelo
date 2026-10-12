@@ -1,0 +1,56 @@
+﻿name: validate
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+
+concurrency:
+  group: validate-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    env:
+      NEXT_TELEMETRY_DISABLED: "1"
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.34.6
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - name: Install dependencies (frozen lockfile)
+        run: pnpm install --frozen-lockfile
+
+      - name: Typecheck
+        run: node node_modules/typescript/bin/tsc --noEmit
+
+      - name: Lint
+        run: pnpm lint
+
+      - name: Test
+        run: pnpm test
+
+      - name: Build OpenNext worker (Next.js 14.2.35 + nodejs_compat)
+        run: pnpm exec opennextjs-cloudflare build
+
+      - name: Check bundle size (wrangler dry-run)
+        run: pnpm exec wrangler deploy --dry-run --outdir .wrangler-ci
+
+      - name: Verify artifacts
+        run: |
+          test -f .open-next/worker.js
+          test -f .open-next/server-functions/default/handler.mjs
+          test -f .open-next/assets/favicon.ico
+          test -f .open-next/assets/icon.svg
+          test -f .open-next/assets/_headers
