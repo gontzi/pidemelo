@@ -1,6 +1,6 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
-  "name": "pidemelo",
+  "name": "pidemelo-app",
   "main": ".open-next/worker.js",
   "compatibility_date": "2026-09-02",
   "compatibility_flags": [
@@ -20,7 +20,7 @@
     {
       "binding": "WORKER_SELF_REFERENCE",
       // Debe coincidir con el "name" de arriba.
-      "service": "pidemelo"
+      "service": "pidemelo-app"
     }
   ],
   "observability": {

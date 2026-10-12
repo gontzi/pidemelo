@@ -92,8 +92,10 @@ vía `node:async_hooks`, incompatible con su bundler Edge-only).
 | Comando | Qué hace |
 | --- | --- |
 | `pnpm build` | Build estándar de Next.js (`.next`) |
+| `pnpm build:worker` | Genera el Worker de producción con OpenNext (`.open-next`) |
+| `pnpm deploy:worker` | Publica el artefacto ya generado con Wrangler |
 | `pnpm preview` | Build OpenNext + sirve el Worker en local (`http://127.0.0.1:8787`) en el runtime real de Workers |
-| `pnpm deploy` | Build OpenNext + despliega el Worker a Cloudflare |
+| `pnpm deploy` | Ejecuta `build:worker` y después `deploy:worker` (despliegue manual completo) |
 
 > ⚠️ **`preview` y `deploy` deben ejecutarse en Linux o macOS.** El propio adaptador
 > advierte de que Windows no está soportado: el artefacto embebe rutas Windows en
@@ -124,13 +126,21 @@ cp .dev.vars.example .dev.vars   # y rellena los valores (o cp .env .dev.vars)
 
 ### Pasos manuales en Cloudflare (una sola vez)
 
-1. Crear el Worker `pidemelo` (o renombrar el `name` de `wrangler.jsonc`).
+1. Crear el Worker `pidemelo-app` (el nombre `pidemelo` está ocupado por Pages; el dominio `pidemelo.app` se mantiene independiente).
 2. Activar el plan adecuado: el bundle pesa ~1.6 MiB gzip (límite Free: 3 MiB).
 3. Configurar las variables/secretos del apartado anterior.
-4. Conectar el repositorio con [Workers Builds](https://developers.cloudflare.com/workers/ci-cd/)
-   (Build command: `pnpm build`, Deploy command: `pnpm deploy`) **o** desplegar
-   a mano con `pnpm deploy` desde un runner Linux/macOS.
+4. Conectar el repositorio con [Workers Builds](https://developers.cloudflare.com/workers/ci-cd/).
+   Configurar Build command `pnpm build:worker` y Deploy command
+   `pnpm deploy:worker`. Workers Builds instala las dependencias desde
+   `pnpm-lock.yaml`; `.nvmrc` fija Node 20 y `packageManager` fija pnpm 10.34.6.
+   Para previsualizaciones, usar `npx wrangler preview` después del build.
+   También se puede desplegar a mano con `pnpm deploy` desde Linux/macOS.
 5. Añadir el dominio `pidemelo.app` al Worker y ajustar DNS.
+
+La integración antigua de Cloudflare Pages no debe compilar este proyecto:
+su comando `next-on-pages` ya no forma parte de la aplicación. Mantén Pages
+publicado hasta que el Worker pase las comprobaciones en su URL `workers.dev`;
+el traspaso del dominio personalizado es el último paso.
 
 ## ☕ Support & Sponsorship
 
