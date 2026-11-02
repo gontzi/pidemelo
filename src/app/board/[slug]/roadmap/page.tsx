@@ -4,6 +4,7 @@ import { boards, ideas, votes } from "@/db/schema";
 import { eq, desc, ne, count, inArray } from "drizzle-orm";
 import { notFound } from "next/navigation";
 import RoadmapClient from "../RoadmapClient";
+import { Panel } from "@/components/ui/panel";
 import { getDictionary } from "@/i18n";
 
 export const dynamic = 'force-dynamic';
@@ -80,13 +81,13 @@ export default async function RoadmapPage({ params }: Props) {
 
     return (
         <div className="min-h-screen pb-16 md:pb-24">
-            <header className="bg-white border-b border-zinc-200 py-8 md:py-12 shadow-sm">
-                <div className="max-w-7xl mx-auto px-4 md:px-6 text-center space-y-2">
-                    <h1 className="font-heading text-3xl md:text-4xl font-extrabold tracking-tight text-zinc-900 break-words">
+            <header className="px-4 md:px-6 pt-6 md:pt-10 pb-2">
+                <Panel tone="sky" padding="lg" className="max-w-7xl mx-auto text-center space-y-2">
+                    <h1 className="font-heading text-3xl md:text-4xl font-semibold tracking-tight text-foreground break-words">
                         {board.name} — {t.roadmap.title}
                     </h1>
-                    <p className="text-zinc-500 font-medium">{t.roadmap.subtitle}</p>
-                </div>
+                    <p className="text-[#C24A00] font-medium">{t.roadmap.subtitle}</p>
+                </Panel>
             </header>
 
             <main className="max-w-7xl mx-auto px-4 md:px-6 py-6">

@@ -21,7 +21,7 @@ const DialogOverlay = React.forwardRef<
   <DialogPrimitive.Overlay
     ref={ref}
     className={cn(
-      "fixed inset-0 z-50 bg-black/40 backdrop-blur-sm duration-500 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
+      "fixed inset-0 z-50 bg-black/40 backdrop-blur-sm duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
       className
     )}
     {...props}
@@ -52,6 +52,32 @@ const DialogContent = React.forwardRef<
   </DialogPortal>
 ))
 DialogContent.displayName = DialogPrimitive.Content.displayName
+
+// Panel lateral: hoja inferior en móvil, columna a la derecha en escritorio.
+// Comparte overlay/portal con Dialog; el cierre lo gestiona quien lo usa.
+const SheetContent = React.forwardRef<
+  React.ElementRef<typeof DialogPrimitive.Content>,
+  React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content>
+>(({ className, children, ...props }, ref) => (
+  <DialogPortal>
+    <DialogOverlay />
+    <DialogPrimitive.Content
+      ref={ref}
+      className={cn(
+        "fixed z-50 flex flex-col bg-card shadow-pop duration-200 focus:outline-none",
+        "inset-x-0 bottom-0 max-h-[92dvh] rounded-t-xl border-t border-border",
+        "md:inset-y-0 md:left-auto md:right-0 md:h-full md:max-h-none md:w-full md:max-w-xl md:rounded-none md:border-l md:border-t-0",
+        "data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=open]:slide-in-from-bottom data-[state=closed]:slide-out-to-bottom",
+        "md:data-[state=open]:slide-in-from-right md:data-[state=closed]:slide-out-to-right md:data-[state=open]:slide-in-from-bottom-0 md:data-[state=closed]:slide-out-to-bottom-0",
+        className
+      )}
+      {...props}
+    >
+      {children}
+    </DialogPrimitive.Content>
+  </DialogPortal>
+))
+SheetContent.displayName = "SheetContent"
 
 const DialogHeader = ({
   className,
@@ -115,6 +141,7 @@ export {
   DialogTrigger,
   DialogClose,
   DialogContent,
+  SheetContent,
   DialogHeader,
   DialogFooter,
   DialogTitle,

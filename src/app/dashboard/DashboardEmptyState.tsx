@@ -1,42 +1,20 @@
-'use client';
+import { LayoutGrid } from "lucide-react";
+import type { Dictionary } from "@/i18n/types";
+import CreateBoardForm from "./CreateBoardForm";
 
-import { Button } from "@/components/ui/button";
-
-interface DashboardEmptyStateProps {
-    dict: {
-        empty_title: string;
-        empty_subtitle: string;
-        create_first_btn: string;
-    };
-}
-
-export default function DashboardEmptyState({ dict }: DashboardEmptyStateProps) {
-    const handleFocusInput = () => {
-        const input = document.getElementById('name');
-        if (input) {
-            input.focus();
-            input.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        }
-    };
-
+export default function DashboardEmptyState({ dict }: { dict: Dictionary['dashboard_index'] }) {
     return (
-        <div className="col-span-full py-24 flex flex-col items-center justify-center text-center bg-zinc-50/50 rounded-[3rem] border border-dashed border-zinc-200">
-            <div className="w-20 h-20 bg-white rounded-3xl shadow-xl flex items-center justify-center text-4xl mb-8 border border-zinc-100 transform -rotate-6">
-                🏜️
+        <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-border bg-card px-4 py-14 text-center md:py-20">
+            <div className="mb-5 grid h-14 w-14 place-items-center rounded-xl bg-[#FFF0E8] text-[#FF5C00]">
+                <LayoutGrid className="h-7 w-7" aria-hidden="true" />
             </div>
-            <h3 className="text-2xl font-black tracking-tight text-zinc-900 mb-2">
+            <h2 className="max-w-sm font-heading text-xl font-bold tracking-tight text-foreground md:text-2xl">
                 {dict.empty_title}
-            </h3>
-            <p className="text-zinc-500 font-medium max-w-xs mx-auto mb-8">
+            </h2>
+            <p className="mx-auto mt-2 max-w-sm text-sm text-muted-foreground md:text-base">
                 {dict.empty_subtitle}
             </p>
-            <Button 
-                variant="outline" 
-                className="rounded-full border-zinc-200 font-black text-[10px] uppercase tracking-widest hover:bg-white px-8 transition-transform active:scale-95"
-                onClick={handleFocusInput}
-            >
-                {dict.create_first_btn}
-            </Button>
+            <CreateBoardForm dict={dict} autoFocus className="mt-6 max-w-md" />
         </div>
     );
 }

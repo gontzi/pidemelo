@@ -7,17 +7,13 @@ import { resolveUploadError, type ImageUploadDict } from '@/lib/feedback';
 
 interface ImageUploadProps {
     boardId: string;
-    isCurrentUserAdmin?: boolean;
-    widgetVersion?: 'normal' | 'lite';
     onUploadSuccess: (url: string) => void;
-    isDarkMode?: boolean;
     dict: ImageUploadDict;
 }
 
 export default function ImageUploadDropzone({
     boardId,
     onUploadSuccess,
-    isDarkMode = false,
     dict
 }: ImageUploadProps) {
     const [isUploading, setIsUploading] = useState(false);
@@ -57,7 +53,7 @@ export default function ImageUploadDropzone({
     };
 
     return (
-        <div className="w-full mb-4">
+        <div className="w-full">
             <input
                 type="file"
                 ref={fileInputRef}
@@ -71,20 +67,18 @@ export default function ImageUploadDropzone({
                 type="button"
                 onClick={() => fileInputRef.current?.click()}
                 disabled={isUploading}
-                className={`w-full flex items-center justify-center gap-2 rounded-2xl border-2 border-dashed p-4 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-[#FF5C00]/50 active:scale-[0.98] ${isDarkMode ? 'border-zinc-800 bg-zinc-900 hover:bg-zinc-800 hover:border-zinc-700 text-zinc-400' : 'border-zinc-200 bg-white hover:bg-zinc-50 hover:border-zinc-300 text-zinc-600'}`}
+                className="flex w-full items-center justify-center gap-2 rounded-lg border border-dashed border-input bg-card px-3 py-3 text-sm font-medium text-muted-foreground transition-colors hover:border-primary/50 hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/40 active:scale-[0.98] disabled:opacity-70"
             >
                 {isUploading ? (
-                    <Loader2 className="w-5 h-5 animate-spin" />
+                    <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
                 ) : (
-                    <ImagePlus className="w-5 h-5" />
+                    <ImagePlus className="h-4 w-4" aria-hidden="true" />
                 )}
-                <span className="text-sm font-medium">
-                    {isUploading ? dict.uploading : dict.attach}
-                </span>
+                {isUploading ? dict.uploading : dict.attach}
             </button>
 
             {error && (
-                <p className="mt-2 text-xs font-semibold text-red-500 text-center animate-in fade-in slide-in-from-top-1">
+                <p role="alert" className="mt-2 text-center text-xs font-semibold text-destructive animate-in fade-in slide-in-from-top-1">
                     {error}
                 </p>
             )}

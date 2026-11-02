@@ -20,6 +20,15 @@ const nextConfig = {
         ];
     },
 
+    // Secciones antiguas del panel: los widgets viven ahora en la pestaña
+    // "Compartir" de cada tablero y el perfil en el menú del avatar.
+    async redirects() {
+        return [
+            { source: "/dashboard/widgets", destination: "/dashboard", permanent: true },
+            { source: "/dashboard/profile", destination: "/dashboard", permanent: true },
+        ];
+    },
+
     // 🔒 Configuración de seguridad para imágenes externas
     images: {
         // Las imágenes se sirven directamente desde ImageKit (que ya es un CDN

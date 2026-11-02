@@ -3,45 +3,41 @@ import { boards, ideas, votes } from "@/db/schema";
 import { eq, desc, ne, count, inArray } from "drizzle-orm";
 import { notFound } from "next/navigation";
 import PublicBoardClient from "../../../board/[slug]/PublicBoardClient";
+import SubmitIdeaSheet from "../../../board/[slug]/SubmitIdeaSheet";
 import { getDictionary } from "@/i18n";
+import { getVotedIdeaIds } from "@/lib/voter";
+import { getWidgetTheme, type WidgetSearchParams, type WidgetTheme } from "@/lib/widget-theme";
 import { Suspense } from "react";
 import WidgetSkeleton from "@/components/WidgetSkeleton";
+import WidgetShell, { WidgetFrame } from "../../WidgetShell";
 
 export const dynamic = 'force-dynamic';
 
-export default async function WidgetBoardPage({
+export default function WidgetBoardPage({
     params,
     searchParams
 }: {
     params: { slug: string },
-    searchParams: { color?: string, textColor?: string, darkMode?: string, lang?: string, version?: string }
+    searchParams: WidgetSearchParams
 }) {
-    const lang = (searchParams.lang === 'en' || searchParams.lang === 'es') ? searchParams.lang : 'es';
-    const t = await getDictionary(lang);
+    const theme = getWidgetTheme(searchParams);
 
     return (
-        <div className="min-h-screen transition-colors">
-            <Suspense fallback={<WidgetSkeleton />}>
-                <BoardContent params={params} searchParams={searchParams} t={t} />
+        <WidgetFrame theme={theme}>
+            <Suspense fallback={<WidgetSkeleton variant="board" />}>
+                <BoardContent slug={params.slug} theme={theme} />
             </Suspense>
-        </div>
+        </WidgetFrame>
     );
 }
 
-async function BoardContent({ params, searchParams, t }: {
-    params: { slug: string };
-    searchParams: { color?: string; textColor?: string; darkMode?: string; lang?: string; version?: string };
-    t: Awaited<ReturnType<typeof getDictionary>>;
-}) {
-    const accentColor = searchParams.color ? decodeURIComponent(searchParams.color) : "#FF5C00";
-    const textColor = searchParams.textColor ? decodeURIComponent(searchParams.textColor) : "#18181b";
-    const isDarkMode = searchParams.darkMode === 'true';
-    const widgetVersion = searchParams.version === 'lite' ? 'lite' : 'normal';
+async function BoardContent({ slug, theme }: { slug: string; theme: WidgetTheme }) {
+    const t = await getDictionary(theme.lang);
 
     const board = await db.query.boards.findFirst({
-        where: eq(boards.slug, params.slug),
+        where: eq(boards.slug, slug),
         with: {
-            user: true,
+            tags: true,
             ideas: {
                 where: ne(ideas.status, 'archivado'),
                 with: { tag: true },
@@ -60,44 +56,43 @@ async function BoardContent({ params, searchParams, t }: {
             .groupBy(votes.ideaId)
         : [];
     const voteCountMap = new Map(voteRows.map(r => [r.ideaId, r.count]));
+    const votedIdeaIds = await getVotedIdeaIds(ideaIds);
 
     const sortedIdeas = board.ideas.sort((a, b) => (voteCountMap.get(b.id) ?? 0) - (voteCountMap.get(a.id) ?? 0));
 
     return (
-        <div className={`min-h-screen flex flex-col p-4 ${isDarkMode ? 'bg-zinc-950 text-zinc-50' : 'bg-white text-zinc-900'}`}>
-            <div className="flex-1">
-                <PublicBoardClient
-                    initialIdeas={sortedIdeas.map(i => ({
-                        ...i,
-                        status: i.status as 'en_revision' | 'planeado' | 'en_progreso' | 'completado' | 'descartado',
-                        title: i.title ?? '',
-                        description: i.description ?? '',
-                        imageUrl: i.imageUrl,
-                        votesCount: voteCountMap.get(i.id) ?? 0
-                    }))}
+        <WidgetShell
+            theme={theme}
+            title={board.name}
+            subtitle={t.widget_page.board_subtitle}
+            action={
+                <SubmitIdeaSheet
+                    variant="inline"
+                    boardId={board.id}
                     boardSlug={board.slug}
-                    accentColor={accentColor}
-                    textColor={textColor}
-                    isDarkMode={isDarkMode}
-                    widgetVersion={widgetVersion}
-                    dict={t.public_board_client}
+                    formTitle={t.public_board_page.form_title}
+                    formDesc={t.public_board_page.form_desc}
+                    dict={t.submit_idea_form}
+                    imageDict={t.image_upload}
+                    tags={board.tags}
+                    triggerLabel={t.widget_page.suggest}
                 />
-            </div>
-            {/* Watermark */}
-            <div className="text-center pt-8 mt-auto">
-                <a
-                    href="https://pidemelo.app"
-                    target="_blank"
-                    className="inline-flex items-center gap-1.5 text-[10px] uppercase tracking-[0.2em] font-black text-zinc-300 hover:text-zinc-400 transition-all group"
-                >
-                    <span>{t.public_board_client.powered_by || 'Powered by'}</span>
-                    <span className="font-jakarta font-extrabold lowercase tracking-tighter text-[13px] flex items-center">
-                        <span className="group-hover:text-[#FF5C00] transition-colors text-zinc-400">pidemelo</span>
-                        <span className="text-[#FF5C00]">.</span>
-                        <span className="text-zinc-400">app</span>
-                    </span>
-                </a>
-            </div>
-        </div>
+            }
+            footerLink={{ href: `https://pidemelo.app/board/${board.slug}/roadmap`, label: t.widget_page.see_roadmap }}
+            poweredBy={t.public_board_client.powered_by}
+        >
+            <PublicBoardClient
+                initialIdeas={sortedIdeas.map(i => ({
+                    ...i,
+                    status: i.status as 'en_revision' | 'planeado' | 'en_progreso' | 'completado' | 'descartado',
+                    votesCount: voteCountMap.get(i.id) ?? 0
+                }))}
+                boardSlug={board.slug}
+                widgetVersion={theme.version}
+                embedded
+                votedIdeaIds={votedIdeaIds}
+                dict={t.public_board_client}
+            />
+        </WidgetShell>
     );
 }

@@ -6,11 +6,12 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import PublicBoardClient from "./PublicBoardClient";
 import SubmitIdeaForm from "./SubmitIdeaForm";
-import MobileSubmitSheet from "./MobileSubmitSheet";
+import SubmitIdeaSheet from "./SubmitIdeaSheet";
+import { Panel } from "@/components/ui/panel";
 import { getDictionary } from "@/i18n";
-import { auth } from "@clerk/nextjs/server";
 
 import JsonLd from "@/components/JsonLd";
+import { getVotedIdeaIds } from "@/lib/voter";
 
 export const dynamic = 'force-dynamic';
 
@@ -85,7 +86,6 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function PublicBoardPage({ params }: { params: { slug: string } }) {
     const t = await getDictionary();
-    const { userId } = auth();
 
     const board = await db.query.boards.findFirst({
         where: eq(boards.slug, params.slug),
@@ -102,8 +102,6 @@ export default async function PublicBoardPage({ params }: { params: { slug: stri
 
     if (!board) notFound();
 
-    const isCurrentUserAdmin = userId === board.userId;
-
     // Conteo de votos agregado en SQL (evita cargar todas las filas de votos)
     const ideaIds = board.ideas.map(i => i.id);
     const voteRows = ideaIds.length > 0
@@ -113,6 +111,7 @@ export default async function PublicBoardPage({ params }: { params: { slug: stri
             .groupBy(votes.ideaId)
         : [];
     const voteCountMap = new Map(voteRows.map(r => [r.ideaId, r.count]));
+    const votedIdeaIds = await getVotedIdeaIds(ideaIds);
 
     const sortedIdeas = board.ideas.sort((a, b) => (voteCountMap.get(b.id) ?? 0) - (voteCountMap.get(a.id) ?? 0));
 
@@ -138,30 +137,35 @@ export default async function PublicBoardPage({ params }: { params: { slug: stri
             <JsonLd schema={collectionSchema} />
 
             {/* Header */}
-            <header className="bg-white border-b border-zinc-200 py-8 md:py-16 mb-6 md:mb-10 shadow-sm">
-                <div className="max-w-3xl mx-auto px-5 text-center space-y-3 md:space-y-4">
-                    <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#FF5C00]/10 text-[#FF5C00] text-xs md:text-sm font-bold border border-[#FF5C00]/20 mb-1 md:mb-2">
-                        {t.public_board_page.tag}
+            <header className="px-4 md:px-6 pt-5 md:pt-8">
+                <div className="max-w-5xl mx-auto rounded-xl border border-border bg-card p-5 md:p-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                    <div className="min-w-0">
+                        <h1 className="font-heading text-xl md:text-2xl font-bold tracking-tight text-foreground break-words text-balance">
+                            {board.name}
+                        </h1>
+                        <p className="text-muted-foreground text-sm max-w-xl mt-0.5">
+                            {t.public_board_page.description}
+                        </p>
                     </div>
-                    <h1 className="font-heading text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight text-zinc-900 break-words">
-                        {board.name}
-                    </h1>
-                    <p className="text-base md:text-xl text-zinc-500 max-w-xl mx-auto font-medium">
-                        {t.public_board_page.description}
-                    </p>
-                    <div className="pt-2">
+                    <div className="flex items-center gap-2 shrink-0">
                         <Link
                             href={`/board/${board.slug}/roadmap`}
-                            className="inline-flex items-center px-5 h-10 rounded-full border border-zinc-200 bg-white text-zinc-700 text-[11px] font-black uppercase tracking-widest transition-colors hover:border-[#FF5C00]/60 hover:text-[#FF5C00] active:scale-95"
+                            className="inline-flex items-center h-10 px-4 rounded-lg border border-border bg-card text-foreground text-sm font-medium transition-colors hover:bg-muted"
                         >
                             {t.public_board_page.roadmap_btn}
                         </Link>
+                        <a
+                            href="#propose"
+                            className="hidden lg:inline-flex items-center h-10 px-4 rounded-lg bg-primary text-primary-foreground text-sm font-semibold transition-colors hover:bg-primary/90"
+                        >
+                            {t.public_board_page.submit_fab}
+                        </a>
                     </div>
                 </div>
             </header>
 
-            <main className="max-w-5xl mx-auto px-4 md:px-6">
-                <div className="flex flex-col lg:grid lg:grid-cols-[1fr_340px] gap-6 lg:gap-10 items-start">
+            <main className="max-w-5xl mx-auto px-4 md:px-6 pt-6">
+                <div className="flex flex-col lg:grid lg:grid-cols-[1fr_340px] gap-6 lg:gap-8 items-start">
 
                     {/* Contenido principal: feed de ideas */}
                     <PublicBoardClient
@@ -174,27 +178,29 @@ export default async function PublicBoardPage({ params }: { params: { slug: stri
                             votesCount: voteCountMap.get(i.id) ?? 0
                         }))}
                         boardSlug={board.slug}
-                        dict={t.public_board_client}
+                        votedIdeaIds={votedIdeaIds}
+                    dict={t.public_board_client}
                     />
 
                     {/* Formulario en línea (solo escritorio). En móvil se abre como hoja inferior */}
-                    <aside className="hidden lg:block lg:sticky lg:top-20 bg-white border border-zinc-200 p-8 rounded-3xl shadow-lg shadow-zinc-200/40 w-full">
-                        <h2 className="font-heading text-xl font-bold tracking-tight mb-1">{t.public_board_page.form_title}</h2>
-                        <p className="text-zinc-500 font-medium text-sm mb-5">{t.public_board_page.form_desc}</p>
-                        <SubmitIdeaForm
-                            boardId={board.id}
-                            boardSlug={board.slug}
-                            dict={t.submit_idea_form}
-                            imageDict={t.image_upload}
-                            tags={board.tags}
-                            isCurrentUserAdmin={isCurrentUserAdmin}
-                        />
+                    <aside id="propose" className="hidden lg:block lg:sticky lg:top-20 w-full scroll-mt-24">
+                        <Panel tone="cream" padding="lg" className="w-full">
+                            <h2 className="font-heading text-lg font-bold tracking-tight mb-1">{t.public_board_page.form_title}</h2>
+                            <p className="text-muted-foreground font-medium text-sm mb-5">{t.public_board_page.form_desc}</p>
+                            <SubmitIdeaForm
+                                boardId={board.id}
+                                boardSlug={board.slug}
+                                dict={t.submit_idea_form}
+                                imageDict={t.image_upload}
+                                tags={board.tags}
+                            />
+                        </Panel>
                     </aside>
 
                 </div>
             </main>
 
-            <MobileSubmitSheet
+            <SubmitIdeaSheet
                 boardId={board.id}
                 boardSlug={board.slug}
                 formTitle={t.public_board_page.form_title}
@@ -202,8 +208,7 @@ export default async function PublicBoardPage({ params }: { params: { slug: stri
                 dict={t.submit_idea_form}
                 imageDict={t.image_upload}
                 tags={board.tags}
-                isCurrentUserAdmin={isCurrentUserAdmin}
-                fabLabel={t.public_board_page.submit_fab}
+                triggerLabel={t.public_board_page.submit_fab}
             />
 
         </div>

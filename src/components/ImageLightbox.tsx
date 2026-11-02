@@ -16,9 +16,10 @@ interface ImageLightboxProps {
     src: string;
     alt: string;
     className?: string;
+    closeLabel?: string;
 }
 
-export default function ImageLightbox({ src, alt, className }: ImageLightboxProps) {
+export default function ImageLightbox({ src, alt, className, closeLabel = 'Close' }: ImageLightboxProps) {
     if (!src) return null;
 
     return (
@@ -45,7 +46,7 @@ export default function ImageLightbox({ src, alt, className }: ImageLightboxProp
                 <div className="relative w-full h-full flex items-center justify-center p-4 md:p-12 animate-in fade-in zoom-in-95 duration-200">
                     <DialogClose className="absolute top-6 right-6 md:top-10 md:right-10 z-[110] rounded-full p-3 bg-black/40 hover:bg-black/60 text-white/70 hover:text-white transition-all backdrop-blur-xl outline-none border border-white/10 group">
                         <X className="w-6 h-6 transition-transform group-hover:rotate-90 duration-300" />
-                        <span className="sr-only">Cerrar</span>
+                        <span className="sr-only">{closeLabel}</span>
                     </DialogClose>
 
                     <div className="relative w-full h-full flex items-center justify-center select-none" onClick={(e) => e.stopPropagation()}>

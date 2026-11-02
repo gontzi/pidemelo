@@ -25,7 +25,12 @@
   ],
   "observability": {
     "enabled": true
-  }
+  },
+  // Requerido por `wrangler preview` (Worker Previews), el comando que usa
+  // Workers Builds para las ramas que no son producción. Las previews no
+  // admiten service bindings: sin caché de OpenNext (open-next.config.ts)
+  // WORKER_SELF_REFERENCE no es necesario en ellas.
+  "previews": {}
   // Nota: los secretos (CLERK_SECRET_KEY, DATABASE_URL, IMAGEKIT_PRIVATE_KEY,
   // RESEND_API_KEY, NEXT_PUBLIC_*) NO se declaran aquí. Se configuran en el
   // dashboard de Cloudflare o con `wrangler secret put <NOMBRE>`, y en local

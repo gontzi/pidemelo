@@ -12,24 +12,25 @@
 
 ---
 
-## ✦ The Vision: Modern B2B Clarity
+## ✦ Who it's for
 
-Pidemelo.app is built under the **"Modern B2B Clarity"** design philosophy, where visual structure and strategic use of color create a professional, intuitive, and data-driven interface.
+Pidemelo.app is built for **makers, indie hackers, creators and small SaaS teams** — usually one person who checks in a couple of times a week and wants three answers fast: *what's new, what's most requested, and how do I reply?*
 
-* **Defined Visual Hierarchy:** Goodbye to clutter. We use tactile cards with rounded corners and soft drop-shadows to clearly separate each piece of feedback. As seen in our dashboard, the organized columns allow for quick scanning, making feedback management a frictionless process.
-* **Monochrome Precision with a Punch:** The interface maintains a clean, high-contrast aesthetic, reserving our signature **Orange (#FF6600)** exclusively for critical actions (CTAs) and memorable messaging. This color naturally guides the user's eye to what truly matters.
-* **User Voice-First Design:** Every pixel has a purpose: prioritizing feedback. Through crisp typography and generous spacing, we remove all distractions so that votes, tags, and the users' ideas take center stage.
+* **Inbox, not project management:** the admin panel is a single list of ideas with status filters ("To review" first), a side panel to reply and change status, and a "new since your last visit" marker.
+* **Everything about a board lives inside the board:** *Ideas · Share (public link + embeddable widget) · Settings (name, URL, notifications, tags)*.
+* **Friendly in public, clear in the panel:** playful copy on the landing page and public boards; plain labels where you get work done.
 
 ## 🚀 Features
 
 -   **🎯 Public Feedback Boards:** Create unlimited boards for your products or projects.
--   **🔼 Community Voting:** Anonymous and authenticated voting system (fingerprint-authenticated) to identify real priorities.
--   **🔌 Widget Studio:** Fully customizable iframe widgets to embed feedback forms or boards directly into your own website.
--   **🏷️ Smart Tagging:** Categorize ideas using custom tags with precise visual indicators.
--   **📸 High-Fidelity Uploads:** Support for image attachments in every suggestion via ImageKit integration.
--   **⚙️ Admin Dashboard:** A premium kanban-style management interface to move ideas from "Review" to "Completed".
--   **🌐 Multi-language (i18n):** Support for English and Spanish out of the box.
--   **📩 Auto-notifications:** Real-time email alerts via Resend when new suggestions arrive.
+-   **🔼 Community Voting:** Anonymous voting (device cookie + IP fingerprint). Voters see which ideas they already voted.
+-   **📥 Ideas Inbox:** Triage new ideas, reply publicly and move them through *To review → Planned → In progress → Done*, or close them (visible or hidden).
+-   **🗺️ Public Roadmap:** Planned, in-progress and done ideas, generated automatically.
+-   **🔌 Embeddable Widget:** Customizable iframe (form or voting board) with live preview, inside each board's *Share* tab.
+-   **🏷️ Tags:** Optional categories with custom colors.
+-   **📸 Image Uploads:** Attach screenshots to suggestions via ImageKit.
+-   **🌐 Multi-language (i18n):** English and Spanish out of the box.
+-   **📩 Email notifications:** Optional alerts via Resend when new suggestions arrive.
 
 ## 🛠️ Tech Stack
 
@@ -48,7 +49,7 @@ Built with the most modern and scalable technologies:
 ## 🏁 Getting Started
 
 ### 1. Requirements
-- Node.js 20+ y [pnpm 10](https://pnpm.io/) (`corepack enable` o `npm i -g pnpm`)
+- Node.js 22 LTS (ver `.nvmrc`) y [pnpm 10](https://pnpm.io/) (`corepack enable` o `npm i -g pnpm`)
 - A Neon PostgreSQL instance
 - A Clerk account
 - A Resend API key
@@ -60,6 +61,12 @@ git clone https://github.com/gontzi/pidemelo.git
 cd pidemelo
 pnpm install
 ```
+
+> ⚠️ **Este proyecto usa pnpm en exclusiva.** No ejecutes `npm install`: npm no
+> entiende el layout de `node_modules` de pnpm (junctions/`pnpm-lock.yaml`) y
+> además **borra** el contenido de paquetes como `next` antes de fallar, dejando
+> el árbol roto. Si ya lo hiciste, recupera con `pnpm install` (o borra
+> `node_modules` y vuelve a ejecutarlo).
 
 ### 3. Environment Setup
 Copy the `.env.example` file to `.env.local` and fill in your credentials:
@@ -132,8 +139,13 @@ cp .dev.vars.example .dev.vars   # y rellena los valores (o cp .env .dev.vars)
 4. Conectar el repositorio con [Workers Builds](https://developers.cloudflare.com/workers/ci-cd/).
    Configurar Build command `pnpm build:worker` y Deploy command
    `pnpm deploy:worker`. Workers Builds instala las dependencias desde
-   `pnpm-lock.yaml`; `.nvmrc` fija Node 20 y `packageManager` fija pnpm 10.34.6.
-   Para previsualizaciones, usar `npx wrangler preview` después del build.
+   `pnpm-lock.yaml`; `.nvmrc` fija Node 22 y `packageManager` fija pnpm 10.34.6.
+   Las ramas de vista previa (PRs) usan Worker Previews: en *Compilaciones →
+   Base de vistas previas* el comando es `npx wrangler preview`, que exige el
+   bloque `"previews": {}` de `wrangler.jsonc`. Cada rama crea su propia vista
+   previa con su configuración copiada de la base (si cambias la base, revisa
+   también las vistas previas ya creadas). `wrangler versions upload` no sirve
+   aquí: falla porque el nombre de la vista previa no coincide con el Worker.
    También se puede desplegar a mano con `pnpm deploy` desde Linux/macOS.
 5. Añadir el dominio `pidemelo.app` al Worker y ajustar DNS.
 
