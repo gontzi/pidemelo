@@ -26,13 +26,17 @@ export default function DashboardHeader({ dict }: { dict: Dictionary['navbar'] }
                         target="_blank"
                         rel="noopener noreferrer"
                         aria-label={dict.support}
-                        className="inline-flex h-9 items-center gap-2 rounded-lg px-2.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/40"
+                        title={dict.support}
+                        className="inline-flex h-9 shrink-0 items-center gap-1.5 whitespace-nowrap rounded-lg px-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/40 sm:px-2.5"
                     >
-                        <Coffee className="h-4 w-4" aria-hidden="true" />
-                        <span className="hidden sm:inline">{dict.support}</span>
+                        <Coffee className="h-4 w-4 shrink-0" aria-hidden="true" />
+                        <span className="hidden sm:inline">{dict.support_short}</span>
                     </a>
                     <LanguageSwitcher />
-                    <UserButton appearance={{ elements: { avatarBox: "w-8 h-8 border border-border" } }} />
+                    {/* Caja fija: Clerk añade un contenedor propio que desalinea el avatar */}
+                    <div className="flex h-9 w-9 shrink-0 items-center justify-center">
+                        <UserButton appearance={{ elements: { rootBox: "flex", avatarBox: "w-8 h-8 border border-border" } }} />
+                    </div>
                 </div>
             </div>
         </header>

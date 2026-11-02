@@ -56,6 +56,7 @@ const es = {
         "close_menu": "Cerrar menú",
         "boards": "Tableros",
         "support": "Invítame a un café",
+        "support_short": "Apoyar",
         "create_yours": "Crea tu tablero gratis"
     },
     "dashboard_index": {

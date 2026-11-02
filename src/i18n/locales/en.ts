@@ -58,6 +58,7 @@ const en: Dictionary = {
         "close_menu": "Close menu",
         "boards": "Boards",
         "support": "Buy me a coffee",
+        "support_short": "Support",
         "create_yours": "Create your free board"
     },
     "dashboard_index": {
