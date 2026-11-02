@@ -4,6 +4,7 @@ import { db } from "@/db";
 import { boards, users } from "@/db/schema";
 import { auth, currentUser } from "@clerk/nextjs/server";
 import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 import { eq } from "drizzle-orm";
 import { slugify, randomSuffix } from "@/lib/feedback";
 
@@ -56,11 +57,13 @@ export async function createBoard(formData: FormData) {
         slug = candidate;
     }
 
-    await db.insert(boards).values({
+    const [created] = await db.insert(boards).values({
         userId,
-        name,
+        name: name.trim(),
         slug,
-    });
+    }).returning({ id: boards.id });
 
     revalidatePath('/dashboard');
+    // Tras crear, lo siguiente es darlo a conocer: vamos directos a "Compartir"
+    redirect(`/dashboard/board/${created.id}/share?new=1`);
 }

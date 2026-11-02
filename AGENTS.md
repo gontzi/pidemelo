@@ -2,16 +2,30 @@
 
 # Pidemelo.app - Core AI Agent Directives
 
-You are acting as a Lead Technical Architect and Senior Product Designer for a B2B SaaS (pidemelo.app). Read and strictly adhere to the following constraints before writing any code.
+You are acting as a Lead Technical Architect and Senior Product Designer for pidemelo.app. Read and strictly adhere to the following constraints before writing any code.
 
-## 1. Design System: "Fintech Minimalism" (STRICT STRICT STRICT)
-1. **The Golden Rule**: Data and Typography ARE the interface. If you can remove a background color, a shadow, or a border without losing meaning, REMOVE IT. Use whitespace as your primary structural tool.
-2. **Color Palette**: 
-   - Backgrounds: Pure White (`#FFFFFF`) or Pure Black (`#000000`). NO intermediate gray backgrounds for containers.
-   - Accents: Strictly monochrome. The ONLY permitted color is Orange (`#FF6600` / `primary`) reserved EXCLUSIVELY for main CTAs and critical state dots. No gradients. No pastel backgrounds.
-3. **Typography**: Use the established utility font (Geist/Inter). Build hierarchy with weight (`font-black`, `font-bold`) and tracking (`tracking-tighter`), NOT by drawing boxes around text. NO embedded emojis.
-4. **Radii & Borders**: Use `rounded-md` (8px) for buttons and inputs. `rounded-none` and `rounded-full` are forbidden (except for avatars). Use hairline borders (`border-zinc-100` or `border-zinc-900`) only when necessary. Zero heavy drop shadows.
-5. **No Containers**: Stop putting things in boxes. Kanban columns do not have backgrounds. Idea cards are flat data rows separated by thin lines. 
+## 0. Producto y público
+Pídemelo es un tablero de sugerencias con votos, roadmap público y widget incrustable. Gratis, ilimitado y open source.
+
+- **Público real**: makers, indie hackers, creadores y SaaS pequeños (sobre todo hispanohablantes). **Una persona sola** gestiona sus tableros y entra al panel de vez en cuando; no es una herramienta de equipo ni de gestión de proyectos.
+- **Lo que el admin necesita del panel**: ¿hay algo nuevo? → ¿qué es lo más pedido? → responder o cambiar el estado rápido. El panel es una **bandeja de entrada**, no un kanban.
+- **Principios de UX**:
+  1. **Una forma principal de hacer cada cosa.** No dupliques acciones (drag, select, menú contextual y botones para lo mismo).
+  2. **Todo lo de un tablero vive dentro del tablero**: pestañas *Ideas · Compartir (enlace + widget) · Ajustes (incl. etiquetas)*. Nada de secciones globales que vuelvan a pedir "elige tablero".
+  3. **Estados en la UI**: Por revisar → Planeada → En progreso → Hecha, más *Cerrada* (con interruptor "visible en público": `descartado` = visible, `archivado` = oculto). La BBDD mantiene los 6 valores del enum (`src/lib/idea-status.ts`).
+  4. **Tono**: humor e ironía en la landing, estados vacíos, emails y tablero público. **Claridad** en botones, etiquetas y formularios del panel.
+  5. El naranja `primary` es para la acción principal de cada pantalla; enlaces de apoyo/donación van en estilo `ghost`/`outline`.
+
+## 1. Design System: "Community-first" (paleta naranja)
+La interfaz es luminosa, limpia y con personalidad; coherente en **toda** la app (público, dashboard, auth y widgets).
+
+1. **Paleta**: superficies **blancas** (`--card` `#FFFFFF`) sobre **gris muy claro** (`--background` `#F7F7F6`), **naranja** `#FF5C00` como `primary` (acciones), **coral** `#EA655F` para destacados, **verde** `#65AD8C`/menta `#EFF8F2` para positivos, **amarillo** `#F5C35B` y **violeta** `#8051D9` como acentos de categoría, bordes `#E4E5E8` y texto **azul marino** `#151B35`. Nada de pastel crema ni de violeta como color principal.
+2. **Superficie**: `Card`/`Panel` blancas con borde fino (`border-border`) y sombras discretas (`shadow-soft`/`shadow-card`). Los colores se usan como **acentos** (badges, chips de categoría, badges de estado), no como grandes bloques de fondo.
+3. **Tipografía**: títulos en `font-heading` (**Plus Jakarta Sans**, peso alto) y texto/formularios en `font-sans` (**Inter**). Jerarquía por tamaño y peso.
+4. **Radios y sombras**: `rounded-lg` para botones/inputs/cards; `rounded-full` solo para pills/avatares/FAB. Sin sombras exageradas, glassmorphism ni neón.
+5. **Interacción**: define `hover`, `focus-visible` (anillo naranja), `active` y `disabled`. Microinteracciones breves (`active:scale-[0.98]`, `animate-pop`).
+6. **Estados/etiquetas**: color de fondo de las etiquetas = color elegido por el usuario (`readableTextColor`); badges de estado con tintes suaves.
+7. **Iconografía**: `lucide-react`, tamaño consistente y `aria-hidden` cuando sea decorativa.
 
 ## 2. Global Architecture: Mobile-First & i18n
 1. **Mobile-First Tailwind**: You MUST write all UI code assuming a mobile screen first. Default to stacked layouts (`flex-col`, small paddings like `p-4`). Use `md:` and `lg:` prefixes strictly to scale the UI UP for desktop. Never design for desktop and try to squash it down later.

@@ -3,40 +3,36 @@
 import { useState, useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
 import { submitIdea } from './actions';
 import { ChevronDown, X, Check } from 'lucide-react';
 import ImageUploadDropzone from '@/components/ImageUploadDropzone';
 import { resolveError, type ImageUploadDict } from '@/lib/feedback';
+import { cn } from '@/lib/utils';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 type Tag = { id: string, name: string, color: string, description?: string | null };
 
+// Formulario para enviar ideas. Se usa en el tablero público y en los widgets;
+// el color de marca y el modo oscuro llegan por tokens CSS (ver lib/widget-theme).
 export default function SubmitIdeaForm({
     boardId,
     boardSlug,
-    accentColor = "#FF5C00",
-    textColor = "#18181b",
-    isDarkMode = false,
     dict,
     imageDict,
     tags,
-    isCurrentUserAdmin = false
+    onSubmitted,
 }: {
     boardId: string,
     boardSlug: string,
-    accentColor?: string,
-    textColor?: string,
-    isDarkMode?: boolean,
     dict: Record<string, string>,
     imageDict: ImageUploadDict,
     tags?: Tag[],
-    isCurrentUserAdmin?: boolean,
-    widgetVersion?: 'normal' | 'lite'
+    onSubmitted?: () => void,
 }) {
     const [isPending, setIsPending] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [showSuccess, setShowSuccess] = useState(false);
-    const [showError, setShowError] = useState(false);
     const [selectedTagId, setSelectedTagId] = useState<string | null>(null);
     const [uploadedImageUrl, setUploadedImageUrl] = useState<string | null>(null);
     const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -56,7 +52,6 @@ export default function SubmitIdeaForm({
     async function handleSubmit(formData: FormData) {
         setIsPending(true);
         setError(null);
-        setShowError(false);
 
         if (uploadedImageUrl) {
             formData.append('imageUrl', uploadedImageUrl);
@@ -66,117 +61,83 @@ export default function SubmitIdeaForm({
             const res = await submitIdea(boardId, boardSlug, formData);
             if (res && res.error) {
                 setError(resolveError(res, dict));
-                setShowError(true);
-                setTimeout(() => setShowError(false), 3000);
             } else {
                 formRef.current?.reset();
                 setSelectedTagId(null);
                 setUploadedImageUrl(null);
                 setShowSuccess(true);
-                setTimeout(() => setShowSuccess(false), 3000);
+                setTimeout(() => {
+                    setShowSuccess(false);
+                    onSubmitted?.();
+                }, 2500);
             }
         } catch (err: unknown) {
-            if (err instanceof Error) {
-                setError(err.message || dict.error_fallback);
-            } else {
-                setError(dict.error_fallback);
-            }
-            setShowError(true);
-            setTimeout(() => setShowError(false), 3000);
+            setError(err instanceof Error && err.message ? err.message : dict.error_fallback);
         } finally {
             setIsPending(false);
         }
     }
 
+    const selectedTag = tags?.find(t => t.id === selectedTagId);
+
     return (
-        <form ref={formRef} action={handleSubmit} className="space-y-4 relative">
-            {/* Full-screen animations (only really show over the widget since widget is an iframe) */}
-            {(showSuccess || showError) && (
-                <div 
-                    className="fixed inset-0 z-[200] flex flex-col items-center justify-center animate-in fade-in duration-500 overflow-hidden" 
-                    style={{ 
-                        backgroundColor: showSuccess ? accentColor : (isDarkMode ? '#09090b' : '#ffffff')
-                    }}
+        <form ref={formRef} action={handleSubmit} className="relative space-y-3">
+            {showSuccess && (
+                <div
+                    role="status"
+                    className="absolute inset-0 z-20 flex flex-col items-center justify-center rounded-lg bg-primary px-6 text-center text-primary-foreground animate-in fade-in duration-300"
                 >
-                    {showSuccess && (
-                         <div className="absolute inset-0 opacity-30 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-white/40 via-transparent to-transparent pointer-events-none" />
-                    )}
-                    {showSuccess ? (
-                        <div className="flex flex-col items-center text-center px-6 animate-in slide-in-from-bottom-8 duration-700 ease-out relative z-10 w-full max-w-sm mx-auto">
-                            <div className="w-16 h-16 mb-6 rounded-full bg-white/20 flex items-center justify-center backdrop-blur-md shadow-[0_8px_30px_rgb(0,0,0,0.12)] border border-white/30">
-                                <Check className="w-8 h-8 text-white stroke-[3] animate-in zoom-in duration-500 delay-150" />
-                            </div>
-                            <h3 className="font-[family-name:var(--font-jakarta)] text-2xl md:text-3xl font-extrabold tracking-tight mb-2 text-white drop-shadow-sm w-full text-balance">
-                                {dict.success_title}
-                            </h3>
-                            <p className="text-sm md:text-base font-medium text-white/90 max-w-[260px] mx-auto leading-relaxed text-balance">
-                                {dict.success_desc}
-                            </p>
-                        </div>
-                    ) : (
-                        <div className="flex flex-col items-center text-center px-6 animate-in zoom-in-95 duration-500 relative z-10 w-full max-w-sm mx-auto">
-                            <div className="w-16 h-16 mb-6 rounded-[2rem] bg-red-100 flex items-center justify-center shadow-sm border border-red-200">
-                                <X className="w-8 h-8 text-red-600 stroke-[3]" />
-                            </div>
-                            <h3 className={`font-[family-name:var(--font-jakarta)] text-2xl font-extrabold tracking-tight mb-2 text-balance ${isDarkMode ? 'text-zinc-50' : 'text-zinc-900'}`}>
-                                {dict.error_submit_title}
-                            </h3>
-                            <p className="text-sm font-medium opacity-80 max-w-[260px] mx-auto text-balance" style={{ color: isDarkMode ? '#a1a1aa' : '#52525b' }}>
-                                {error}
-                            </p>
-                        </div>
-                    )}
+                    <div className="mb-4 grid h-14 w-14 place-items-center rounded-full bg-primary-foreground/15">
+                        <Check className="h-7 w-7 stroke-[3] animate-in zoom-in duration-500" aria-hidden="true" />
+                    </div>
+                    <h3 className="font-heading text-2xl font-bold tracking-tight text-balance">{dict.success_title}</h3>
+                    <p className="mt-1 max-w-[260px] text-sm font-medium opacity-90 text-balance">{dict.success_desc}</p>
                 </div>
             )}
-            <div>
-                <Input
-                    name="title"
-                    placeholder={dict.title_placeholder}
-                    required
-                    maxLength={100}
-                    autoComplete="off"
-                    enterKeyHint="next"
-                    style={{ '--tw-ring-color': accentColor, color: isDarkMode ? '#f4f4f5' : '#18181b' } as React.CSSProperties}
-                    className={`h-12 md:h-14 shadow-none ${isDarkMode ? 'border-zinc-800 bg-zinc-900 placeholder:text-zinc-600 focus-visible:bg-zinc-800' : 'border-zinc-200 bg-[#FAFAFA] focus-visible:bg-white'} rounded-2xl focus-visible:ring-1 font-medium px-4 text-base transition-colors`}
-                />
-            </div>
+
+            <Input
+                name="title"
+                aria-label={dict.title_label}
+                placeholder={dict.title_placeholder}
+                required
+                maxLength={100}
+                autoComplete="off"
+                enterKeyHint="next"
+                className="h-11 text-base md:text-sm"
+            />
+
             {tags && tags.length > 0 && (
                 <div className="relative z-10" ref={dropdownRef}>
                     <input type="hidden" name="tagId" value={selectedTagId || ''} />
                     <button
                         type="button"
                         onClick={() => setDropdownOpen(p => !p)}
-                        style={{
-                            borderColor: dropdownOpen ? accentColor : (isDarkMode ? '#27272a' : '#e4e4e7'),
-                            color: isDarkMode ? '#f4f4f5' : '#18181b',
-                            backgroundColor: isDarkMode ? '#18181b' : '#FAFAFA'
-                        }}
-                        className="w-full h-12 md:h-14 pl-4 pr-10 rounded-2xl border text-base md:text-sm font-medium focus:outline-none transition-all cursor-pointer shadow-sm flex items-center gap-2 relative"
+                        aria-haspopup="listbox"
+                        aria-expanded={dropdownOpen}
+                        className={cn(
+                            'relative flex h-11 w-full items-center gap-2 rounded-lg border bg-card pl-3 pr-10 text-left text-base transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/40 md:text-sm',
+                            dropdownOpen ? 'border-primary' : 'border-input'
+                        )}
                     >
-                        {selectedTagId ? (
-                            <span className="flex items-center gap-2">
-                                <span className="w-3 h-3 rounded-full border border-black/10 flex-shrink-0" style={{ backgroundColor: tags.find(t => t.id === selectedTagId)?.color }} />
-                                {tags.find(t => t.id === selectedTagId)?.name}
+                        {selectedTag ? (
+                            <span className="flex items-center gap-2 text-foreground">
+                                <span className="h-3 w-3 shrink-0 rounded-full border border-black/10" style={{ backgroundColor: selectedTag.color }} />
+                                {selectedTag.name}
                             </span>
                         ) : (
-                            <span style={{ color: isDarkMode ? '#a1a1aa' : '#71717a' }}>{dict.select_tag}</span>
+                            <span className="text-muted-foreground">{dict.select_tag}</span>
                         )}
-                        <ChevronDown className={`absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 transition-transform duration-200 opacity-50 ${dropdownOpen ? 'rotate-180' : ''}`} />
+                        <ChevronDown className={cn('absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground transition-transform', dropdownOpen && 'rotate-180')} aria-hidden="true" />
                     </button>
 
                     {dropdownOpen && (
-                        <div className="absolute top-[calc(100%+8px)] left-0 w-full z-50 rounded-2xl shadow-xl overflow-hidden animate-in fade-in slide-in-from-top-2 duration-150 border"
-                            style={{
-                                backgroundColor: isDarkMode ? '#18181b' : '#ffffff',
-                                borderColor: isDarkMode ? '#27272a' : '#e4e4e7',
-                                boxShadow: isDarkMode ? '0 10px 15px -3px rgba(0, 0, 0, 0.5)' : '0 10px 15px -3px rgba(0, 0, 0, 0.1)'
-                            }}
-                        >
+                        <div role="listbox" className="absolute left-0 top-[calc(100%+6px)] z-50 w-full overflow-hidden rounded-lg border border-border bg-popover py-1 shadow-pop animate-pop">
                             <button
                                 type="button"
+                                role="option"
+                                aria-selected={!selectedTagId}
                                 onClick={() => { setSelectedTagId(null); setDropdownOpen(false); }}
-                                style={{ color: isDarkMode ? '#a1a1aa' : '#71717a' }}
-                                className={`w-full text-left px-4 py-3 text-sm font-medium transition-colors ${isDarkMode ? 'hover:bg-zinc-800/50' : 'hover:bg-zinc-50'}`}
+                                className="w-full px-3 py-2.5 text-left text-sm text-muted-foreground transition-colors hover:bg-muted"
                             >
                                 {dict.no_tag}
                             </button>
@@ -186,11 +147,12 @@ export default function SubmitIdeaForm({
                                         <button
                                             key={t.id}
                                             type="button"
+                                            role="option"
+                                            aria-selected={selectedTagId === t.id}
                                             onClick={() => { setSelectedTagId(t.id); setDropdownOpen(false); }}
-                                            style={{ color: isDarkMode ? '#f4f4f5' : '#18181b' }}
-                                            className={`w-full flex items-center gap-2 px-4 py-3 text-sm font-bold transition-colors ${isDarkMode ? 'hover:bg-zinc-800/50' : 'hover:bg-zinc-50'}`}
+                                            className="flex w-full items-center gap-2 px-3 py-2.5 text-sm font-medium text-foreground transition-colors hover:bg-muted"
                                         >
-                                            <span className="w-3 h-3 rounded-full border border-black/10 flex-shrink-0" style={{ backgroundColor: t.color }} />
+                                            <span className="h-3 w-3 shrink-0 rounded-full border border-black/10" style={{ backgroundColor: t.color }} />
                                             <span className="truncate">{t.name}</span>
                                         </button>
                                     );
@@ -199,13 +161,8 @@ export default function SubmitIdeaForm({
 
                                     return (
                                         <Tooltip key={t.id}>
-                                            <TooltipTrigger asChild>
-                                                {button}
-                                            </TooltipTrigger>
-                                            <TooltipContent
-                                                side="right"
-                                                className={`max-w-[200px] text-xs font-medium border shadow-lg z-[60] ml-2 ${isDarkMode ? 'bg-zinc-900 border-zinc-800 text-zinc-300' : 'bg-white border-zinc-200 text-zinc-600'}`}
-                                            >
+                                            <TooltipTrigger asChild>{button}</TooltipTrigger>
+                                            <TooltipContent side="right" className="z-[60] ml-2 max-w-[200px] border border-border bg-popover text-xs font-medium text-muted-foreground shadow-pop">
                                                 {t.description}
                                             </TooltipContent>
                                         </Tooltip>
@@ -216,51 +173,44 @@ export default function SubmitIdeaForm({
                     )}
                 </div>
             )}
-            <div>
-                <textarea
-                    name="description"
-                    placeholder={dict.desc_placeholder}
-                    required
-                    maxLength={1000}
-                    style={{ '--tw-ring-color': accentColor, color: isDarkMode ? '#f4f4f5' : '#18181b' } as React.CSSProperties}
-                    className={`w-full shadow-none border ${isDarkMode ? 'border-zinc-800 bg-zinc-900 placeholder:text-zinc-600 focus-visible:border-zinc-700 focus-visible:bg-zinc-800' : 'border-zinc-200 bg-[#FAFAFA] focus-visible:border-zinc-300 focus-visible:bg-white'} p-4 rounded-2xl min-h-[120px] md:min-h-[140px] outline-none font-medium text-base md:text-sm focus-visible:ring-1 resize-y transition-colors`}
-                />
-            </div>
 
-            {/* Subida de Imágenes */}
+            <Textarea
+                name="description"
+                aria-label={dict.desc_label}
+                placeholder={dict.desc_placeholder}
+                required
+                maxLength={1000}
+                className="min-h-[110px] resize-y text-base md:text-sm"
+            />
+
             {!uploadedImageUrl ? (
                 <ImageUploadDropzone
                     boardId={boardId}
-                    isCurrentUserAdmin={isCurrentUserAdmin}
                     onUploadSuccess={(url) => setUploadedImageUrl(url)}
-                    isDarkMode={isDarkMode}
                     dict={imageDict}
                 />
             ) : (
-                <div className="relative inline-block mt-2">
+                <div className="relative inline-block">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src={uploadedImageUrl} alt={dict.image_uploaded_alt} className="h-24 w-24 object-cover rounded-xl border-2 border-zinc-200 shadow-sm" />
+                    <img src={uploadedImageUrl} alt={dict.image_uploaded_alt} className="h-20 w-20 rounded-lg border border-border object-cover" />
                     <button
                         type="button"
                         onClick={() => setUploadedImageUrl(null)}
-                        className="absolute -top-2 -right-2 bg-zinc-900 text-white rounded-full p-1 shadow-md hover:bg-zinc-800 transition-colors"
+                        aria-label={dict.remove_image}
+                        className="absolute -right-2 -top-2 rounded-full bg-foreground p-1 text-background shadow-soft transition-opacity hover:opacity-90"
                     >
-                        <X className="w-4 h-4" />
+                        <X className="h-3.5 w-3.5" aria-hidden="true" />
                     </button>
                 </div>
             )}
 
             {error && (
-                <div className="p-3 bg-red-50 text-red-600 text-[10px] md:text-sm font-bold rounded-xl border border-red-100 text-center uppercase tracking-widest">
+                <p role="alert" className="rounded-lg border border-destructive/20 bg-destructive/10 px-3 py-2 text-center text-sm font-medium text-destructive">
                     {error}
-                </div>
+                </p>
             )}
-            <Button
-                disabled={isPending}
-                type="submit"
-                style={{ color: textColor, backgroundColor: accentColor, boxShadow: `0 4px 12px ${accentColor}33` }}
-                className="w-full h-12 md:h-14 text-white hover:opacity-90 rounded-full font-black tracking-widest uppercase transition-all active:scale-95 text-xs md:text-sm disabled:opacity-70 disabled:hover:scale-100 shadow-lg"
-            >
+
+            <Button disabled={isPending} type="submit" size="lg" className="w-full">
                 {isPending ? dict.submitting : dict.submit_btn}
             </Button>
         </form>

@@ -1,19 +1,21 @@
 import type { Metadata, Viewport } from 'next'
-import { Outfit, Instrument_Sans } from 'next/font/google'
+import { Plus_Jakarta_Sans, Inter } from 'next/font/google'
 import { ClerkProvider } from '@clerk/nextjs'
 import './globals.css'
 import { getDictionary, getLocale } from '@/i18n'
 import Navbar from '@/components/Navbar'
+import { clerkAppearance } from '@/lib/clerk-appearance'
 
-const outfit = Outfit({
+const jakarta = Plus_Jakarta_Sans({
   subsets: ['latin'],
-  variable: '--font-outfit',
+  variable: '--font-heading',
   display: 'swap',
+  weight: ['500', '600', '700', '800'],
 })
 
-const instrument = Instrument_Sans({
+const inter = Inter({
   subsets: ['latin'],
-  variable: '--font-instrument',
+  variable: '--font-body',
   display: 'swap',
 })
 
@@ -22,7 +24,7 @@ export const viewport: Viewport = {
   initialScale: 1,
   maximumScale: 5,
   viewportFit: 'cover',
-  themeColor: '#FFFFFF',
+  themeColor: '#F7F7F6',
 }
 
 export const metadata: Metadata = {
@@ -106,12 +108,12 @@ export default async function RootLayout({
   const locale = await getLocale();
 
   return (
-    <ClerkProvider>
-      <html lang={locale}>
+    <ClerkProvider appearance={clerkAppearance}>
+      <html lang={locale} className={`${inter.variable} ${jakarta.variable}`}>
         <head>
           <link rel="preconnect" href="https://clerk.pidemelo.app" />
         </head>
-        <body className={`${instrument.variable} ${outfit.variable} font-sans bg-[#FAFAFA] text-zinc-900 min-h-screen selection:bg-[#FF5C00]/20 selection:text-zinc-900`}>
+        <body className="font-sans bg-background bg-brand-wash text-foreground min-h-screen antialiased selection:bg-primary/40 selection:text-primary-foreground">
           <Navbar dict={t.navbar} />
           {children}
         </body>

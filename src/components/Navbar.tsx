@@ -1,6 +1,6 @@
 'use client';
 
-import { SignedIn, SignedOut, SignInButton, UserButton } from "@clerk/nextjs";
+import { useAuth, UserButton } from "@clerk/nextjs";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { useState, useEffect } from "react";
@@ -10,6 +10,7 @@ import LanguageSwitcher from "./LanguageSwitcher";
 
 export default function Navbar({ dict }: { dict: Record<string, string> }) {
     const pathname = usePathname();
+    const { isLoaded, isSignedIn } = useAuth();
     const [menuOpen, setMenuOpen] = useState(false);
 
     useEffect(() => {
@@ -19,70 +20,61 @@ export default function Navbar({ dict }: { dict: Record<string, string> }) {
 
     if (pathname !== '/') return null;
 
+    const showSignIn = !isLoaded || !isSignedIn;
+
     return (
         <>
-            <nav className="sticky top-0 z-50 w-full bg-white/90 backdrop-blur-md border-b border-zinc-200/50 pt-safe">
-                <div className="max-w-5xl mx-auto px-5 h-16 flex items-center justify-between">
-                    {/* Logo */}
-                    <Link href="/" onClick={() => setMenuOpen(false)} className="font-jakarta font-extrabold text-xl tracking-tighter hover:scale-105 transition-all flex items-center active:scale-95 group">
-                        <span className="group-hover:text-[#FF5C00] transition-colors">pidemelo</span>
+            <nav
+                aria-label={dict.nav_menu}
+                className="sticky top-0 z-50 w-full bg-card/90 backdrop-blur-md border-b border-border pt-safe"
+            >
+                <div className="max-w-5xl mx-auto px-5 h-16 flex items-center justify-between gap-3">
+                    <Link href="/" onClick={() => setMenuOpen(false)} className="font-heading font-semibold text-xl tracking-tight flex items-center">
+                        <span className="transition-colors hover:text-[#FF5C00]">pidemelo</span>
                         <span className="text-[#FF5C00]">.</span>
                         <span>app</span>
                     </Link>
 
-                    {/* Desktop nav links */}
-                    <div className="hidden md:flex items-center gap-2 mr-2">
-                        <Link href="/#que-es" className="text-sm font-bold text-zinc-600 hover:text-zinc-900 transition-colors px-3 py-2 rounded-xl hover:bg-zinc-50">{dict.what_is}</Link>
-                        <Link href="/#faq" className="text-sm font-bold text-zinc-600 hover:text-zinc-900 transition-colors px-3 py-2 rounded-xl hover:bg-zinc-50">{dict.faq}</Link>
+                    <div className="hidden md:flex items-center gap-1">
+                        <Link href="/#que-es" className="text-sm font-semibold text-muted-foreground rounded-lg px-3 py-2 transition-colors hover:text-foreground hover:bg-accent">
+                            {dict.what_is}
+                        </Link>
+                        <Link href="/#faq" className="text-sm font-semibold text-muted-foreground rounded-lg px-3 py-2 transition-colors hover:text-foreground hover:bg-accent">
+                            {dict.faq}
+                        </Link>
                     </div>
 
-                    {/* Right side */}
                     <div className="flex items-center gap-2 md:gap-3">
                         <LanguageSwitcher />
-                        <SignedOut>
-                            <div className="hidden md:flex items-center gap-3">
-                                <SignInButton mode="modal">
-                                    <button className="text-sm font-bold text-zinc-500 hover:text-zinc-900 transition-colors px-4 py-2 rounded-full hover:bg-zinc-100/50">{dict.login}</button>
-                                </SignInButton>
-                                <SignInButton mode="modal">
-                                    <Button className="bg-[#FF5C00] hover:bg-[#E65300] text-white font-black text-xs tracking-widest uppercase rounded-full px-6 h-10 shadow-lg shadow-orange-500/20 transition-all hover:scale-105 active:scale-95">
-                                        {dict.start_now}
-                                    </Button>
-                                </SignInButton>
-                            </div>
-                            {/* Mobile: solo botón de entrar */}
-                            <div className="flex md:hidden">
-                                <SignInButton mode="modal">
-                                    <Button className="bg-[#FF5C00] hover:bg-[#E65300] text-white font-black text-[10px] tracking-widest uppercase rounded-full px-4 h-9 shadow-lg shadow-orange-500/20 active:scale-95">
-                                        {dict.login_mobile}
-                                    </Button>
-                                </SignInButton>
-                            </div>
-                        </SignedOut>
-
-                        <SignedIn>
-                            {/* Desktop signed-in links */}
-                            <div className="hidden md:flex items-center gap-2">
-                                <Link href="/dashboard">
-                                    <Button className="bg-[#FF5C00] hover:bg-[#E65300] text-white font-black text-xs tracking-widest uppercase rounded-full px-6 h-10 shadow-lg shadow-orange-500/20 transition-all hover:scale-105 active:scale-95 ml-2">
-                                        {dict.dashboard}
-                                    </Button>
+                        {showSignIn ? (
+                            <>
+                                <Link href="/sign-in" className="hidden md:inline-flex text-sm font-semibold text-muted-foreground px-4 py-2 rounded-lg transition-colors hover:text-foreground hover:bg-accent">
+                                    {dict.login}
                                 </Link>
-                                <div className="ml-2 flex items-center">
-                                    <UserButton appearance={{ elements: { avatarBox: "w-9 h-9 border border-zinc-200 shadow-sm" } }} />
+                                <Link href="/sign-in" className="hidden md:block">
+                                    <Button size="pill">{dict.start_now}</Button>
+                                </Link>
+                                <Link href="/sign-in" className="md:hidden">
+                                    <Button size="sm" className="rounded-full px-4 h-9">{dict.login_mobile}</Button>
+                                </Link>
+                            </>
+                        ) : (
+                            <>
+                                <Link href="/dashboard" className="hidden md:block">
+                                    <Button size="pill">{dict.dashboard}</Button>
+                                </Link>
+                                <div className="hidden md:flex items-center">
+                                    <UserButton appearance={{ elements: { avatarBox: "w-9 h-9 border border-border shadow-soft" } }} />
                                 </div>
-                            </div>
-
-                            {/* Mobile: avatar (hamburger below) */}
-                            <div className="flex md:hidden items-center">
-                                <UserButton appearance={{ elements: { avatarBox: "w-8 h-8 border border-zinc-200" } }} />
-                            </div>
-                        </SignedIn>
-
-                        {/* Hamburger */}
+                                <div className="flex md:hidden items-center">
+                                    <UserButton appearance={{ elements: { avatarBox: "w-8 h-8 border border-border shadow-soft" } }} />
+                                </div>
+                            </>
+                        )}
                         <button
-                            aria-label={menuOpen ? "Cerrar menú" : "Abrir menú"}
-                            className="p-2 rounded-xl text-zinc-600 hover:bg-zinc-100 transition-colors md:hidden"
+                            aria-label={menuOpen ? dict.close_menu : dict.open_menu}
+                            aria-expanded={menuOpen}
+                            className="p-2 rounded-lg text-muted-foreground transition-colors hover:bg-accent hover:text-foreground md:hidden"
                             onClick={() => setMenuOpen(p => !p)}
                         >
                             {menuOpen ? <X className="w-6 h-6" aria-hidden="true" /> : <Menu className="w-6 h-6" aria-hidden="true" />}
@@ -91,39 +83,29 @@ export default function Navbar({ dict }: { dict: Record<string, string> }) {
                 </div>
             </nav>
 
-            {/* Mobile Menu Drawer */}
             {menuOpen && (
-                <div className="fixed inset-0 z-40 md:hidden bg-white/80 backdrop-blur-md animate-in fade-in duration-300">
-                    <div className="absolute top-16 left-0 right-0 bg-white border-b border-zinc-200 shadow-2xl p-6 space-y-4 animate-in slide-in-from-top-5 duration-300">
-                        <SignedOut>
-                            <div className="grid gap-2 text-left">
-                                <Link href="/#que-es" onClick={() => setMenuOpen(false)} className="px-5 py-4 rounded-2xl text-zinc-600 font-bold hover:bg-zinc-50 border border-transparent hover:border-zinc-100 transition-all">
-                                    {dict.mobile_what_is}
-                                </Link>
-                                <Link href="/#faq" onClick={() => setMenuOpen(false)} className="px-5 py-4 rounded-2xl text-zinc-600 font-bold hover:bg-zinc-50 border border-transparent hover:border-zinc-100 transition-all">
-                                    {dict.mobile_faq}
-                                </Link>
-                            </div>
-                            <div className="pt-4 border-t border-zinc-100">
-                                <SignInButton mode="modal">
-                                    <Button className="w-full bg-[#FF5C00] text-white font-black text-sm tracking-widest uppercase rounded-2xl h-14 shadow-xl shadow-orange-500/20 active:scale-95 transition-all">
-                                        {dict.mobile_try_free}
-                                    </Button>
-                                </SignInButton>
-                            </div>
-                        </SignedOut>
-
-                        <SignedIn>
-                            <div className="grid gap-2 text-left">
-                                <Link href="/dashboard" onClick={() => setMenuOpen(false)} className="w-full px-5 py-4 rounded-2xl bg-zinc-900 text-white font-black text-sm tracking-widest uppercase shadow-xl shadow-zinc-900/10 flex items-center justify-between group active:scale-[0.98] transition-all">
-                                    {dict.mobile_dashboard} <span className="text-orange-500 opacity-0 group-hover:opacity-100 transition-opacity">→</span>
-                                </Link>
-                            </div>
-                        </SignedIn>
+                <div className="fixed inset-0 top-16 z-40 md:hidden bg-background/95 backdrop-blur-md">
+                    <div className="p-6 space-y-4 animate-pop">
+                        <div className="grid gap-2">
+                            <Link href="/#que-es" onClick={() => setMenuOpen(false)} className="px-5 py-4 rounded-2xl text-muted-foreground font-semibold hover:bg-accent hover:text-foreground">
+                                {dict.mobile_what_is}
+                            </Link>
+                            <Link href="/#faq" onClick={() => setMenuOpen(false)} className="px-5 py-4 rounded-2xl text-muted-foreground font-semibold hover:bg-accent hover:text-foreground">
+                                {dict.mobile_faq}
+                            </Link>
+                        </div>
+                        {showSignIn ? (
+                            <Link href="/sign-in" onClick={() => setMenuOpen(false)} className="block">
+                                <Button className="w-full" size="xl">{dict.mobile_try_free}</Button>
+                            </Link>
+                        ) : (
+                            <Link href="/dashboard" onClick={() => setMenuOpen(false)} className="block">
+                                <Button className="w-full" size="xl">{dict.mobile_dashboard}</Button>
+                            </Link>
+                        )}
                     </div>
                 </div>
             )}
         </>
     );
 }
-

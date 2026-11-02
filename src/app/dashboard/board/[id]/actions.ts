@@ -30,7 +30,7 @@ export async function updateBoardSettings(boardId: string, newName: string, form
         .set({ name: newName, slug: newSlug })
         .where(and(eq(boards.id, boardId), eq(boards.userId, userId)));
 
-    revalidatePath(`/dashboard/board/${boardId}`);
+    revalidatePath(`/dashboard/board/${boardId}`, "layout");
     return { success: true };
 }
 
@@ -42,7 +42,7 @@ export async function updateBoardNotificationPreference(boardId: string, notify:
         .set({ notifyNewIdeas: notify })
         .where(and(eq(boards.id, boardId), eq(boards.userId, userId)));
 
-    revalidatePath(`/dashboard/board/${boardId}`);
+    revalidatePath(`/dashboard/board/${boardId}`, "layout");
     return { success: true };
 }
 
@@ -64,7 +64,8 @@ export async function updateIdeaStatus(ideaId: string, newStatus: 'en_revision' 
         .set({ status: newStatus })
         .where(eq(ideas.id, ideaId));
 
-    revalidatePath(`/dashboard/board/${boardId}`);
+    revalidatePath(`/dashboard/board/${boardId}`, "layout");
+    revalidatePath(`/board/${idea.board.slug}`, "layout");
     return { success: true };
 }
 
@@ -86,7 +87,8 @@ export async function deleteIdea(ideaId: string, boardId: string) {
     await db.delete(votes).where(eq(votes.ideaId, ideaId));
     await db.delete(ideas).where(eq(ideas.id, ideaId));
 
-    revalidatePath(`/dashboard/board/${boardId}`);
+    revalidatePath(`/dashboard/board/${boardId}`, "layout");
+    revalidatePath(`/board/${idea.board.slug}`, "layout");
     return { success: true };
 }
 
@@ -103,7 +105,7 @@ export async function deleteBoard(boardId: string) {
     // Automatic cascade delete on Postgres
     await db.delete(boards).where(and(eq(boards.id, boardId), eq(boards.userId, userId)));
 
-    revalidatePath(`/dashboard`);
+    revalidatePath(`/dashboard`, "layout");
     return { success: true };
 }
 
@@ -125,7 +127,7 @@ export async function createTag(boardId: string, name: string, color: string, de
         description
     });
 
-    revalidatePath(`/dashboard/board/${boardId}`);
+    revalidatePath(`/dashboard/board/${boardId}`, "layout");
     return { success: true };
 }
 
@@ -143,7 +145,7 @@ export async function updateTag(tagId: string, boardId: string, name: string, co
         .set({ name, color, description })
         .where(and(eq(tags.id, tagId), eq(tags.boardId, boardId)));
 
-    revalidatePath(`/dashboard/board/${boardId}`);
+    revalidatePath(`/dashboard/board/${boardId}`, "layout");
     return { success: true };
 }
 
@@ -159,7 +161,7 @@ export async function deleteTag(tagId: string, boardId: string) {
 
     await db.delete(tags).where(and(eq(tags.id, tagId), eq(tags.boardId, boardId)));
 
-    revalidatePath(`/dashboard/board/${boardId}`);
+    revalidatePath(`/dashboard/board/${boardId}`, "layout");
     return { success: true };
 }
 
@@ -186,7 +188,7 @@ export async function setAdminResponse(ideaId: string, boardId: string, response
         })
         .where(eq(ideas.id, ideaId));
 
-    revalidatePath(`/dashboard/board/${boardId}`);
+    revalidatePath(`/dashboard/board/${boardId}`, "layout");
     revalidatePath(`/board/${idea.board.slug}`);
     revalidatePath(`/board/${idea.board.slug}/roadmap`);
     return { success: true };

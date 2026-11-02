@@ -4,7 +4,9 @@ import { useState, useTransition } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Trash2, Plus, Pencil } from 'lucide-react';
+import { Trash2, Plus, Pencil, Check } from 'lucide-react';
+import { cn, readableTextColor } from '@/lib/utils';
+import type { Dictionary } from '@/i18n/types';
 import { createTag, deleteTag, updateTag } from './actions';
 
 type Tag = {
@@ -14,41 +16,49 @@ type Tag = {
     description?: string | null;
 };
 
+const COLOR_PRESETS = ['#FF5C00', '#EA655F', '#65AD8C', '#F5C35B', '#8051D9', '#151B35', '#E4E5E8'];
+const DEFAULT_COLOR = COLOR_PRESETS[0];
+
 export default function TagsManager({
     boardId,
     tags,
-    dict
+    dict,
+    errors,
 }: {
     boardId: string;
     tags: Tag[];
-    dict: Record<string, string>;
+    dict: Dictionary['board_settings'];
+    errors: Dictionary['errors'];
 }) {
     const [name, setName] = useState('');
-    const [color, setColor] = useState('#FF5C00');
+    const [color, setColor] = useState(DEFAULT_COLOR);
     const [description, setDescription] = useState('');
     const [editingId, setEditingId] = useState<string | null>(null);
     const [isPending, startTransition] = useTransition();
     const [error, setError] = useState<string | null>(null);
+    const [saved, setSaved] = useState(false);
 
-
+    const reset = () => {
+        setEditingId(null);
+        setName('');
+        setColor(DEFAULT_COLOR);
+        setDescription('');
+        setError(null);
+    };
 
     const handleSubmit = () => {
         if (!name.trim()) return;
         setError(null);
         startTransition(async () => {
-            let res;
-            if (editingId) {
-                res = await updateTag(editingId, boardId, name, color, description);
-            } else {
-                res = await createTag(boardId, name, color, description);
-            }
+            const res = editingId
+                ? await updateTag(editingId, boardId, name.trim(), color, description.trim() || null)
+                : await createTag(boardId, name.trim(), color, description.trim() || null);
             if (res?.error) {
-                setError(res.error);
+                setError((errors as Record<string, string>)[res.error] ?? errors.generic);
             } else {
-                setName('');
-                setDescription('');
-                setColor('#FF5C00');
-                setEditingId(null);
+                reset();
+                setSaved(true);
+                setTimeout(() => setSaved(false), 1500);
             }
         });
     };
@@ -61,150 +71,143 @@ export default function TagsManager({
         setError(null);
     };
 
-    const handleCancelEdit = () => {
-        setEditingId(null);
-        setName('');
-        setColor('#FF5C00');
-        setDescription('');
-        setError(null);
-    };
-
     const handleDelete = (tagId: string) => {
         startTransition(async () => {
             await deleteTag(tagId, boardId);
+            if (editingId === tagId) reset();
         });
     };
 
-    const colorPresets = [
-        '#FF5C00', '#6366f1', '#10b981', '#f43f5e', '#a855f7', '#18181b', '#0ea5e9', '#eab308'
-    ];
-
     return (
-        <div className="flex flex-col h-full space-y-6">
-            <div className="space-y-1">
-                <div className="flex items-center gap-2">
-                    <h3 className="font-bold text-lg md:text-xl text-zinc-900 tracking-tight">{dict.tags_title}</h3>
-                    <span className="text-[10px] font-black px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-600">
-                        ∞
-                    </span>
-                </div>
-                <p className="text-xs md:text-sm font-medium text-zinc-500">{dict.tags_desc}</p>
-            </div>
-
-            <div className="flex-1 bg-zinc-50 border border-zinc-100 rounded-[1.5rem] p-4 flex flex-col gap-3 overflow-y-auto max-h-[250px] shadow-inner">
-                {tags.length === 0 ? (
-                    <div className="flex-1 flex flex-col items-center justify-center text-center text-zinc-400 gap-2 min-h-[100px]">
-                        <span className="text-xs font-bold uppercase tracking-widest">{dict.no_tags}</span>
-                    </div>
-                ) : (
-                    tags.map(tag => (
-                        <div key={tag.id} className="flex flex-col gap-2 bg-white px-4 py-3 rounded-xl border border-zinc-100 shadow-sm transition-all hover:border-zinc-200">
-                            <div className="flex flex-row items-center justify-between">
-                                <div className="flex items-center gap-3">
-                                    <span className="w-4 h-4 rounded-full border border-black/10" style={{ backgroundColor: tag.color }} />
-                                    <span className="font-bold text-sm text-zinc-900">{tag.name}</span>
-                                </div>
-                                <div className="flex gap-1">
-                                    <button
-                                        onClick={() => handleEdit(tag)}
-                                        disabled={isPending || editingId === tag.id}
-                                        className="text-zinc-300 hover:text-blue-500 hover:bg-blue-50 p-2 rounded-lg transition-colors active:scale-95 disabled:opacity-50"
-                                    >
-                                        <Pencil className="w-4 h-4" />
-                                    </button>
-                                    <button
-                                        onClick={() => handleDelete(tag.id)}
-                                        disabled={isPending}
-                                        className="text-zinc-300 hover:text-red-500 hover:bg-red-50 p-2 rounded-lg transition-colors active:scale-95 disabled:opacity-50"
-                                    >
-                                        <Trash2 className="w-4 h-4" />
-                                    </button>
-                                </div>
+        <div className="space-y-5">
+            {tags.length === 0 ? (
+                <p className="rounded-lg border border-dashed border-border px-4 py-6 text-center text-sm text-muted-foreground">
+                    {dict.no_tags}
+                </p>
+            ) : (
+                <ul className="divide-y divide-border rounded-lg border border-border">
+                    {tags.map(tag => (
+                        <li key={tag.id} className={cn('flex items-center justify-between gap-3 px-3 py-2', editingId === tag.id && 'bg-muted/50')}>
+                            <div className="min-w-0 space-y-0.5">
+                                <span
+                                    className="inline-flex rounded-full border border-black/10 px-2.5 py-0.5 text-xs font-bold"
+                                    style={{ backgroundColor: tag.color, color: readableTextColor(tag.color) }}
+                                >
+                                    {tag.name}
+                                </span>
+                                {tag.description && <p className="truncate text-xs text-muted-foreground">{tag.description}</p>}
                             </div>
-                            {tag.description && (
-                                <p className="text-xs text-zinc-500 pl-7">{tag.description}</p>
-                            )}
-                        </div>
-                    ))
-                )}
-            </div>
-
-            <div className="relative mt-auto pt-4 border-t border-zinc-100">
-                <div className="space-y-4">
-                    <div className="flex flex-col gap-4">
-                        <div className="space-y-1.5 flex-1">
-                            <Label htmlFor="tag-name" className="text-[10px] uppercase tracking-widest font-bold text-zinc-400 ml-1">{dict.new_tag_name}</Label>
-                            <Input
-                                id="tag-name"
-                                value={name}
-                                onChange={e => setName(e.target.value)}
-                                placeholder={dict.new_tag_ph}
-                                disabled={isPending}
-                                className="h-12 rounded-xl shadow-none border-zinc-200 bg-white focus-visible:ring-[#FF5C00] font-medium px-4 text-sm"
-                            />
-                        </div>
-
-                        <div className="space-y-1.5">
-                            <Label htmlFor="tag-desc" className="text-[10px] uppercase tracking-widest font-bold text-zinc-400 ml-1">{dict.tag_desc || 'Descripción (Opcional)'}</Label>
-                            <Input
-                                id="tag-desc"
-                                value={description}
-                                onChange={e => setDescription(e.target.value)}
-                                maxLength={100}
-                                placeholder={dict.tag_desc_ph}
-                                disabled={isPending}
-                                className="h-10 rounded-xl shadow-none border-zinc-200 bg-white focus-visible:ring-[#FF5C00] text-xs px-4"
-                            />
-                        </div>
-
-                        <div className="space-y-2">
-                            <Label className="text-[10px] uppercase tracking-widest font-bold text-zinc-400 ml-1">{dict.color}</Label>
-                            <div className="flex flex-wrap gap-2">
-                                {colorPresets.map((preset) => (
-                                    <button
-                                        key={preset}
-                                        type="button"
-                                        disabled={isPending}
-                                        onClick={() => setColor(preset)}
-                                        className={`w-8 h-8 rounded-lg border-2 transition-all hover:scale-110 active:scale-90 ${color === preset ? 'border-zinc-900 shadow-sm' : 'border-transparent'}`}
-                                        style={{ backgroundColor: preset }}
-                                    />
-                                ))}
-                                <input
-                                    type="color"
-                                    value={color}
-                                    onChange={(e) => setColor(e.target.value)}
+                            <div className="flex shrink-0 gap-1">
+                                <Button
+                                    type="button"
+                                    variant="ghost"
+                                    size="icon"
+                                    onClick={() => handleEdit(tag)}
                                     disabled={isPending}
-                                    className="w-8 h-8 rounded-lg border-2 border-transparent cursor-pointer bg-white overflow-hidden shadow-inner flex-shrink-0 p-0"
-                                />
+                                    aria-label={`${dict.edit_tag}: ${tag.name}`}
+                                    className="h-9 w-9 text-muted-foreground"
+                                >
+                                    <Pencil aria-hidden="true" />
+                                </Button>
+                                <Button
+                                    type="button"
+                                    variant="ghost"
+                                    size="icon"
+                                    onClick={() => handleDelete(tag.id)}
+                                    disabled={isPending}
+                                    aria-label={`${dict.delete_tag}: ${tag.name}`}
+                                    className="h-9 w-9 text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
+                                >
+                                    <Trash2 aria-hidden="true" />
+                                </Button>
                             </div>
-                        </div>
+                        </li>
+                    ))}
+                </ul>
+            )}
+
+            <div className="space-y-3 rounded-lg border border-border bg-muted/40 p-3 md:p-4">
+                <div className="grid gap-3 sm:grid-cols-2">
+                    <div className="space-y-1.5">
+                        <Label htmlFor="tag-name">{dict.new_tag_name}</Label>
+                        <Input
+                            id="tag-name"
+                            value={name}
+                            onChange={e => setName(e.target.value)}
+                            placeholder={dict.new_tag_ph}
+                            maxLength={30}
+                            disabled={isPending}
+                        />
                     </div>
+                    <div className="space-y-1.5">
+                        <Label htmlFor="tag-desc">{dict.tag_desc}</Label>
+                        <Input
+                            id="tag-desc"
+                            value={description}
+                            onChange={e => setDescription(e.target.value)}
+                            maxLength={100}
+                            placeholder={dict.tag_desc_ph}
+                            disabled={isPending}
+                        />
+                    </div>
+                </div>
 
-                    {error && <p className="text-[10px] text-red-500 font-medium">{(dict as { errors?: Record<string, string> }).errors?.[error] || error}</p>}
-
-                    <div className="flex gap-2">
-                        {editingId && (
-                            <Button
+                <fieldset className="space-y-1.5">
+                    <legend className="text-sm font-medium text-foreground">{dict.color}</legend>
+                    <div className="flex flex-wrap items-center gap-2">
+                        {COLOR_PRESETS.map(preset => (
+                            <button
+                                key={preset}
                                 type="button"
-                                onClick={handleCancelEdit}
                                 disabled={isPending}
-                                variant="outline"
-                                className="w-1/3 h-12 rounded-xl text-zinc-600 font-medium transition-all active:scale-95 text-xs shadow-sm bg-white"
+                                onClick={() => setColor(preset)}
+                                aria-label={preset}
+                                aria-pressed={color === preset}
+                                className={cn(
+                                    'grid h-8 w-8 place-items-center rounded-full border border-black/10 transition-transform active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/40 focus-visible:ring-offset-2',
+                                    color === preset && 'ring-2 ring-foreground ring-offset-2'
+                                )}
+                                style={{ backgroundColor: preset }}
                             >
-                                {dict.cancel}
-                            </Button>
+                                {color === preset && <Check className="h-3.5 w-3.5" style={{ color: readableTextColor(preset) }} aria-hidden="true" />}
+                            </button>
+                        ))}
+                        <input
+                            type="color"
+                            value={color}
+                            onChange={(e) => setColor(e.target.value)}
+                            disabled={isPending}
+                            aria-label={dict.color}
+                            className="h-8 w-8 cursor-pointer rounded-full border border-border bg-card p-0"
+                        />
+                        {name.trim() && (
+                            <span
+                                className="ml-auto inline-flex rounded-full border border-black/10 px-2.5 py-0.5 text-xs font-bold"
+                                style={{ backgroundColor: color, color: readableTextColor(color) }}
+                            >
+                                {name.trim()}
+                            </span>
                         )}
-                        <Button
-                            type="button"
-                            onClick={handleSubmit}
-                            disabled={isPending || !name.trim()}
-                            className={`${editingId ? 'w-2/3' : 'w-full'} h-12 rounded-xl bg-zinc-900 text-white hover:bg-zinc-800 font-bold transition-all active:scale-95 flex items-center justify-center gap-2 text-sm shadow-md`}
-                        >
-                            {!editingId && <Plus className="w-4 h-4" />}
-                            {editingId ? dict.save : dict.add_tag}
-                        </Button>
                     </div>
+                </fieldset>
+
+                {error && <p role="alert" className="text-sm font-medium text-destructive">{error}</p>}
+
+                <div className="flex items-center gap-2">
+                    <Button type="button" onClick={handleSubmit} disabled={isPending || !name.trim()}>
+                        {!editingId && <Plus aria-hidden="true" />}
+                        {editingId ? dict.save_tag : dict.add_tag}
+                    </Button>
+                    {editingId && (
+                        <Button type="button" variant="ghost" onClick={reset} disabled={isPending}>
+                            {dict.cancel}
+                        </Button>
+                    )}
+                    {saved && (
+                        <span className="inline-flex items-center gap-1 text-sm font-medium text-[#2F7457]">
+                            <Check className="h-4 w-4" aria-hidden="true" /> {dict.saved}
+                        </span>
+                    )}
                 </div>
             </div>
         </div>

@@ -1,10 +1,25 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useMemo, useTransition } from 'react';
 import { upvoteIdea } from './actions';
-import { Search, ChevronDown } from 'lucide-react';
+import {
+    Search,
+    ChevronDown,
+    ChevronUp,
+    Check,
+    Inbox,
+    Clock,
+    Hammer,
+    Rocket,
+    CheckCircle2,
+    Archive,
+    Layers,
+    X,
+} from 'lucide-react';
 import ImageLightbox from '@/components/ImageLightbox';
 import AdminResponseBlock from '@/components/AdminResponseBlock';
+import { cn, readableTextColor } from '@/lib/utils';
+import { STATUS_BADGE } from '@/lib/idea-status';
 
 type Idea = {
     id: string;
@@ -17,28 +32,59 @@ type Idea = {
     adminResponse?: string | null;
 };
 
+type StatusFilter = 'all' | Idea['status'];
+
+// Lista pública de ideas con votos. Se usa en el tablero público y en el widget
+// de tablero; el color de marca y el modo oscuro llegan por tokens CSS.
 export default function PublicBoardClient({
     initialIdeas,
     boardSlug,
-    accentColor = "#FF5C00",
-    isDarkMode = false,
     widgetVersion = 'normal',
+    embedded = false,
+    votedIdeaIds = [],
     dict
 }: {
     initialIdeas: Idea[],
     boardSlug: string,
-    accentColor?: string,
-    textColor?: string,
-    isDarkMode?: boolean,
     widgetVersion?: 'normal' | 'lite',
+    // Dentro de un iframe no hay cabecera fija encima de la barra de filtros
+    embedded?: boolean,
+    votedIdeaIds?: string[],
     dict: Record<string, string>
 }) {
     const [searchQuery, setSearchQuery] = useState('');
-    const [statusFilter, setStatusFilter] = useState<'all' | 'en_revision' | 'planeado' | 'en_progreso' | 'completado' | 'descartado'>('all');
+    const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');
     const [dropdownOpen, setDropdownOpen] = useState(false);
+    // Votos del visitante: los que ya constaban en el servidor + los de esta sesión
+    const [voted, setVoted] = useState<Set<string>>(() => new Set(votedIdeaIds));
+    const [, startVoting] = useTransition();
     const dropdownRef = useRef<HTMLDivElement>(null);
+    const isLite = widgetVersion === 'lite';
 
-    // Cerrar el dropdown al hacer click fuera
+    // Clave estable: evita re-ejecutar el efecto por arrays nuevos con el mismo contenido
+    const votedKey = votedIdeaIds.join(',');
+    useEffect(() => {
+        if (!votedKey) return;
+        setVoted(prev => new Set(Array.from(prev).concat(votedKey.split(","))));
+    }, [votedKey]);
+
+    const handleVote = (id: string) => {
+        if (voted.has(id)) return;
+        setVoted(prev => new Set(prev).add(id));
+        startVoting(async () => {
+            try {
+                await upvoteIdea(id, boardSlug);
+            } catch {
+                // Si falla, deshacemos la marca para permitir reintentar
+                setVoted(prev => {
+                    const next = new Set(prev);
+                    next.delete(id);
+                    return next;
+                });
+            }
+        });
+    };
+
     useEffect(() => {
         function handleClickOutside(e: MouseEvent) {
             if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
@@ -50,156 +96,210 @@ export default function PublicBoardClient({
     }, []);
 
     const filterOptions = [
-        { value: 'all', label: dict.filter_all || 'Todas', emoji: '🗂️' },
-        { value: 'en_revision', label: dict.filter_pending || 'En Revisión', emoji: '🤔' },
-        { value: 'planeado', label: dict.filter_planned || 'Planeado', emoji: '🏗️' },
-        { value: 'en_progreso', label: dict.filter_in_progress || 'En Progreso', emoji: '⚙️' },
-        { value: 'completado', label: dict.filter_done || 'Completado', emoji: '✅' },
-        { value: 'descartado', label: dict.filter_discarded || 'Descartadas', emoji: '💨' }
+        { value: 'all', label: dict.filter_all, Icon: Layers },
+        { value: 'en_revision', label: dict.filter_pending, Icon: Clock },
+        { value: 'planeado', label: dict.filter_planned, Icon: Hammer },
+        { value: 'en_progreso', label: dict.filter_in_progress, Icon: Rocket },
+        { value: 'completado', label: dict.filter_done, Icon: CheckCircle2 },
+        { value: 'descartado', label: dict.filter_discarded, Icon: Archive }
     ] as const;
 
-    const filteredIdeas = initialIdeas.filter(idea => {
-        const matchesSearch = idea.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            idea.description.toLowerCase().includes(searchQuery.toLowerCase());
+    const activeFilter = filterOptions.find(o => o.value === statusFilter);
+    const hasFilters = statusFilter !== 'all' || searchQuery.trim().length > 0;
+
+    const filteredIdeas = useMemo(() => initialIdeas.filter(idea => {
+        const q = searchQuery.toLowerCase();
+        const matchesSearch = !q || idea.title.toLowerCase().includes(q) || idea.description.toLowerCase().includes(q);
         const matchesStatus = statusFilter === 'all' || idea.status === statusFilter;
         return matchesSearch && matchesStatus;
-    });
+    }), [initialIdeas, searchQuery, statusFilter]);
+
+    const resetFilters = () => { setSearchQuery(''); setStatusFilter('all'); };
+
+    const statusLabel = (status: Idea['status']) =>
+        status === 'completado' ? dict.tag_done :
+            status === 'planeado' ? dict.tag_planned :
+                status === 'en_progreso' ? dict.tag_in_progress :
+                    status === 'descartado' ? dict.tag_discarded : '';
+
+    const toolbar = (
+        <div className="flex items-center gap-2">
+            <p className="shrink-0 whitespace-nowrap text-sm font-semibold text-muted-foreground">
+                {dict.showing} <span className="text-foreground">{filteredIdeas.length}</span>
+            </p>
+            <div className="relative ml-auto min-w-0 max-w-[280px] flex-1">
+                <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" aria-hidden="true" />
+                <input
+                    type="search"
+                    placeholder={dict.search_placeholder}
+                    aria-label={dict.search_placeholder}
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="h-9 w-full rounded-lg border border-input bg-card pl-9 pr-3 text-sm font-medium text-foreground transition-colors placeholder:text-muted-foreground/70 focus:outline-none focus-visible:ring-2 focus-visible:ring-ring/40"
+                />
+            </div>
+            <div className="relative shrink-0" ref={dropdownRef}>
+                <button
+                    type="button"
+                    onClick={() => setDropdownOpen(p => !p)}
+                    aria-haspopup="listbox"
+                    aria-expanded={dropdownOpen}
+                    className="relative flex h-9 max-w-[150px] cursor-pointer items-center gap-2 rounded-lg border border-input bg-card pl-3 pr-8 text-sm font-semibold text-foreground transition-colors hover:bg-muted focus:outline-none focus-visible:ring-2 focus-visible:ring-ring/40 active:scale-[0.98]"
+                >
+                    {activeFilter && <activeFilter.Icon className="h-3.5 w-3.5 shrink-0 text-muted-foreground" aria-hidden="true" />}
+                    <span className="truncate">{activeFilter?.label}</span>
+                    <ChevronDown className={cn('absolute right-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground transition-transform', dropdownOpen && 'rotate-180')} aria-hidden="true" />
+                </button>
+                {dropdownOpen && (
+                    <div className="absolute right-0 top-[calc(100%+6px)] z-50 min-w-[190px] overflow-hidden rounded-lg border border-border bg-popover py-1.5 shadow-pop animate-pop" role="listbox">
+                        {filterOptions.map(option => {
+                            const isActive = statusFilter === option.value;
+                            return (
+                                <button
+                                    key={option.value}
+                                    type="button"
+                                    role="option"
+                                    aria-selected={isActive}
+                                    onClick={() => { setStatusFilter(option.value); setDropdownOpen(false); }}
+                                    className={cn(
+                                        'flex w-full items-center gap-3 px-3.5 py-2 text-left text-sm font-medium transition-colors',
+                                        isActive ? 'bg-primary/10 text-primary' : 'text-foreground hover:bg-muted'
+                                    )}
+                                >
+                                    <option.Icon className="h-4 w-4" aria-hidden="true" />
+                                    <span>{option.label}</span>
+                                    {isActive && <span className="ml-auto h-1.5 w-1.5 rounded-full bg-primary" aria-hidden="true" />}
+                                </button>
+                            );
+                        })}
+                    </div>
+                )}
+            </div>
+            {hasFilters && (
+                <button
+                    type="button"
+                    onClick={resetFilters}
+                    aria-label={dict.clear}
+                    title={dict.clear}
+                    className="grid h-9 w-9 shrink-0 place-items-center rounded-lg border border-input text-muted-foreground transition-colors hover:bg-muted"
+                >
+                    <X className="h-4 w-4" aria-hidden="true" />
+                </button>
+            )}
+        </div>
+    );
 
     return (
-        <section className="space-y-6" style={{ color: isDarkMode ? '#f4f4f5' : '#18181b' }}>
-            {/* Cabecera con título y filtros */}
-            {widgetVersion !== 'lite' && (
-                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                    <h2 className="font-[family-name:var(--font-jakarta)] text-2xl font-bold tracking-tight inline-flex items-center gap-2" style={{ color: isDarkMode ? '#f4f4f5' : '#18181b' }}>
-                        {dict.showing} <span>🔥</span>
-                    </h2>
-
-                    <div className="flex flex-col sm:flex-row flex-wrap gap-3">
-                        <div className="relative">
-                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400" />
-                            <input
-                                type="text"
-                                placeholder={dict.search_placeholder}
-                                value={searchQuery}
-                                onChange={(e) => setSearchQuery(e.target.value)}
-                                style={{
-                                    outlineColor: accentColor,
-                                    boxShadow: `0 0 0 2px ${accentColor}10`,
-                                    color: isDarkMode ? '#f4f4f5' : '#18181b'
-                                } as React.CSSProperties}
-                                className={`h-11 pl-9 pr-4 rounded-2xl border ${isDarkMode ? 'border-zinc-800 bg-zinc-900 placeholder:text-zinc-600 focus-visible:bg-zinc-800' : 'border-zinc-200 bg-[#FAFAFA] focus-visible:bg-white'} text-sm font-medium focus:outline-none transition-colors w-full sm:w-64 shadow-sm`}
-                            />
-                        </div>
-                        {/* Custom Dropdown */}
-                        <div className="relative" ref={dropdownRef}>
-                            <button
-                                type="button"
-                                onClick={() => setDropdownOpen(p => !p)}
-                                style={{ borderColor: dropdownOpen ? accentColor : (isDarkMode ? '#27272a' : undefined), color: isDarkMode ? '#f4f4f5' : '#18181b', backgroundColor: isDarkMode ? '#18181b' : '#FAFAFA' } as React.CSSProperties}
-                                className={`h-11 pl-4 pr-10 rounded-2xl border ${isDarkMode ? 'border-zinc-800 hover:border-zinc-700 hover:bg-zinc-900' : 'border-zinc-200 hover:border-zinc-300 hover:bg-white'} text-sm font-bold focus:outline-none transition-all cursor-pointer shadow-sm flex items-center gap-2 min-w-[160px] relative`}
-                            >
-                                <span>{filterOptions.find(o => o.value === statusFilter)?.emoji}</span>
-                                <span className="flex-1 text-left">{filterOptions.find(o => o.value === statusFilter)?.label}</span>
-                                <ChevronDown
-                                    className={`absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400 transition-transform duration-200 ${dropdownOpen ? 'rotate-180' : ''}`}
-                                />
-                            </button>
-
-                            {dropdownOpen && (
-                                <div className={`absolute top-[calc(100%+8px)] right-0 z-50 ${isDarkMode ? 'bg-zinc-900 border-zinc-800 shadow-black/50' : 'bg-white border-zinc-200 shadow-zinc-200/60'} border rounded-2xl shadow-xl py-2 min-w-full overflow-hidden animate-in fade-in slide-in-from-top-2 duration-150`}>
-                                    {filterOptions.map(option => {
-                                        const isActive = statusFilter === option.value;
-                                        return (
-                                            <button
-                                                key={option.value}
-                                                type="button"
-                                                onClick={() => { setStatusFilter(option.value); setDropdownOpen(false); }}
-                                                style={isActive ? { color: accentColor, backgroundColor: `${accentColor}10` } : { color: isDarkMode ? '#f4f4f5' : '#18181b' }}
-                                                className={`w-full flex items-center gap-3 px-4 py-2.5 text-sm font-bold ${isDarkMode ? 'hover:bg-zinc-800/50' : 'hover:bg-zinc-50'} transition-colors text-left`}
-                                            >
-                                                <span>{option.emoji}</span>
-                                                <span>{option.label}</span>
-                                                {isActive && <span className="ml-auto w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ backgroundColor: accentColor }} />}
-                                            </button>
-                                        );
-                                    })}
-                                </div>
-                            )}
-                        </div>
-                    </div>
+        <section className="space-y-4 text-foreground">
+            {!isLite && (
+                <div
+                    className={cn(
+                        'sticky z-20 bg-background/85 py-3 backdrop-blur',
+                        embedded ? 'top-0 bg-card/90 py-2' : '-mx-4 top-14 px-4 md:static md:mx-0 md:px-0 md:py-0'
+                    )}
+                >
+                    {toolbar}
                 </div>
             )}
 
-            {/* Lista de ideas */}
-            <div className="space-y-3 md:space-y-4">
-                {filteredIdeas.map((idea) => (
-                    <div key={idea.id} className={`group flex gap-3 md:gap-5 p-4 md:p-6 ${isDarkMode ? 'bg-zinc-900 border-zinc-800 hover:border-zinc-700 hover:shadow-black/50' : 'bg-white border-zinc-200 hover:border-zinc-300 hover:shadow-zinc-200/50'} border rounded-2xl md:rounded-3xl hover:shadow-lg transition-all`}>
-                        <form action={upvoteIdea.bind(null, idea.id, boardSlug)} className="shrink-0 text-[#FF5C00]">
+            <div className={cn(isLite ? 'space-y-2' : 'space-y-3')}>
+                {filteredIdeas.map((idea) => {
+                    const hasVoted = voted.has(idea.id);
+                    return (
+                        <article
+                            key={idea.id}
+                            className={cn(
+                                'flex gap-3 rounded-xl border border-border bg-card transition-shadow hover:shadow-card md:gap-4',
+                                isLite ? 'p-3' : 'p-4 md:p-5'
+                            )}
+                        >
                             <button
-                                type="submit"
-                                aria-label={`${dict.vote} (${idea.votesCount})`}
-                                style={{
-                                    '--hover-bg': `${accentColor}15`,
-                                    '--hover-border': accentColor,
-                                    '--hover-text': accentColor,
-                                    backgroundColor: isDarkMode ? '#18181b' : '#FAFAFA'
-                                } as React.CSSProperties}
-                                className={`flex flex-col items-center justify-center w-14 md:w-16 h-[4.5rem] md:h-20 border ${isDarkMode ? 'border-zinc-800 hover:bg-[var(--hover-bg)]' : 'border-zinc-200 hover:bg-[var(--hover-bg)]'} rounded-xl md:rounded-2xl hover:border-[var(--hover-border)] hover:text-[var(--hover-text)] transition-colors active:scale-95 group/btn shadow-sm`}
+                                type="button"
+                                onClick={() => handleVote(idea.id)}
+                                disabled={hasVoted}
+                                aria-label={`${hasVoted ? dict.voted : dict.vote} (${idea.votesCount})`}
+                                aria-pressed={hasVoted}
+                                className={cn(
+                                    'flex shrink-0 flex-col items-center justify-center gap-0.5 rounded-lg border transition-colors active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/40',
+                                    isLite ? 'h-12 w-11' : 'h-16 w-14',
+                                    hasVoted
+                                        ? 'border-primary bg-primary/10 text-primary'
+                                        : 'border-border bg-muted/40 text-muted-foreground hover:border-primary hover:bg-primary/10 hover:text-primary'
+                                )}
                             >
-                                <span className="text-zinc-400 font-black mb-0.5 md:mb-1 text-[10px] md:text-sm group-hover/btn:text-[var(--hover-text)]" aria-hidden="true">▲</span>
-                                <span className={`font-black text-lg md:text-xl leading-none group-hover/btn:text-[var(--hover-text)] ${isDarkMode ? 'text-zinc-100' : 'text-zinc-900'}`}>{idea.votesCount}</span>
+                                {hasVoted
+                                    ? <Check className="h-4 w-4" aria-hidden="true" />
+                                    : <ChevronUp className="h-4 w-4" aria-hidden="true" />}
+                                <span className="text-base font-bold leading-none text-foreground">{idea.votesCount}</span>
+                                {!isLite && (
+                                    <span className="text-[9px] opacity-80">{hasVoted ? dict.voted : dict.vote}</span>
+                                )}
                             </button>
-                        </form>
 
-                        <div className="flex-1 min-w-0 flex flex-col justify-center">
-                            <div className="flex flex-col sm:flex-row sm:items-center flex-wrap gap-1.5 md:gap-3 mb-1.5 md:mb-2 text-left min-w-0">
-                                <h3 className="font-[family-name:var(--font-jakarta)] text-lg md:text-xl font-bold tracking-tight truncate leading-tight" style={{ color: isDarkMode ? '#f4f4f5' : '#18181b' }}>
+                            <div className="min-w-0 flex-1">
+                                {!isLite && (idea.status !== 'en_revision' || idea.tag) && (
+                                    <div className="mb-1.5 flex flex-wrap items-center gap-2">
+                                        {idea.status !== 'en_revision' && (
+                                            <span className={cn('rounded-full px-2 py-0.5 text-[10px] font-bold', STATUS_BADGE[idea.status])}>
+                                                {statusLabel(idea.status)}
+                                            </span>
+                                        )}
+                                        {idea.tag && (
+                                            <span
+                                                className="inline-flex items-center rounded-full border border-black/10 px-2 py-0.5 text-[10px] font-bold"
+                                                style={{ backgroundColor: idea.tag.color, color: readableTextColor(idea.tag.color) }}
+                                            >
+                                                {idea.tag.name}
+                                            </span>
+                                        )}
+                                    </div>
+                                )}
+
+                                <h3 className={cn('break-words font-heading font-bold leading-snug text-foreground', isLite ? 'text-sm' : 'text-base md:text-lg')}>
                                     {idea.title}
                                 </h3>
-                                {idea.status !== 'en_revision' && widgetVersion !== 'lite' && (
-                                    <span className={`w-fit px-2 md:px-3 py-0.5 md:py-1 rounded-full text-[9px] md:text-[11px] uppercase font-black md:font-bold tracking-wider 
-                                        ${idea.status === 'completado' ? 'bg-green-100 text-green-700 border border-green-200' :
-                                            idea.status === 'planeado' ? 'bg-amber-100 text-amber-700 border border-amber-200' :
-                                                idea.status === 'en_progreso' ? 'bg-blue-100 text-blue-700 border border-blue-200' :
-                                                    idea.status === 'descartado' ? 'bg-zinc-100 text-zinc-500 border border-zinc-200' : ''}`}>
-                                        {idea.status === 'completado' ? (dict.tag_done || 'Completado') :
-                                            idea.status === 'planeado' ? (dict.tag_planned || 'Planeado') :
-                                                idea.status === 'en_progreso' ? (dict.tag_in_progress || 'En Progreso') :
-                                                    idea.status === 'descartado' ? (dict.tag_discarded || 'Descartado') : ''}
-                                    </span>
+                                <p className={cn(
+                                    'mt-1 whitespace-pre-wrap break-words text-sm leading-relaxed text-muted-foreground',
+                                    isLite ? 'line-clamp-1' : 'line-clamp-2 md:line-clamp-3'
+                                )}>
+                                    {idea.description}
+                                </p>
+
+                                {idea.imageUrl && !isLite && (
+                                    <ImageLightbox
+                                        src={idea.imageUrl}
+                                        alt={idea.title}
+                                        className="mt-3 rounded-lg border border-border"
+                                        closeLabel={dict.close}
+                                    />
                                 )}
-                                {idea.tag && widgetVersion !== 'lite' && (
-                                    <span
-                                        className="w-fit flex items-center gap-1.5 px-2 md:px-3 py-0.5 md:py-1 rounded-full text-[9px] md:text-[11px] uppercase font-black tracking-wider border border-zinc-200 bg-white"
-                                    >
-                                        <span className="w-2 h-2 rounded-full" style={{ backgroundColor: idea.tag.color }} />
-                                        <span className={`${isDarkMode ? 'text-zinc-300' : 'text-zinc-600'}`}>{idea.tag.name}</span>
-                                    </span>
+                                {!isLite && (
+                                    <AdminResponseBlock
+                                        response={idea.adminResponse ?? ''}
+                                        label={dict.admin_response}
+                                    />
                                 )}
                             </div>
-                            <p className={`font-medium text-xs md:text-base leading-relaxed whitespace-pre-wrap break-words ${widgetVersion === 'lite' ? 'line-clamp-1 opacity-60' : 'line-clamp-2 md:line-clamp-3 opacity-80'}`} style={{ color: isDarkMode ? '#d4d4d8' : '#18181b' }}>
-                                {idea.description}
-                            </p>
-                            {idea.imageUrl && widgetVersion !== 'lite' && (
-                                <ImageLightbox
-                                    src={idea.imageUrl}
-                                    alt={idea.title}
-                                    className="mt-4 rounded-xl border border-zinc-100 shadow-sm"
-                                />
-                            )}
-                            <AdminResponseBlock
-                                response={idea.adminResponse ?? ''}
-                                label={dict.admin_response}
-                            />
-                        </div>
-                    </div>
-                ))}
+                        </article>
+                    );
+                })}
 
                 {filteredIdeas.length === 0 && (
-                    <div className={`p-16 text-center border-2 rounded-3xl border-dashed ${isDarkMode ? 'bg-zinc-900/50 border-zinc-800' : 'bg-white border-zinc-200'}`}>
-                        <span className="text-4xl block mb-4">👀</span>
-                        <p className="font-bold text-lg" style={{ color: isDarkMode ? '#f4f4f5' : '#18181b' }}>{dict.empty_title}</p>
-                        <p className="font-medium mt-1 opacity-60" style={{ color: isDarkMode ? '#d4d4d8' : '#18181b' }}>{dict.empty_desc}</p>
+                    <div className="rounded-xl border-2 border-dashed border-border bg-card p-10 text-center">
+                        {initialIdeas.length === 0
+                            ? <Inbox className="mx-auto mb-3 h-9 w-9 text-muted-foreground" aria-hidden="true" />
+                            : <Search className="mx-auto mb-3 h-9 w-9 text-muted-foreground" aria-hidden="true" />}
+                        <p className="font-heading font-bold text-foreground">{dict.empty_title}</p>
+                        <p className="mt-1 text-sm font-medium text-muted-foreground">{dict.empty_desc}</p>
+                        {initialIdeas.length > 0 && (
+                            <button
+                                type="button"
+                                onClick={resetFilters}
+                                className="mt-4 inline-flex h-9 items-center rounded-lg bg-primary px-4 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90"
+                            >
+                                {dict.clear}
+                            </button>
+                        )}
                     </div>
                 )}
             </div>

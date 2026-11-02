@@ -4,25 +4,11 @@ import { db } from "@/db";
 import { ideas, votes, boards } from "@/db/schema";
 import { and, eq, desc } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
-import { cookies, headers } from "next/headers";
+import { cookies } from "next/headers";
 import { v4 as uuidv4 } from 'uuid';
 import { Resend } from 'resend';
 import { escapeHtml, sanitizeHeader, sha256 } from "@/lib/feedback";
-
-// IP de confianza: priorizamos la cabecera de Cloudflare y, como respaldo,
-// el último valor de X-Forwarded-For (el más cercano a nuestro proxy).
-function getClientIp(): string {
-    const cfIp = headers().get('cf-connecting-ip');
-    if (cfIp) return cfIp.trim();
-
-    const forwardedFor = headers().get('x-forwarded-for');
-    if (forwardedFor) {
-        const parts = forwardedFor.split(',').map(p => p.trim()).filter(Boolean);
-        if (parts.length > 0) return parts[parts.length - 1];
-    }
-
-    return 'unknown';
-}
+import { VOTER_COOKIE, fingerprintFor, getClientIp } from "@/lib/voter";
 
 async function getIpHash() {
     return sha256(getClientIp());
@@ -31,15 +17,14 @@ async function getIpHash() {
 // Identidad de voto = cookie de dispositivo + IP. Dificulta el voto múltiple
 // sin depender únicamente de una cookie borrable.
 async function getVoterFingerprint(): Promise<string> {
-    const cookieStore = cookies();
-    let cookieId = cookieStore.get('voter-id')?.value;
+    let cookieId = cookies().get(VOTER_COOKIE)?.value;
 
     if (!cookieId) {
         cookieId = uuidv4();
-        cookies().set('voter-id', cookieId, { maxAge: 60 * 60 * 24 * 365 });
+        cookies().set(VOTER_COOKIE, cookieId, { maxAge: 60 * 60 * 24 * 365 });
     }
 
-    return sha256(`${cookieId}|${getClientIp()}`);
+    return fingerprintFor(cookieId);
 }
 
 export async function submitIdea(boardId: string, slug: string, formData: FormData) {
@@ -125,14 +110,14 @@ export async function submitIdea(boardId: string, slug: string, formData: FormDa
                             <h2 style="font-size: 20px; font-weight: 800; margin: 0 0 16px 0; line-height: 1.2;">Alguien te está dando la chapa en <b>${escapeHtml(boardName)}</b></h2>
                             <p style="font-size: 15px; color: #52525b; margin: 0 0 24px 0; line-height: 1.5;">Acaban de dejarte una nueva sugerencia en tu tablón. O igual es una idea brillante, quién sabe.</p>
                             
-                            <div style="background-color: #fff7ed; border-left: 4px solid #FF5C00; padding: 16px; border-radius: 8px; margin-bottom: 32px;">
-                                <p style="font-size: 12px; text-transform: uppercase; letter-spacing: 1px; color: #FF5C00; font-weight: 800; margin: 0 0 8px 0;">TÍTULO:</p>
+                            <div style="background-color: #FFF0E8; border-left: 4px solid #FF5C00; padding: 16px; border-radius: 8px; margin-bottom: 32px;">
+                                <p style="font-size: 12px; text-transform:; letter-spacing: 1px; color: #FF5C00; font-weight: 800; margin: 0 0 8px 0;">TÍTULO:</p>
                                 <p style="font-size: 16px; font-weight: 700; margin: 0 0 16px 0; color: #18181b;">${escapeHtml(title)}</p>
-                                <p style="font-size: 12px; text-transform: uppercase; letter-spacing: 1px; color: #FF5C00; font-weight: 800; margin: 0 0 8px 0;">DESCRIPCIÓN:</p>
+                                <p style="font-size: 12px; text-transform:; letter-spacing: 1px; color: #FF5C00; font-weight: 800; margin: 0 0 8px 0;">DESCRIPCIÓN:</p>
                                 <p style="font-size: 14px; margin: 0; color: #3f3f46; white-space: pre-wrap; font-style: italic;">"${escapeHtml(description)}"</p>
                             </div>
 
-                            <a href="https://pidemelo.app/dashboard/board/${boardId}" style="display: block; background-color: #FF5C00; color: #ffffff; font-weight: 900; text-decoration: none; padding: 16px 24px; border-radius: 9999px; font-size: 12px; text-transform: uppercase; letter-spacing: 2px; text-align: center;">Entrar al panel y gestionar</a>
+                            <a href="https://pidemelo.app/dashboard/board/${boardId}" style="display: block; background-color: #FF5C00; color: #ffffff; font-weight: 900; text-decoration: none; padding: 16px 24px; border-radius: 9999px; font-size: 12px; text-transform:; letter-spacing: 2px; text-align: center;">Entrar al panel y gestionar</a>
 
                             <p style="font-size: 14px; color: #71717a; margin: 24px 0 0 0; text-align: center;">Tú mandas: pásala a planeado, bórrala o ignórala épicamente.</p>
                         </div>
@@ -155,14 +140,14 @@ export async function submitIdea(boardId: string, slug: string, formData: FormDa
                             <h2 style="font-size: 20px; font-weight: 800; margin: 0 0 16px 0; line-height: 1.2;">Someone is requesting stuff on <b>${escapeHtml(boardName)}</b></h2>
                             <p style="font-size: 15px; color: #52525b; margin: 0 0 24px 0; line-height: 1.5;">Someone just dropped a new request on your board. Or maybe it's a genius idea, who knows.</p>
                             
-                            <div style="background-color: #fff7ed; border-left: 4px solid #FF5C00; padding: 16px; border-radius: 8px; margin-bottom: 32px;">
-                                <p style="font-size: 12px; text-transform: uppercase; letter-spacing: 1px; color: #FF5C00; font-weight: 800; margin: 0 0 8px 0;">TITLE:</p>
+                            <div style="background-color: #FFF0E8; border-left: 4px solid #FF5C00; padding: 16px; border-radius: 8px; margin-bottom: 32px;">
+                                <p style="font-size: 12px; text-transform:; letter-spacing: 1px; color: #FF5C00; font-weight: 800; margin: 0 0 8px 0;">TITLE:</p>
                                 <p style="font-size: 16px; font-weight: 700; margin: 0 0 16px 0; color: #18181b;">${escapeHtml(title)}</p>
-                                <p style="font-size: 12px; text-transform: uppercase; letter-spacing: 1px; color: #FF5C00; font-weight: 800; margin: 0 0 8px 0;">DESCRIPTION:</p>
+                                <p style="font-size: 12px; text-transform:; letter-spacing: 1px; color: #FF5C00; font-weight: 800; margin: 0 0 8px 0;">DESCRIPTION:</p>
                                 <p style="font-size: 14px; margin: 0; color: #3f3f46; white-space: pre-wrap; font-style: italic;">"${escapeHtml(description)}"</p>
                             </div>
 
-                            <a href="https://pidemelo.app/dashboard/board/${boardId}" style="display: block; background-color: #FF5C00; color: #ffffff; font-weight: 900; text-decoration: none; padding: 16px 24px; border-radius: 9999px; font-size: 12px; text-transform: uppercase; letter-spacing: 2px; text-align: center;">Open dashboard to review</a>
+                            <a href="https://pidemelo.app/dashboard/board/${boardId}" style="display: block; background-color: #FF5C00; color: #ffffff; font-weight: 900; text-decoration: none; padding: 16px 24px; border-radius: 9999px; font-size: 12px; text-transform:; letter-spacing: 2px; text-align: center;">Open dashboard to review</a>
 
                             <p style="font-size: 14px; color: #71717a; margin: 24px 0 0 0; text-align: center;">You're the boss: move it to planned, delete it, or ignore it entirely.</p>
                         </div>
