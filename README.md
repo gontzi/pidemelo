@@ -140,7 +140,11 @@ cp .dev.vars.example .dev.vars   # y rellena los valores (o cp .env .dev.vars)
    Configurar Build command `pnpm build:worker` y Deploy command
    `pnpm deploy:worker`. Workers Builds instala las dependencias desde
    `pnpm-lock.yaml`; `.nvmrc` fija Node 22 y `packageManager` fija pnpm 10.34.6.
-   Para previsualizaciones, usar `npx wrangler preview` después del build.
+   Para las ramas de vista previa (PRs), en *Compilaciones → Base de vistas previas*
+   usar `npx wrangler versions upload` como comando de vista previa: crea una
+   versión con URL propia sin desplegarla a producción. (`wrangler preview` está
+   en beta, exige un bloque `previews` y no admite el service binding
+   `WORKER_SELF_REFERENCE` que usa OpenNext).
    También se puede desplegar a mano con `pnpm deploy` desde Linux/macOS.
 5. Añadir el dominio `pidemelo.app` al Worker y ajustar DNS.
 
