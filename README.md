@@ -140,11 +140,12 @@ cp .dev.vars.example .dev.vars   # y rellena los valores (o cp .env .dev.vars)
    Configurar Build command `pnpm build:worker` y Deploy command
    `pnpm deploy:worker`. Workers Builds instala las dependencias desde
    `pnpm-lock.yaml`; `.nvmrc` fija Node 22 y `packageManager` fija pnpm 10.34.6.
-   Para las ramas de vista previa (PRs), en *Compilaciones → Base de vistas previas*
-   usar `npx wrangler versions upload` como comando de vista previa: crea una
-   versión con URL propia sin desplegarla a producción. (`wrangler preview` está
-   en beta, exige un bloque `previews` y no admite el service binding
-   `WORKER_SELF_REFERENCE` que usa OpenNext).
+   Las ramas de vista previa (PRs) usan Worker Previews: en *Compilaciones →
+   Base de vistas previas* el comando es `npx wrangler preview`, que exige el
+   bloque `"previews": {}` de `wrangler.jsonc`. Cada rama crea su propia vista
+   previa con su configuración copiada de la base (si cambias la base, revisa
+   también las vistas previas ya creadas). `wrangler versions upload` no sirve
+   aquí: falla porque el nombre de la vista previa no coincide con el Worker.
    También se puede desplegar a mano con `pnpm deploy` desde Linux/macOS.
 5. Añadir el dominio `pidemelo.app` al Worker y ajustar DNS.
 
